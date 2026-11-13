@@ -261,6 +261,7 @@ async function acceptConfirmation(page) {
   });
   await check('a stale tab cannot overwrite records saved in another tab', async () => {
     const second = await context.newPage();
+    second.on('pageerror', err => report.browserErrors.push(err.message));
     await second.clock.install({ time: new Date('2026-11-13T12:00:00Z') });
     await second.goto(base);
     await navigate(second, 'fechamento');
@@ -272,6 +273,10 @@ async function acceptConfirmation(page) {
     await navigate(page, 'fechamento');
     await fill(page, 'dia', { data: '2026-11-09', ganhos: '70', entregas: '7' });
     await page.locator('#dia button[value="salvar"]').click();
+    await page.waitForFunction(() => {
+      const message = document.querySelector('#mensagem');
+      return message.dataset.error === 'true' && message.textContent.includes('outra aba');
+    });
     assert.equal((await readRecords(page)).length, finalCount, 'stale save must be rejected rather than drop concurrent record');
     assert.ok((await page.locator('#mensagem').innerText()).includes('outra aba'));
     await second.close();
@@ -302,6 +307,16 @@ async function acceptConfirmation(page) {
   report.errors.push(error.stack || error.message);
   console.error(error.stack || error);
   if (page && !page.isClosed()) {
+    try {
+      report.failureState = await page.evaluate(() => ({
+        notice: document.querySelector('#mensagem')?.textContent,
+        noticeError: document.querySelector('#mensagem')?.dataset.error,
+        panel: document.querySelector('.view:not([hidden])')?.id,
+        recordCount: JSON.parse(localStorage.getItem('minha-rodagem-v1') || '{"registros":[]}').registros.length,
+        url: location.href
+      }));
+      console.error('FAILURE_STATE', JSON.stringify(report.failureState));
+    } catch (diagnosticError) { report.diagnosticError = diagnosticError.message; }
     try { await page.screenshot({ path: path.join(__dirname, 'failure.png'), fullPage: true, timeout: 10000 }); }
     catch (captureError) { report.screenshotError = captureError.message; }
   }
@@ -310,4 +325,5 @@ async function acceptConfirmation(page) {
   if (browser) await browser.close();
   if (server) await new Promise(resolve => server.close(resolve));
   await fs.writeFile(path.join(__dirname, 'report.json'), JSON.stringify(report, null, 2));
+  console.log('BROWSER_REPORT', JSON.stringify(report));
 });

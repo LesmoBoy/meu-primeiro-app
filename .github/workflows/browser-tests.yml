@@ -30,6 +30,20 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Testar o app publicado com dados fictícios
         run: npm run test:browser
+      - name: Exibir prévia para revisão visual
+        if: always()
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          for (const name of ['failure.png','mobile-dashboard.png']) {
+            const path = 'qa/' + name;
+            if (!fs.existsSync(path)) continue;
+            const encoded = fs.readFileSync(path).toString('base64');
+            for (let start = 0, part = 0; start < encoded.length; start += 4000, part++) {
+              console.log('BROWSER_IMAGE:' + name + ':' + part + ':' + encoded.slice(start,start+4000));
+            }
+          }
+          NODE
       - name: Guardar relatório e capturas
         if: always()
         uses: actions/upload-artifact@v4
