@@ -311,6 +311,11 @@ async function acceptConfirmation(page) {
     }, null, { timeout: 15000 });
     await page.reload();
     await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller), null, { timeout: 15000 });
+    const expectedVersion = report.appVersion.match(/v(\d+\.\d+\.\d+)/)?.[1];
+    await page.waitForFunction(async version => (await caches.keys()).some(key => key.endsWith(':' + version)),expectedVersion,{timeout:15000});
+    const browserCache = await context.newCDPSession(page);
+    await browserCache.send('Network.clearBrowserCache');
+    await browserCache.detach();
     await context.setOffline(true);
     await snapshot('immediately-after-setOffline');
     await page.reload({ waitUntil: 'domcontentloaded' });

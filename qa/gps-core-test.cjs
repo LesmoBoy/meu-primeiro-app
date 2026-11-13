@@ -43,6 +43,18 @@ check('accuracy thresholds differ by mode and mode can be changed canonically',(
   eco=Geo.validate({...eco,mode:'precise'});assert.equal(eco.mode,'precise');
   assert.equal(Geo.accept(eco,position(0,0,now,60),now).reason,'accuracy');
 });
+check('coarse fixes with unknown speed cannot accumulate stationary GPS drift',()=>{
+  let track=Geo.create('coarse-stationary','eco',now);
+  track=Geo.accept(track,position(-23.55,-46.63,now,60,null),now).track;
+  for(let i=1;i<=20;i++){
+    const t=now+i*15000;
+    const result=Geo.accept(track,position(i%2?-23.54955:-23.55,-46.63,t,60,null),t);
+    assert.equal(result.accepted,false);assert.equal(result.reason,'jitter');track=result.track;
+  }
+  assert.equal(track.totalMeters,0);assert.equal(track.points.length,1);assert.equal(track.gaps,0);
+  const moving=Geo.accept(track,position(-23.548,-46.63,now+315000,60,null),now+315000);
+  assert.ok(moving.accepted,moving.reason);assert.ok(moving.track.totalMeters>200);
+});
 check('malformed, stale, future and repeated timestamps are rejected',()=>{
   const track=first();
   for(const bad of [position(NaN,0,now+15000),position(91,0,now+15000),position(0,181,now+15000),position(0,0,now+15000,-1)])assert.equal(Geo.accept(track,bad,now+15000).reason,'invalid');

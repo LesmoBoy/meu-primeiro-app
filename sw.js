@@ -1,6 +1,6 @@
 const PREFIXO = 'rodagem-cache:' + self.registration.scope + ':';
-const CACHE = PREFIXO + '2.0.2';
-const ARQUIVOS = ['./index.html','./styles.css','./app.js','./experience.js','./manifest.webmanifest','./icon-192.png','./icon-512.png'];
+const CACHE = PREFIXO + '2.1.0';
+const ARQUIVOS = ['./index.html','./styles.css','./enhancements.css','./app.js','./gps-core.js','./tracking.js','./experience.js','./interactions.js','./vendor/leaflet/leaflet.js','./vendor/leaflet/leaflet.css','./assets/inicio.svg','./assets/fechamento.svg','./assets/consumo.svg','./assets/historico.svg','./assets/ajustes.svg','./manifest.webmanifest','./icon-192.png','./icon-512.png'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(

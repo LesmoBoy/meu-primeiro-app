@@ -223,7 +223,7 @@
     if (el('gps-exportar')) el('gps-exportar').disabled = !track?.points.length;
     if (el('gps-apagar')) el('gps-apagar').disabled = !track && !invalidRoutes.has(viewedId || journey?.id);
     if (el('gps-voltar')) { el('gps-voltar').hidden = !historical; el('gps-voltar').textContent = journey?.id ? 'Voltar à jornada' : 'Ir para o início'; }
-    text('gps-tempo',historical ? 'Percurso salvo' : el('jornada-tempo')?.textContent || '00:00:00');
+    text('gps-tempo',historical ? 'Salvo' : el('jornada-tempo')?.textContent || '00:00:00');
     if (el('gps-pausar')) { el('gps-pausar').hidden = historical || !['running','paused'].includes(journey?.estado); el('gps-pausar').textContent = journey?.estado === 'paused' ? 'Retomar jornada' : 'Pausar jornada'; }
     if (el('gps-encerrar')) el('gps-encerrar').hidden = historical || !['running','paused'].includes(journey?.estado);
     if (draw && isMapVisible()) drawMap(track);

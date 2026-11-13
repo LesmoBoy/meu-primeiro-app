@@ -41,6 +41,34 @@ const callCount = page => page.evaluate(() => window.__gpsTest.calls.length);
 async function setPosition(page, fields) { await page.evaluate(fields => Object.assign(window.__gpsTest.position,fields),fields); }
 async function advance(page, ms = 16000) { await page.clock.fastForward(ms); await page.evaluate(() => Promise.resolve()); }
 async function waitFix(page, count=1) { await page.waitForFunction(count => window.__gpsTest.calls.length >= count,count); }
+async function paintMap(page) {
+  // Leaflet batches Canvas redraw and resize through requestAnimationFrame.
+  // A mocked clock must let those real browser frames run before screenshots.
+  await page.clock.runFor(350);
+}
+async function paintedRouteBounds(page) {
+  return page.evaluate(()=>{
+    const map=document.querySelector('#mapa');const box=map.getBoundingClientRect();const output=[];
+    for(const canvas of map.querySelectorAll('.leaflet-overlay-pane canvas')) {
+      const rect=canvas.getBoundingClientRect();if(!rect.width||!rect.height)continue;
+      const sx=canvas.width/rect.width,sy=canvas.height/rect.height;
+      const x0=Math.max(0,Math.ceil((box.left-rect.left)*sx));
+      const y0=Math.max(0,Math.ceil((box.top-rect.top)*sy));
+      const x1=Math.min(canvas.width,Math.floor((box.right-rect.left)*sx));
+      const y1=Math.min(canvas.height,Math.floor((box.bottom-rect.top)*sy));
+      const pixels=canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data;
+      let minX=Infinity,minY=Infinity,maxX=-1,maxY=-1,count=0;
+      for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++)if(pixels[(y*canvas.width+x)*4+3]>128) {
+        minX=Math.min(minX,x);minY=Math.min(minY,y);maxX=Math.max(maxX,x);maxY=Math.max(maxY,y);count++;
+      }
+      output.push({kind:'canvas',width:count?(maxX-minX+1)/sx:0,height:count?(maxY-minY+1)/sy:0,paintedPixels:count});
+    }
+    for(const element of map.querySelectorAll('.leaflet-overlay-pane svg path')) {
+      const bounds=element.getBBox();output.push({kind:'svg',width:bounds.width,height:bounds.height});
+    }
+    return output;
+  });
+}
 
 async function newMockContext(base, initial={}) {
   const context = await browser.newContext({viewport:{width:390,height:844},locale:'pt-BR',timezoneId:'America/Sao_Paulo',acceptDownloads:true});
@@ -163,16 +191,19 @@ async function newMockContext(base, initial={}) {
       await route(page,'inicio');await page.locator('#jornada-mapa').click();
     }
     await page.locator('#percurso').waitFor({state:'visible'});
+    await paintMap(page);
     await page.locator('#mapa.leaflet-container').waitFor({state:'visible'});
     assert.ok(await page.locator('#mapa .leaflet-overlay-pane path, #mapa .leaflet-overlay-pane canvas').count()>0,'recorded route should draw as a vector');
     assert.ok(await page.evaluate(id=>RodagemGPS.getSummary(id)?.points>=4,id));
     assert.ok((await page.locator('#gps-distancia').innerText()).trim().length);
     for(const width of [320,390,1280]){
       await page.setViewportSize({width,height:width>500?960:844});
+      await paintMap(page);
       const size=await page.evaluate(()=>({content:document.documentElement.scrollWidth,viewport:innerWidth}));
       assert.ok(size.content<=size.viewport+1,`Map layout overflows at ${width}: ${JSON.stringify(size)}`);
     }
     await page.setViewportSize({width:390,height:844});
+    await paintMap(page);
   });
   await check('ending the journey prefills distance and saved history can reopen its route',async()=>{
     await route(page,'inicio');await page.locator('#jornada-encerrar').click();await page.locator('#fechamento').waitFor({state:'visible'});
@@ -183,6 +214,7 @@ async function newMockContext(base, initial={}) {
     const saved=(await records(page))[0];assert.equal(saved.jornadaId,id);assert.equal(saved.km,Math.round(km*100));
     await route(page,'historico');await page.locator('#lista button').filter({hasText:/percurso|trajeto/i}).click();
     await page.locator('#percurso').waitFor({state:'visible'});
+    await paintMap(page);
     assert.ok(await meters(page,id)>250);
   });
   await check('GPX exports contain the recorded segments and routes survive a page reload',async()=>{
@@ -192,11 +224,15 @@ async function newMockContext(base, initial={}) {
     assert.ok((gpx.match(/<trkseg>/g)||[]).length>=2,'the exported route must retain the pause boundary');
     const distance=await meters(page,id);await page.reload();
     await page.evaluate(id=>RodagemGPS.openRoute(id),id);await page.locator('#percurso').waitFor({state:'visible'});
+    await paintMap(page);
     assert.equal(await meters(page,id),distance);assert.equal((await records(page)).length,1);
     await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));
+    report.mapPaintedBounds=await paintedRouteBounds(page);
+    assert.ok(report.mapPaintedBounds.some(bounds=>Math.max(bounds.width,bounds.height)>20),'the fitted recorded route must paint more than a single GPS dot');
     await page.screenshot({path:path.join(__dirname,'gps-mobile.png'),animations:'disabled'});
-    await page.setViewportSize({width:1280,height:960});await page.screenshot({path:path.join(__dirname,'gps-desktop.png'),animations:'disabled'});
+    await page.setViewportSize({width:1280,height:960});await paintMap(page);await page.screenshot({path:path.join(__dirname,'gps-desktop.png'),animations:'disabled'});
     await page.setViewportSize({width:390,height:844});
+    await paintMap(page);
   });
   await check('discarding a stored route preserves the saved financial kilometres',async()=>{
     const before=(await records(page))[0].km;await page.locator('#gps-apagar').click();await accept(page);
@@ -222,6 +258,16 @@ async function newMockContext(base, initial={}) {
     await setPosition(p,{latitude:-23.54});await advance(p);await waitFix(p,2);assert.equal(await meters(p,key),0);
     await setPosition(p,{accuracy:6,age:120000});await advance(p);await waitFix(p,3);assert.equal(await meters(p,key),0);
     await weak.context.close();
+  });
+  await check('coarse economic fixes with unknown speed do not turn stationary drift into distance',async()=>{
+    const coarse=await newMockContext(base,{accuracy:60,speed:null});const p=coarse.page;
+    await p.locator('#jornada-iniciar').click();await waitFix(p);const key=(await journal(p)).id;
+    for(let i=0;i<5;i++) {
+      await setPosition(p,{latitude:i%2===0?-23.55007:-23.55052});
+      await advance(p);await waitFix(p,i+2);
+    }
+    assert.equal(await meters(p,key),0,'50m drift inside two 60m uncertainty circles must not count as travel');
+    await coarse.context.close();
   });
   await check('map screenshots are captured with no JavaScript runtime errors',async()=>{
     await fs.access(path.join(__dirname,'gps-mobile.png'));await fs.access(path.join(__dirname,'gps-desktop.png'));

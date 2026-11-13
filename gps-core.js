@@ -114,9 +114,12 @@
       meters = distance(previous, next);
       const speedSeconds = Math.max(SAMPLE_MS[track.mode],t-track.lastSeenAt)/1000;
       if (!finite(meters) || meters / speedSeconds > MAX_SPEED_MPS) return reject('jump');
-      const uncertainty = Math.max(10, Math.min(30, (previous.accuracy + next.accuracy) / 2));
+      // A displacement inside the combined error circles is not reliable motion.
+      // In particular, coarse fixes often have no speed estimate: capping this
+      // threshold would turn ordinary position drift into traveled kilometers.
+      const uncertainty = Math.max(10, previous.accuracy + next.accuracy);
       if (speed !== null && speed < 0.6 && meters <= Math.max(40, (previous.accuracy + next.accuracy) * 2)) return seen('stationary');
-      if (meters < uncertainty) return seen('jitter');
+      if (meters <= uncertainty) return seen('jitter');
     }
     if (gap) next.break = true;
     const total = track.totalMeters + meters;
