@@ -339,12 +339,13 @@ function atualizarJornadaRodagem() {
   $('jornada-pausar').textContent = estado === 'pending' ? 'Descartar jornada' : estado === 'paused' ? 'Retomar' : 'Pausar';
   $('jornada-encerrar').hidden = ['idle','pending','completed','invalid'].includes(estado);
   $('jornada-dica').textContent = estado === 'running'
-    ? 'Tempo contado desde ' + new Date(j.iniciadaEm).toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'}) + '. Pode fechar o app: a jornada continua.'
+    ? 'Tempo contado desde ' + new Date(j.iniciadaEm).toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'}) + '. O relógio continua ao sair; o GPS pode ser suspenso em segundo plano.'
     : estado === 'paused' ? 'Respire um pouco. O tempo da pausa fica fora do total.'
       : estado === 'pending' ? 'Suas horas estão guardadas. Revise os valores e salve o fechamento para concluir.'
         : estado === 'completed' ? 'Esta jornada já foi salva em um fechamento. Você pode iniciar outra sem registrar as mesmas horas novamente.'
           : estado === 'invalid' ? 'O marcador anterior não pôde ser lido. Revise suas horas no fechamento antes de iniciar outra jornada.'
             : 'Inicie para acompanhar suas horas. As pausas ficam fora da conta.';
+  window.RodagemGPS?.sync(j && estado !== 'completed' && estado !== 'invalid' ? j : null);
 }
 
 async function salvarJornadaRodagem(nova) {
@@ -395,6 +396,8 @@ async function levarJornadaAoFechamento() {
   if (editando) limpar(form);
   form.elements.data.value = j.data;
   form.elements.horas.value = String(horasEsperadas).replace('.', ',');
+  const metrosGPS = window.RodagemGPS?.distanceMeters(j.id) || 0;
+  if (!form.elements.km.value.trim() && metrosGPS > 0) form.elements.km.value = (metrosGPS / 1000).toFixed(2).replace('.',',');
   form.dataset.jornada = j.id;
   form.elements.horas.dispatchEvent(new Event('input', {bubbles: true}));
   abrir('fechamento');
@@ -425,6 +428,10 @@ async function acaoJornadaRodagem(acao) {
         const id = globalThis.crypto?.randomUUID?.() || agora + '-' + Math.random();
         await salvarJornadaRodagem({versao: 1, id, estado: 'running', iniciadaEm: agora, rodandoDesde: agora, acumulado: 0, data: dataLocal(new Date(agora))});
         aviso('Jornada iniciada. Pause quando fizer uma parada.');
+        if (window.RodagemGPS && $('gps-usar').checked) {
+          window.RodagemGPS.start(jornadaRodagem,{requestPermission:true}).catch(erro => aviso(erro.message,true));
+          window.RodagemGPS.openRoute(id);
+        }
       }
     } else if (acao === 'pausar' && j) {
       if (j.estado === 'pending') {

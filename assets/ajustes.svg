@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 220" fill="none">
+<defs><linearGradient id="bg" x1="59" y1="32" x2="308" y2="191" gradientUnits="userSpaceOnUse"><stop stop-color="#44354f"/><stop offset="1" stop-color="#243b3e"/></linearGradient><linearGradient id="helmet" x1="123" y1="58" x2="230" y2="164" gradientUnits="userSpaceOnUse"><stop stop-color="#ffd0a5"/><stop offset=".65" stop-color="#f0a5bc"/><stop offset="1" stop-color="#ae8cb9"/></linearGradient><linearGradient id="tool" x1="263" y1="90" x2="227" y2="181" gradientUnits="userSpaceOnUse"><stop stop-color="#bcebd8"/><stop offset="1" stop-color="#74b5a4"/></linearGradient></defs>
+<path d="M42 137c-8-64 46-103 108-99 63 5 80-27 133 1 54 28 67 89 28 135-30 36-260 27-269-37Z" fill="url(#bg)"/>
+<ellipse cx="181" cy="192" rx="130" ry="12" fill="#161f2c"/>
+<circle cx="97" cy="80" r="35" fill="#2c4a4a" stroke="#6f9c95" stroke-width="2"/><circle cx="97" cy="71" r="10" fill="#b7e8d3"/><path d="M77 99c0-12 9-19 20-19s20 7 20 19" fill="#b7e8d3"/>
+<path d="M184 47c-42 0-72 30-72 72v32c0 13 16 26 42 26h57l30-23v-35c0-42-20-72-57-72Z" fill="url(#helmet)" stroke="#ffdecb" stroke-width="2"/>
+<path d="M194 70c25 6 34 27 34 46v13h-70c0-29 14-45 36-59Z" fill="#42465c" stroke="#6e6c87" stroke-width="3"/><path d="M206 79c9 8 14 19 15 32m-39-16 12-13" stroke="#a6bac9" stroke-width="4" stroke-linecap="round" opacity=".8"/>
+<path d="m155 131 10 27h40l23-12m-74 31h57l15-12h-62" stroke="#9b6d8a" stroke-width="4" stroke-linejoin="round"/><circle cx="144" cy="120" r="6" fill="#6e5c7d"/><path d="M165 56c-18 14-27 28-30 47" stroke="#ffe8d5" stroke-width="5" stroke-linecap="round"/>
+<path d="m267 84-4 18 12 9 15-8c6 22-11 35-26 30l-27 48c-5 8-17 2-13-6l27-49c-13-10-8-32 16-42Z" fill="url(#tool)" stroke="#cef7e4" stroke-width="2" stroke-linejoin="round"/><circle cx="232" cy="176" r="4" fill="#347965"/>
+<path d="M81 154h26m-13-13v26" stroke="#d0b7eb" stroke-width="7" stroke-linecap="round"/><circle cx="292" cy="57" r="4" fill="#f8c3a4"/><path d="m50 110 4-8 4 8 8 4-8 4-4 8-4-8-8-4 8-4Z" fill="#b7d9d4"/>
+</svg>
