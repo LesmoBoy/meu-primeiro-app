@@ -207,15 +207,15 @@ function calcular(r, novos) {
     destino.hidden = false;
   }
 }
-const paineis = ['inicio','fechamento','consumo','historico','ajustes'];
-const nomesPaineis = {inicio:'Início',fechamento:'Fechamento',consumo:'Minha moto',historico:'Histórico',ajustes:'Meu perfil'};
+const paineis = ['inicio','fechamento','consumo','historico','ajustes','percurso'];
+const nomesPaineis = {inicio:'Início',fechamento:'Fechamento',consumo:'Minha moto',historico:'Histórico',ajustes:'Meu perfil',percurso:'Meu percurso'};
 function abrir(painel, navegar = true) {
   if (!paineis.includes(painel)) painel = 'inicio';
   for (const aba of document.querySelectorAll('nav button')) {
-    const ativa = aba.dataset.panel === painel;
+    const ativa = aba.dataset.panel === painel || (painel === 'percurso' && aba.dataset.panel === 'inicio');
     aba.setAttribute('aria-pressed',ativa);
-    $(aba.dataset.panel).hidden = !ativa;
   }
+  for (const id of paineis) $(id).hidden = id !== painel;
   if (painel === 'historico') renderizarHistorico();
   document.title = nomesPaineis[painel] + ' · Minha Rodagem';
   if (navegar && location.hash !== '#' + painel) history.pushState(null,'','#' + painel);
@@ -392,6 +392,7 @@ function renderizarHistorico() {
     ['Gastos lançados no fechamento',moeda.format(somar(r => r.combustivel+r.outros)/100)],
     ['Saldo dos fechamentos',moeda.format(somar(saldo)/100)],
     ['Entregas',numero.format(somar(r => r.entregas))],
+    ['Km de trabalho',numero.format(somar(r => r.km)/100) + ' km'],
     ['Total pago no posto',moeda.format(dados.reduce((total,r) => total + (r.tipo === 'posto' ? r.valor : 0),0)/100)]
   ]);
   const lista = $('lista');
@@ -428,7 +429,7 @@ function renderizarHistorico() {
     const consumo = consumos.get(r.id);
     titulo.textContent = tipos[r.tipo] + ' · ' + formatarData(r.data);
     detalhe.textContent = r.tipo === 'dia'
-      ? moeda.format(saldo(r)/100) + ' de saldo · ' + r.entregas + ' entregas'
+      ? moeda.format(saldo(r)/100) + ' de saldo · ' + r.entregas + ' entregas' + (r.km ? ' · ' + numero.format(r.km/100) + ' km' : '')
       : numero.format(r.odometro/100) + ' km · ' + moeda.format(r.valor/100) + ' · ' +
         litrosFormatados.format(r.litros/1000) + ' L · ' +
         (consumo ? kmLitro(consumo.kmPorLitro) + ' · ' + moeda.format(consumo.custoPorKm) + '/km' : r.tanque === 'cheio' ? 'Tanque cheio' : 'Parcial');
@@ -447,6 +448,9 @@ function renderizarHistorico() {
         aviso('Lançamento excluído.');
       } catch (erro) { aviso(erro.message,true); }
     }));
+    if (r.tipo === 'dia' && r.jornadaId && window.RodagemGPS?.hasTrack(r.jornadaId)) {
+      acoes.append(botao('Ver percurso',() => window.RodagemGPS.openRoute(r.jornadaId)));
+    }
     conteudo.append(titulo,detalhe);
     item.append(icone,conteudo,acoes);
     lista.append(item);
