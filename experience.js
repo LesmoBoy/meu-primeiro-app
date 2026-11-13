@@ -10,6 +10,12 @@ let perfilAlterado = false;
 let jornadaRodagem = null;
 let jornadaRaw = null;
 let jornadaOcupada = false;
+let jornadaInvalida = false;
+let perfilSalvando = false;
+
+function comTravaExperiencia(nome, acao) {
+  return navigator.locks?.request ? navigator.locks.request(nome, acao) : Promise.resolve().then(acao);
+}
 
 function lerPerfilRodagem(raw) {
   if (!raw) return {...perfilPadrao};
@@ -21,20 +27,24 @@ function lerPerfilRodagem(raw) {
       !['Gasolina', 'Etanol', 'Flex / alternado'].includes(p.combustivel) ||
       !Number.isFinite(p.jornada) || p.jornada < 0 || p.jornada > 24 ||
       !inteiro(p.meta) || typeof p.configurado !== 'boolean') throw Error('Perfil inválido.');
-  return {...perfilPadrao, ...p};
+  return {versao: 1, nome: p.nome.trim(), trabalho: p.trabalho, jornada: p.jornada,
+    meta: p.meta, moto: p.moto, modelo: p.modelo.trim(), combustivel: p.combustivel,
+    configurado: p.configurado};
 }
 
 function lerJornadaRodagem(raw) {
   if (!raw) return null;
   const j = JSON.parse(raw);
-  if (!j || j.versao !== 1 || typeof j.id !== 'string' || !j.id ||
+  if (!j || j.versao !== 1 || typeof j.id !== 'string' || !j.id || j.id.length > 100 ||
       !['running', 'paused', 'pending'].includes(j.estado) || !dataValida(j.data) ||
-      !Number.isFinite(j.iniciadaEm) || j.iniciadaEm < 0 ||
-      !Number.isFinite(j.acumulado) || j.acumulado < 0 ||
-      (j.estado === 'running' && (!Number.isFinite(j.rodandoDesde) || j.rodandoDesde < 0))) {
+      !Number.isSafeInteger(j.iniciadaEm) || j.iniciadaEm < 0 || j.iniciadaEm > 8.64e15 ||
+      !Number.isSafeInteger(j.acumulado) || j.acumulado < 0 ||
+      (j.estado === 'running' && (!Number.isSafeInteger(j.rodandoDesde) || j.rodandoDesde < 0 || j.rodandoDesde > 8.64e15))) {
     throw Error('Jornada inválida.');
   }
-  return j;
+  return {versao: 1, id: j.id, estado: j.estado, data: j.data,
+    iniciadaEm: j.iniciadaEm, acumulado: j.acumulado,
+    rodandoDesde: j.estado === 'running' ? j.rodandoDesde : null};
 }
 
 try {
@@ -47,16 +57,14 @@ try {
   jornadaRaw = localStorage.getItem(jornadaStorageKey);
   jornadaRodagem = lerJornadaRodagem(jornadaRaw);
 } catch {
+  jornadaInvalida = true;
   aviso('Não consegui abrir a jornada anterior. Confira suas horas antes de fazer o fechamento.', true);
 }
 
 function moedaInputRodagem(valor, opcional = true) {
   const texto = String(valor).trim();
   if (!texto && opcional) return 0;
-  if (!/^\d+(?:[,.]\d{1,2})?$/.test(texto)) return null;
-  const partes = texto.replace(',', '.').split('.');
-  const centavos = Number(partes[0]) * 100 + Number((partes[1] || '').padEnd(2, '0'));
-  return inteiro(centavos) ? centavos : null;
+  return decimalInteiro(texto, 2);
 }
 
 function atualizarPrevia() {
@@ -103,6 +111,7 @@ function graficoSemanaRodagem() {
   for (const d of dias) {
     const coluna = document.createElement('div');
     coluna.className = 'chart-day';
+    coluna.setAttribute('role','img');
     coluna.dataset.negative = String(d.saldo < 0);
     coluna.dataset.today = String(d.data === dataLocal());
     const detalhe = formatarData(d.data) + ': ' + (d.quantidade ? moeda.format(d.saldo / 100) + ' de saldo' : 'sem fechamento');
@@ -163,15 +172,20 @@ function atualizarExperiencia() {
   const avatar = document.querySelector('.avatar');
   avatar.textContent = perfilRodagem.nome ? Array.from(perfilRodagem.nome.trim().split(/\s+/).map(p => p[0]).join('')).slice(0, 2).join('').toLocaleUpperCase('pt-BR') : 'MR';
   avatar.setAttribute('aria-label', 'Abrir perfil' + (perfilRodagem.nome ? ' de ' + perfilRodagem.nome : ''));
-  const medidos = [...ciclos(registros).values()];
+  const datasInconsistentes = abastecimentosForaDeOrdem(registros);
+  const medidos = [...ciclos(registros.filter(r => r.data <= hoje)).values()];
   const ultimo = medidos.at(-1);
   $('moto-consumo').textContent = ultimo ? kmLitro(ultimo.kmPorLitro) : '— km/L';
-  $('moto-consumo-dica').textContent = ultimo ? 'Último ciclo entre tanques cheios.' : 'Complete um ciclo para medir.';
+  $('moto-consumo-dica').textContent = datasInconsistentes
+    ? 'Há datas fora da ordem do hodômetro. Revise no Histórico; ciclos inconsistentes são ignorados.'
+    : ultimo ? 'Último ciclo entre tanques cheios, até hoje.' : 'Complete um ciclo para medir.';
   $('moto-custo').textContent = ultimo ? moeda.format(ultimo.custoPorKm) : '—';
   $('moto-nome').textContent = perfilRodagem.configurado ? (perfilRodagem.modelo || perfilRodagem.moto) : 'Do seu jeito';
   $('moto-combustivel').textContent = perfilRodagem.configurado ? perfilRodagem.moto + ' · ' + perfilRodagem.combustivel : 'Cadastre no seu perfil.';
   $('insight-titulo').textContent = ultimo ? kmLitro(ultimo.kmPorLitro) + ' na prática' : 'Conheça seu custo por km';
-  $('insight-texto').textContent = ultimo
+  $('insight-texto').textContent = datasInconsistentes
+    ? 'Algumas datas de abastecimento estão fora da ordem do hodômetro. Confira os lançamentos no Histórico para corrigir o consumo.'
+    : ultimo
     ? 'No último ciclo, cada km custou ' + moeda.format(ultimo.custoPorKm) + ' em combustível. Use essa referência no fechamento.'
     : 'Dois tanques cheios ajudam a descobrir quanto a moto consome de verdade.';
   atualizarDicaPosto();
@@ -181,6 +195,10 @@ function atualizarExperiencia() {
 }
 
 function atualizarDicaPosto() {
+  if (abastecimentosForaDeOrdem(registros)) {
+    $('posto-dica').textContent = 'Há abastecimentos com datas fora da ordem do hodômetro. Revise-os no Histórico antes de usar o consumo como referência.';
+    return;
+  }
   const parcial = $('posto').elements.tanque.value === 'parcial';
   const existeCheio = registros.some(r => r.tipo === 'posto' && r.tanque === 'cheio');
   $('posto-dica').textContent = parcial
@@ -207,8 +225,12 @@ document.querySelectorAll('[data-rotina]').forEach(botao => botao.addEventListen
   perfilAlterado = true;
   atualizarOpcoesRotina();
 }));
-$('perfil').addEventListener('submit', evento => {
+$('perfil').addEventListener('submit', async evento => {
   evento.preventDefault();
+  if (perfilSalvando) return;
+  perfilSalvando = true;
+  const botaoSalvar = $('perfil').querySelector('button[type="submit"]');
+  botaoSalvar.disabled = true;
   try {
     const c = $('perfil').elements;
     const textoHoras = c.jornada.value.trim();
@@ -223,18 +245,23 @@ $('perfil').addEventListener('submit', evento => {
       moto: c.moto.value, modelo: c.modelo.value.trim(), combustivel: c.combustivel.value, configurado: true};
     const raw = JSON.stringify(novo);
     lerPerfilRodagem(raw);
-    let atual;
-    try { atual = localStorage.getItem(perfilStorageKey); }
-    catch { throw Error('O navegador não conseguiu acessar seu perfil. Confira se o armazenamento está disponível.'); }
-    if (atual !== perfilRaw) throw Error('Seu perfil mudou em outra aba. Reabra a página antes de salvar suas preferências.');
-    try { localStorage.setItem(perfilStorageKey, raw); }
-    catch { throw Error('Não foi possível salvar o perfil neste navegador. Libere espaço e tente novamente.'); }
-    perfilRaw = raw;
-    perfilRodagem = novo;
-    perfilAlterado = false;
+    const formularioEnviado = [...$('perfil').querySelectorAll('input,select')].map(campo => campo.value).join('\u0000');
+    const versaoPerfilEsperada = perfilRaw;
+    await comTravaExperiencia(perfilStorageKey, () => {
+      let atual;
+      try { atual = localStorage.getItem(perfilStorageKey); }
+      catch { throw Error('O navegador não conseguiu acessar seu perfil. Confira se o armazenamento está disponível.'); }
+      if (atual !== versaoPerfilEsperada) throw Error('Seu perfil mudou em outra aba. Reabra a página antes de salvar suas preferências.');
+      try { localStorage.setItem(perfilStorageKey, raw); }
+      catch { throw Error('Não foi possível salvar o perfil neste navegador. Libere espaço e tente novamente.'); }
+      perfilRaw = raw;
+      perfilRodagem = novo;
+    });
+    perfilAlterado = formularioEnviado !== [...$('perfil').querySelectorAll('input,select')].map(campo => campo.value).join('\u0000');
     atualizarExperiencia();
     aviso('Perfil salvo. Sua rotina está pronta para os próximos fechamentos.');
   } catch (erro) { aviso(erro.message || 'Não consegui salvar seu perfil neste navegador.', true); }
+  finally { perfilSalvando = false; botaoSalvar.disabled = false; }
 });
 
 async function preencherHorasRodagem(horas) {
@@ -261,7 +288,11 @@ $('dia').addEventListener('input', atualizarPrevia);
 $('posto').elements.tanque.addEventListener('change', atualizarDicaPosto);
 
 function duracaoJornadaRodagem(j = jornadaRodagem, agora = Date.now()) {
-  return !j ? 0 : j.acumulado + (j.estado === 'running' ? Math.max(0, agora - j.rodandoDesde) : 0);
+  return !j ? 0 : Math.min(Number.MAX_SAFE_INTEGER,
+    j.acumulado + (j.estado === 'running' ? Math.max(0, agora - j.rodandoDesde) : 0));
+}
+function jornadaJaRegistrada(j = jornadaRodagem) {
+  return Boolean(j && registros.some(r => r.tipo === 'dia' && r.jornadaId === j.id));
 }
 function formatarTempoRodagem(ms) {
   const segundos = Math.floor(ms / 1000);
@@ -270,47 +301,56 @@ function formatarTempoRodagem(ms) {
 }
 function atualizarJornadaRodagem() {
   const j = jornadaRodagem;
-  const estado = j?.estado || 'idle';
+  const estado = jornadaInvalida ? 'invalid' : jornadaJaRegistrada(j) ? 'completed' : j?.estado || 'idle';
   const status = $('jornada-status');
   status.dataset.state = estado;
-  status.textContent = ({idle: 'Não iniciada', running: 'Em andamento', paused: 'Em pausa', pending: 'Pronta para fechar'})[estado];
+  status.textContent = ({idle: 'Não iniciada', running: 'Em andamento', paused: 'Em pausa', pending: 'Pronta para fechar', completed: 'Já registrada', invalid: 'Precisa de revisão'})[estado];
   $('jornada-tempo').textContent = formatarTempoRodagem(duracaoJornadaRodagem());
   $('jornada-tempo').dataset.state = estado;
   $('jornada-iniciar').hidden = estado === 'running' || estado === 'paused';
-  $('jornada-iniciar').textContent = estado === 'pending' ? 'Levar ao fechamento' : 'Iniciar jornada';
-  $('jornada-pausar').hidden = estado === 'idle';
+  $('jornada-iniciar').textContent = estado === 'pending' ? 'Levar ao fechamento' : estado === 'completed' ? 'Iniciar outra jornada' : estado === 'invalid' ? 'Revisar jornada' : 'Iniciar jornada';
+  $('jornada-pausar').hidden = ['idle','completed','invalid'].includes(estado);
   $('jornada-pausar').textContent = estado === 'pending' ? 'Descartar jornada' : estado === 'paused' ? 'Retomar' : 'Pausar';
-  $('jornada-encerrar').hidden = estado === 'idle' || estado === 'pending';
+  $('jornada-encerrar').hidden = ['idle','pending','completed','invalid'].includes(estado);
   $('jornada-dica').textContent = estado === 'running'
     ? 'Tempo contado desde ' + new Date(j.iniciadaEm).toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'}) + '. Pode fechar o app: a jornada continua.'
     : estado === 'paused' ? 'Respire um pouco. O tempo da pausa fica fora do total.'
       : estado === 'pending' ? 'Suas horas estão guardadas. Revise os valores e salve o fechamento para concluir.'
-        : 'Inicie para acompanhar suas horas. As pausas ficam fora da conta.';
+        : estado === 'completed' ? 'Esta jornada já foi salva em um fechamento. Você pode iniciar outra sem registrar as mesmas horas novamente.'
+          : estado === 'invalid' ? 'O marcador anterior não pôde ser lido. Revise suas horas no fechamento antes de iniciar outra jornada.'
+            : 'Inicie para acompanhar suas horas. As pausas ficam fora da conta.';
 }
 
-function salvarJornadaRodagem(nova) {
-  let atual;
-  try { atual = localStorage.getItem(jornadaStorageKey); }
-  catch { throw Error('O navegador não conseguiu acessar sua jornada. Confira se o armazenamento está disponível.'); }
-  if (atual !== jornadaRaw) {
-    jornadaRaw = atual;
-    jornadaRodagem = lerJornadaRodagem(jornadaRaw);
+async function salvarJornadaRodagem(nova) {
+  const versaoEsperada = jornadaRaw;
+  return comTravaExperiencia(jornadaStorageKey, () => {
+    let atual;
+    try { atual = localStorage.getItem(jornadaStorageKey); }
+    catch { throw Error('O navegador não conseguiu acessar sua jornada. Confira se o armazenamento está disponível.'); }
+    if (atual !== versaoEsperada) {
+      jornadaRaw = atual;
+      try { jornadaRodagem = lerJornadaRodagem(atual); jornadaInvalida = false; }
+      catch { jornadaRodagem = null; jornadaInvalida = true; }
+      atualizarJornadaRodagem();
+      throw Error('A jornada mudou em outra aba. Confira o estado atualizado e tente novamente.');
+    }
+    const raw = nova ? JSON.stringify(nova) : null;
+    const validada = lerJornadaRodagem(raw);
+    try {
+      if (nova) localStorage.setItem(jornadaStorageKey, raw);
+      else localStorage.removeItem(jornadaStorageKey);
+    } catch { throw Error('Não foi possível guardar a jornada neste navegador. Confira o espaço disponível e tente novamente.'); }
+    jornadaRodagem = validada;
+    jornadaRaw = raw;
+    jornadaInvalida = false;
     atualizarJornadaRodagem();
-    throw Error('A jornada mudou em outra aba. Confira o estado atualizado e tente novamente.');
-  }
-  const raw = nova ? JSON.stringify(nova) : null;
-  try {
-    if (nova) localStorage.setItem(jornadaStorageKey, raw);
-    else localStorage.removeItem(jornadaStorageKey);
-  } catch { throw Error('Não foi possível guardar a jornada neste navegador. Confira o espaço disponível e tente novamente.'); }
-  jornadaRodagem = nova;
-  jornadaRaw = raw;
-  atualizarJornadaRodagem();
+  });
 }
 
 async function levarJornadaAoFechamento() {
   const j = jornadaRodagem;
   if (!j || j.estado !== 'pending') return;
+  if (jornadaJaRegistrada(j)) throw Error('Esta jornada já foi registrada. Confira o lançamento no Histórico.');
   const form = $('dia');
   const campos = ['ganhos', 'entregas', 'horas', 'km', 'combustivel', 'outros'];
   const editando = Boolean(form.dataset.id);
@@ -325,7 +365,7 @@ async function levarJornadaAoFechamento() {
     if (!await confirmar(texto)) return;
   }
   // Uma confirmação pode ficar aberta enquanto a jornada muda em outra aba.
-  if (!jornadaRodagem || jornadaRodagem.id !== j.id || jornadaRodagem.estado !== 'pending') throw Error('A jornada mudou em outra aba. Confira antes de fechar.');
+  if (!jornadaRodagem || jornadaRodagem.id !== j.id || jornadaRodagem.estado !== 'pending' || jornadaJaRegistrada(j)) throw Error('A jornada mudou ou já foi registrada. Confira antes de fechar.');
   if (editando) limpar(form);
   form.elements.data.value = j.data;
   form.elements.horas.value = String(horasEsperadas).replace('.', ',');
@@ -340,32 +380,43 @@ async function acaoJornadaRodagem(acao) {
   if (jornadaOcupada) return;
   jornadaOcupada = true;
   try {
+    if (jornadaInvalida) {
+      if (acao !== 'iniciar' || !await confirmar('O marcador da jornada anterior está inválido. Descartar somente esse marcador? Seus fechamentos e abastecimentos salvos serão mantidos. Confira suas horas no fechamento antes de continuar.')) return;
+      await salvarJornadaRodagem(null);
+      aviso('Marcador inválido descartado. Confira as horas anteriores no fechamento e toque em Iniciar jornada quando estiver pronto.');
+      return;
+    }
+    if (jornadaJaRegistrada()) {
+      if (acao !== 'iniciar') throw Error('Esta jornada já foi registrada. Confira o Histórico.');
+      await salvarJornadaRodagem(null);
+    }
     const j = jornadaRodagem;
     const agora = Date.now();
+    if (j?.estado === 'running' && agora < j.rodandoDesde) throw Error('O relógio do aparelho ficou anterior ao início da contagem. Corrija a data e a hora antes de pausar ou encerrar; sua jornada foi mantida.');
     if (acao === 'iniciar') {
       if (j?.estado === 'pending') await levarJornadaAoFechamento();
       else if (!j) {
         const id = globalThis.crypto?.randomUUID?.() || agora + '-' + Math.random();
-        salvarJornadaRodagem({versao: 1, id, estado: 'running', iniciadaEm: agora, rodandoDesde: agora, acumulado: 0, data: dataLocal(new Date(agora))});
+        await salvarJornadaRodagem({versao: 1, id, estado: 'running', iniciadaEm: agora, rodandoDesde: agora, acumulado: 0, data: dataLocal(new Date(agora))});
         aviso('Jornada iniciada. Pause quando fizer uma parada.');
       }
     } else if (acao === 'pausar' && j) {
       if (j.estado === 'pending') {
         if (await confirmar('Descartar o tempo desta jornada? Seus fechamentos e abastecimentos salvos não serão alterados.')) {
           if (!jornadaRodagem || jornadaRodagem.id !== j.id || jornadaRodagem.estado !== 'pending') throw Error('A jornada mudou em outra aba. Confira antes de descartar.');
-          salvarJornadaRodagem(null);
+          await salvarJornadaRodagem(null);
           if ($('dia').dataset.jornada === j.id) delete $('dia').dataset.jornada;
           aviso('Jornada descartada.');
         }
       } else if (j.estado === 'running') {
-        salvarJornadaRodagem({...j, estado: 'paused', acumulado: duracaoJornadaRodagem(j, agora), rodandoDesde: null});
+        await salvarJornadaRodagem({...j, estado: 'paused', acumulado: duracaoJornadaRodagem(j, agora), rodandoDesde: null});
         aviso('Jornada pausada. Toque em Retomar quando voltar.');
       } else {
-        salvarJornadaRodagem({...j, estado: 'running', rodandoDesde: agora});
+        await salvarJornadaRodagem({...j, estado: 'running', rodandoDesde: agora});
         aviso('Jornada retomada.');
       }
     } else if (acao === 'encerrar' && j && j.estado !== 'pending') {
-      salvarJornadaRodagem({...j, estado: 'pending', acumulado: duracaoJornadaRodagem(j, agora), rodandoDesde: null});
+      await salvarJornadaRodagem({...j, estado: 'pending', acumulado: duracaoJornadaRodagem(j, agora), rodandoDesde: null});
       await levarJornadaAoFechamento();
     }
   } catch (erro) {
@@ -376,12 +427,12 @@ async function acaoJornadaRodagem(acao) {
 $('jornada-iniciar').addEventListener('click', () => acaoJornadaRodagem('iniciar'));
 $('jornada-pausar').addEventListener('click', () => acaoJornadaRodagem('pausar'));
 $('jornada-encerrar').addEventListener('click', () => acaoJornadaRodagem('encerrar'));
-document.addEventListener('rodagem:saved', evento => {
+document.addEventListener('rodagem:saved', async evento => {
   const {tipo, registro, jornadaId} = evento.detail || {};
   const j = jornadaRodagem;
-  if (tipo !== 'dia' || !j || j.estado !== 'pending' || j.id !== jornadaId || registro?.data !== j.data) return;
-  try { salvarJornadaRodagem(null); }
-  catch { aviso('Fechamento salvo. Não consegui limpar o marcador da jornada; confira antes de registrar novamente.', true); }
+  if (tipo !== 'dia' || !j || j.estado !== 'pending' || j.id !== jornadaId || registro?.jornadaId !== j.id) return;
+  try { await salvarJornadaRodagem(null); }
+  catch { atualizarJornadaRodagem(); aviso('Fechamento salvo. O marcador antigo permaneceu neste navegador, mas essa jornada já está registrada no Histórico.', true); }
 });
 document.addEventListener('rodagem:changed', atualizarExperiencia);
 document.addEventListener('rodagem:route', evento => {
@@ -390,6 +441,26 @@ document.addEventListener('rodagem:route', evento => {
 });
 window.addEventListener('online', atualizarConexaoRodagem);
 window.addEventListener('offline', atualizarConexaoRodagem);
+function sincronizarJornadaRodagem() {
+  let raw;
+  try {
+    raw = localStorage.getItem(jornadaStorageKey);
+    if (raw === jornadaRaw) return;
+    const nova = lerJornadaRodagem(raw);
+    jornadaRaw = raw;
+    jornadaRodagem = nova;
+    jornadaInvalida = false;
+    atualizarJornadaRodagem();
+  } catch {
+    if (raw !== undefined) {
+      jornadaRaw = raw;
+      jornadaRodagem = null;
+      jornadaInvalida = true;
+      atualizarJornadaRodagem();
+    }
+    aviso('A jornada mudou e não pôde ser lida. Revise suas horas antes de continuar.', true);
+  }
+}
 window.addEventListener('storage', evento => {
   if (evento.key === perfilStorageKey || evento.key === null) {
     try {
@@ -406,20 +477,27 @@ window.addEventListener('storage', evento => {
     } catch { aviso('Não consegui atualizar o perfil desta aba. Reabra a página para conferir.', true); }
   }
   if (evento.key === jornadaStorageKey || evento.key === null) {
-    try {
-      jornadaRaw = localStorage.getItem(jornadaStorageKey);
-      jornadaRodagem = lerJornadaRodagem(jornadaRaw);
-      atualizarJornadaRodagem();
-    } catch { aviso('A jornada mudou em outra aba. Reabra a página para conferir suas horas.', true); }
+    sincronizarJornadaRodagem();
   }
 });
 document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) { atualizarJornadaRodagem(); atualizarExperiencia(); }
+  if (!document.hidden) {
+    sincronizarJornadaRodagem();
+    atualizarDiaRodagem();
+    atualizarExperiencia();
+  }
 });
 let diaExibidoRodagem = dataLocal();
+function atualizarDiaRodagem() {
+  const novoDia = dataLocal();
+  if (diaExibidoRodagem === novoDia) return false;
+  if (typeof atualizarDatasFormularios === 'function') atualizarDatasFormularios(diaExibidoRodagem, novoDia);
+  diaExibidoRodagem = novoDia;
+  return true;
+}
 setInterval(() => {
   atualizarJornadaRodagem();
-  if (diaExibidoRodagem !== dataLocal()) { diaExibidoRodagem = dataLocal(); atualizarExperiencia(); }
+  if (atualizarDiaRodagem()) atualizarExperiencia();
 }, 1000);
 preencherPerfilRodagem();
 atualizarConexaoRodagem();

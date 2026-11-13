@@ -1,4 +1,5 @@
-const CACHE = 'minha-rodagem-2.0.0';
+const PREFIXO = 'rodagem-cache:' + self.registration.scope + ':';
+const CACHE = PREFIXO + '2.0.1';
 const ARQUIVOS = ['./index.html','./styles.css','./app.js','./experience.js','./manifest.webmanifest','./icon-192.png','./icon-512.png'];
 
 self.addEventListener('install', event => {
@@ -7,9 +8,19 @@ self.addEventListener('install', event => {
   )).then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', event => {
-  event.waitUntil(caches.keys().then(keys => Promise.all(keys
-    .filter(key => key.startsWith('minha-rodagem-') && key !== CACHE)
-    .map(key => caches.delete(key)))).then(() => self.clients.claim()));
+  event.waitUntil(caches.keys().then(keys => Promise.all(keys.map(async key => {
+    if (key.startsWith(PREFIXO) && key !== CACHE) return caches.delete(key);
+    if (!/^minha-rodagem-\d+(?:\.\d+)*$/.test(key)) return;
+    // Versões antigas partilhavam o nome do cache entre repositórios.
+    // Remova apenas os arquivos deste app, preservando outros escopos.
+    const cache = await caches.open(key);
+    const scope = new URL(self.registration.scope);
+    for (const request of await cache.keys()) {
+      const url = new URL(request.url);
+      if (url.origin === scope.origin && url.pathname.startsWith(scope.pathname)) await cache.delete(request);
+    }
+    if (!(await cache.keys()).length) await caches.delete(key);
+  }))).then(() => self.clients.claim()));
 });
 self.addEventListener('fetch', event => {
   const request = event.request;
@@ -18,9 +29,17 @@ self.addEventListener('fetch', event => {
   if (request.method !== 'GET' || url.origin !== scope.origin || !url.pathname.startsWith(scope.pathname)) return;
   const navigation = request.mode === 'navigate' && [scope.pathname,scope.pathname+'index.html'].includes(url.pathname);
   if (!navigation && !ARQUIVOS.some(path => new URL(path,scope).pathname === url.pathname)) return;
-  event.respondWith(fetch(request).catch(async () => {
+  event.respondWith((async () => {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(),5000);
+    let response;
+    try {
+      response = await fetch(request,{signal:controller.signal});
+      if (response.ok) return response;
+    } catch { /* Rede indisponível ou tempo de espera esgotado: use a cópia local. */ }
+    finally { clearTimeout(timeout); }
     const cache = await caches.open(CACHE);
     return await cache.match(navigation ? new URL('./index.html',scope).href : url.pathname) ||
-      new Response('Abra o Minha Rodagem com internet uma vez para preparar o modo offline.',{status:503,headers:{'Content-Type':'text/plain; charset=utf-8'}});
-  }));
+      response || new Response('Abra o Minha Rodagem com internet uma vez para preparar o modo offline.',{status:503,headers:{'Content-Type':'text/plain; charset=utf-8'}});
+  })());
 });

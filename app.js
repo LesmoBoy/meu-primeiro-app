@@ -15,33 +15,55 @@ function dataLocal(data = new Date()) {
 }
 function dataValida(data) {
   return typeof data === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(data) &&
+    !data.startsWith('0000-') &&
     Number.isFinite(Date.parse(data)) && new Date(data).toISOString().slice(0,10) === data;
 }
 function inteiro(valor, minimo = 0) {
   return Number.isSafeInteger(valor) && valor >= minimo && valor <= 1e10;
 }
+function decimalInteiro(texto, casas, minimo = 0, maximo = 1e10) {
+  const formato = casas ? new RegExp('^\\d+(?:[,.]\\d{1,' + casas + '})?$') : /^\d+$/;
+  if (!formato.test(texto)) return null;
+  const partes = texto.replace(',','.').split('.');
+  const valor = Number(partes[0]) * 10 ** casas + Number((partes[1] || '').padEnd(casas,'0'));
+  return inteiro(valor,minimo) && valor <= maximo ? valor : null;
+}
 function validarBackup(dados) {
   if (!dados || dados.versao !== 1 || !Array.isArray(dados.registros)) throw Error('Backup inválido.');
   const ids = new Set();
   const odometros = new Set();
+  const jornadas = new Set();
+  const validados = [];
   for (const r of dados.registros) {
-    if (!r || typeof r.id !== 'string' || !r.id || ids.has(r.id) || !dataValida(r.data)) throw Error('Backup inválido.');
+    if (!r || typeof r.id !== 'string' || !r.id || r.id.length > 100 || ids.has(r.id) || !dataValida(r.data)) throw Error('Backup inválido.');
     ids.add(r.id);
-    if (r.tipo === 'dia' && ['ganhos','combustivel','outros','entregas','horas','km'].every(c => inteiro(r[c]))) continue;
+    const registro = {id:r.id,tipo:r.tipo,data:r.data};
+    if (r.tipo === 'dia' && ['ganhos','combustivel','outros','entregas','horas','km'].every(c => inteiro(r[c]))) {
+      for (const campo of ['ganhos','combustivel','outros','entregas','horas','km']) registro[campo] = r[campo];
+      if (r.jornadaId !== undefined) {
+        if (typeof r.jornadaId !== 'string' || !r.jornadaId || r.jornadaId.length > 100 || jornadas.has(r.jornadaId)) throw Error('Backup inválido ou com jornadas repetidas.');
+        jornadas.add(r.jornadaId);
+        registro.jornadaId = r.jornadaId;
+      }
+      validados.push(registro);
+      continue;
+    }
     if (r.tipo === 'posto' && inteiro(r.odometro) && inteiro(r.litros,1) && inteiro(r.valor) &&
         ['cheio','parcial'].includes(r.tanque) && !odometros.has(r.odometro)) {
       odometros.add(r.odometro);
+      for (const campo of ['odometro','litros','valor','tanque']) registro[campo] = r[campo];
+      validados.push(registro);
       continue;
     }
     throw Error('Backup inválido ou com hodômetros repetidos.');
   }
-  return dados.registros;
+  return validados;
 }
 function aviso(texto, erro = false) {
   $('mensagem').textContent = texto;
   $('mensagem').hidden = !texto;
   $('mensagem').dataset.error = String(erro);
-  if (texto) $('mensagem').scrollIntoView?.({block:'nearest',behavior:'smooth'});
+  if (texto) $('mensagem').scrollIntoView?.({block:'nearest',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
 }
 function confirmar(texto) {
   const dialogo = $('confirmacao');
@@ -60,25 +82,35 @@ try {
   erroLeitura = true;
   aviso('Não consegui abrir os registros. Se tiver uma cópia, restaure seu backup.');
 }
-function persistir(novos, restaurando = false) {
-  if (erroLeitura && !restaurando) throw Error('Restaure um backup antes de salvar novos registros.');
-  if (localStorage.getItem(chave) !== versaoLida) {
-    throw Error('Os registros mudaram em outra aba. Reabra a página antes de salvar.');
-  }
-  const conteudo = JSON.stringify({versao:1, registros:novos});
-  localStorage.setItem(chave, conteudo);
-  versaoLida = conteudo;
-  registros = novos;
-  erroLeitura = false;
-  document.dispatchEvent(new CustomEvent('rodagem:changed'));
+function conferirVersao() {
+  if (erroLeitura) throw Error('Não foi possível ler os registros. Restaure um backup válido antes de continuar.');
+  if (localStorage.getItem(chave) !== versaoLida) throw Error('Os registros mudaram em outra aba. Recarregue antes de salvar ou exportar.');
+}
+async function persistir(novos, restaurando = false) {
+  // Capture antes de aguardar a trava: outro salvamento pode concluir na fila.
+  const esperado = versaoLida;
+  const gravar = () => {
+    if (erroLeitura && !restaurando) throw Error('Restaure um backup antes de salvar novos registros.');
+    if (localStorage.getItem(chave) !== esperado) {
+      throw Error('Os registros mudaram em outra aba. Reabra a página antes de salvar.');
+    }
+    const validados = validarBackup({versao:1,registros:novos});
+    const conteudo = JSON.stringify({versao:1, registros:validados});
+    localStorage.setItem(chave, conteudo);
+    versaoLida = conteudo;
+    registros = validados;
+    erroLeitura = false;
+    document.dispatchEvent(new CustomEvent('rodagem:changed'));
+  };
+  if (navigator.locks?.request) return navigator.locks.request(chave,{mode:'exclusive'},gravar);
+  return gravar();
 }
 function campoNumerico(campo, casas, opcional = false, minimo = 0) {
   let texto = campo.value.trim();
   if (!texto && opcional) return 0;
   if (campo.name === 'odometro' && /^\d{1,3}(\.\d{3})+(,\d{1,2})?$/.test(texto)) texto = texto.replaceAll('.', '');
-  const formato = casas ? new RegExp('^\\d+(?:[,.]\\d{1,' + casas + '})?$') : /^\d+$/;
-  const valor = Math.round(Number(texto.replace(',', '.')) * 10 ** casas);
-  if (!formato.test(texto) || !inteiro(valor, minimo)) {
+  const valor = decimalInteiro(texto,casas,minimo);
+  if (valor === null) {
     campo.focus();
     throw Error('Confira o campo ' + campo.closest('label').childNodes[0].textContent.trim() + '.');
   }
@@ -92,6 +124,12 @@ function ler(form) {
     for (const chave of ['ganhos','combustivel','outros','entregas','horas','km']) {
       r[chave] = campoNumerico(c[chave], chave === 'entregas' ? 0 : 2, !['ganhos','entregas'].includes(chave));
     }
+    if (r.horas > 2400) throw Error('Um fechamento diário pode ter até 24 horas de trabalho. Confira o campo Horas.');
+    if (form.dataset.jornada) r.jornadaId = form.dataset.jornada;
+    else if (form.dataset.id) {
+      const anterior = registros.find(item => item.id === r.id);
+      if (anterior?.jornadaId) r.jornadaId = anterior.jornadaId;
+    }
   } else {
     r.odometro = campoNumerico(c.odometro,2);
     r.litros = campoNumerico(c.litros,3,false,1);
@@ -100,15 +138,25 @@ function ler(form) {
     if (registros.some(a => a.tipo === 'posto' && a.id !== r.id && a.odometro === r.odometro)) {
       throw Error('Já existe um abastecimento com esse hodômetro. Edite pelo histórico se precisar corrigir.');
     }
+    const outros = registros.filter(a => a.tipo === 'posto' && a.id !== r.id).sort((a,b) => a.odometro-b.odometro);
+    const anterior = outros.filter(a => a.odometro < r.odometro).at(-1);
+    const proximo = outros.find(a => a.odometro > r.odometro);
+    if ((anterior && anterior.data > r.data) || (proximo && proximo.data < r.data)) throw Error('A data não combina com a ordem dos hodômetros. Confira a data e a quilometragem deste abastecimento.');
   }
   return r;
 }
 function saldo(r) { return r.ganhos - r.combustivel - r.outros; }
+function abastecimentosForaDeOrdem(dados) {
+  const postos = dados.filter(r => r.tipo === 'posto').sort((a,b) => a.odometro-b.odometro);
+  return postos.some((r,i) => i > 0 && r.data < postos[i-1].data);
+}
 function ciclos(dados) {
   const abastecimentos = dados.filter(r => r.tipo === 'posto').sort((a,b) => a.odometro-b.odometro);
   const calculados = new Map();
-  let inicio, litros = 0, custo = 0;
+  let inicio, anterior, litros = 0, custo = 0;
   for (const r of abastecimentos) {
+    if (anterior && r.data < anterior.data) { inicio = null; litros = 0; custo = 0; }
+    anterior = r;
     if (inicio) {
       litros += r.litros;
       custo += r.valor;
@@ -116,7 +164,7 @@ function ciclos(dados) {
     if (r.tanque === 'cheio') {
       if (inicio) {
         const distancia = (r.odometro-inicio.odometro)/100;
-        calculados.set(r.id, {kmPorLitro:distancia/(litros/1000), custoPorKm:(custo/100)/distancia});
+        calculados.set(r.id, {kmPorLitro:distancia/(litros/1000), custoPorKm:(custo/100)/distancia, distanciaCent:r.odometro-inicio.odometro, custoCent:custo});
       }
       inicio = r;
       litros = 0;
@@ -184,17 +232,30 @@ function limpar(form) {
   form.elements.data.value = dataLocal();
   delete form.dataset.id;
   delete form.dataset.jornada;
+  delete form.dataset.dataAlterada;
   form.querySelector('[data-cancelar]').hidden = true;
   $('resultado-' + form.id).hidden = true;
   if (form.id === 'dia') $('estimativa').hidden = true;
   $('apos-' + form.id).hidden = true;
   if (typeof atualizarPrevia === 'function' && form.id === 'dia') atualizarPrevia();
 }
+function atualizarDatasFormularios(anterior, nova) {
+  for (const tipo of Object.keys(tipos)) {
+    const form = $(tipo);
+    const preenchido = [...form.querySelectorAll('input:not([type="date"])')].some(c => c.value.trim());
+    if (!form.dataset.id && !form.dataset.jornada && !form.dataset.dataAlterada && !preenchido && form.elements.data.value === anterior) form.elements.data.value = nova;
+  }
+}
+function assinaturaFormulario(form) {
+  return JSON.stringify({id:form.dataset.id || null,jornada:form.dataset.jornada || null,
+    campos:[...form.querySelectorAll('input, select')].map(c => [c.name,c.value])});
+}
 for (const tipo of Object.keys(tipos)) {
   const form = $(tipo);
   limpar(form);
   form.querySelector('[data-cancelar]').onclick = () => { limpar(form); aviso('Edição cancelada.'); };
-  form.addEventListener('input', () => {
+  form.addEventListener('input', evento => {
+    if (evento.target.name === 'data') form.dataset.dataAlterada = 'true';
     $('resultado-' + tipo).hidden = true;
     if (tipo === 'dia') $('estimativa').hidden = true;
     if (tipo === 'dia' && typeof atualizarPrevia === 'function') atualizarPrevia();
@@ -207,6 +268,9 @@ for (const tipo of Object.keys(tipos)) {
     aviso('');
     try {
       const registro = ler(form);
+      const assinatura = assinaturaFormulario(form);
+      const identidade = {id:form.dataset.id,jornada:form.dataset.jornada};
+      let manterRascunho = false;
       const novos = [...registros.filter(r => r.id !== registro.id),registro];
       if (evento.submitter?.value === 'salvar') {
         const editando = Boolean(form.dataset.id);
@@ -214,13 +278,20 @@ for (const tipo of Object.keys(tipos)) {
           if (!await confirmar('Já existe um fechamento nesta data. Adicionar outro lançamento ao mesmo dia? Você também pode voltar e editar o anterior no Histórico.')) return;
         }
         const jornadaId = form.dataset.jornada;
-        persistir(novos);
-        limpar(form);
-        aviso(editando ? 'Alterações salvas.' : tipos[tipo] + ' salvo no histórico.');
+        await persistir(novos);
+        manterRascunho = assinaturaFormulario(form) !== assinatura;
+        if (!manterRascunho) limpar(form);
+        else if (form.dataset.id === identidade.id && form.dataset.jornada === identidade.jornada) {
+          // Novas alterações pertencem ao lançamento recém-salvo, sem duplicá-lo.
+          form.dataset.id = registro.id;
+          delete form.dataset.jornada;
+          form.querySelector('[data-cancelar]').hidden = false;
+        }
+        aviso(manterRascunho ? 'Lançamento salvo. Mantive os campos que você alterou enquanto a gravação estava pendente.' : editando ? 'Alterações salvas.' : tipos[tipo] + ' salvo no histórico.');
         $('apos-' + tipo).hidden = false;
         document.dispatchEvent(new CustomEvent('rodagem:saved',{detail:{tipo,registro,jornadaId}}));
       }
-      calcular(registro,novos);
+      if (!manterRascunho) calcular(registro,novos);
     } catch (erro) { aviso(erro.message,true); }
     finally { salvando = false; }
   });
@@ -228,13 +299,20 @@ for (const tipo of Object.keys(tipos)) {
 $('estimar').onclick = async () => {
   aviso('');
   try {
+    conferirVersao();
     const form = $('dia');
-    const km = campoNumerico(form.elements.km,2,false,1)/100;
+    if (!dataValida(form.elements.data.value)) throw Error('Escolha uma data válida antes de estimar o combustível.');
+    const km = campoNumerico(form.elements.km,2,false,1);
     const ultimo = [...ciclos(registros.filter(r => r.data <= form.elements.data.value)).values()].at(-1);
     if (!ultimo) throw Error('Salve um ciclo com dois tanques cheios para estimar o combustível.');
-    const estimado = (km*ultimo.custoPorKm).toFixed(2);
+    const numerador = BigInt(km) * BigInt(ultimo.custoCent);
+    const denominador = BigInt(ultimo.distanciaCent);
+    const centavos = Number((numerador + denominador / 2n) / denominador);
+    if (!inteiro(centavos)) throw Error('A estimativa ultrapassa o limite do campo. Confira os km e os abastecimentos.');
+    const estimado = (centavos / 100).toFixed(2);
     const campo = form.elements.combustivel;
     if (campo.value.trim() && !await confirmar('Substituir o combustível informado por ' + moeda.format(Number(estimado)) + '?')) return;
+    conferirVersao();
     campo.value = estimado.replace('.',',');
     $('resultado-dia').hidden = true;
     $('estimativa').textContent = 'Estimativa preenchida no campo Combustível. Confira antes de salvar.';
@@ -248,10 +326,19 @@ $('estimar').onclick = async () => {
 };
 document.querySelectorAll('nav button').forEach(aba => aba.onclick = () => abrir(aba.dataset.panel));
 document.addEventListener('click', evento => {
+  if (evento.target.closest('.skip-link')) {
+    evento.preventDefault();
+    $('conteudo').focus({preventScroll:true});
+    $('conteudo').scrollIntoView({block:'start',behavior:'instant'});
+    return;
+  }
   const atalho = evento.target.closest('[data-go]');
   if (atalho) abrir(atalho.dataset.go);
 });
-window.addEventListener('hashchange',() => abrir(location.hash.slice(1),false));
+window.addEventListener('hashchange',() => {
+  const painel = location.hash.slice(1);
+  if (paineis.includes(painel) || !painel) abrir(painel,false);
+});
 $('filtro').onchange = renderizarHistorico;
 $('tipo-filtro').onchange = renderizarHistorico;
 function filtrados() {
@@ -290,6 +377,7 @@ function editar(r) {
 function formatarData(data) { return data.split('-').reverse().join('/'); }
 function botao(texto, acao) {
   const elemento = document.createElement('button');
+  elemento.type = 'button';
   elemento.className = 'secondary';
   elemento.textContent = texto;
   elemento.onclick = acao;
@@ -353,7 +441,7 @@ function renderizarHistorico() {
     }),botao('Excluir',async () => {
       if (!await confirmar('Excluir o lançamento de ' + formatarData(r.data) + '? Essa ação não pode ser desfeita.')) return;
       try {
-        persistir(registros.filter(item => item.id !== r.id));
+        await persistir(registros.filter(item => item.id !== r.id));
         if ($(r.tipo).dataset.id === r.id) limpar($(r.tipo));
         renderizarHistorico();
         aviso('Lançamento excluído.');
@@ -373,10 +461,14 @@ function baixar(nome, conteudo, tipo) {
   setTimeout(() => URL.revokeObjectURL(url),30000);
 }
 $('backup').onclick = () => {
-  if (erroLeitura) { aviso('Não foi possível ler os registros para o backup.'); return; }
-  baixar('minha-rodagem-' + dataLocal() + '.json',JSON.stringify({versao:1,registros},null,2),'application/json');
+  try {
+    conferirVersao();
+    baixar('minha-rodagem-' + dataLocal() + '.json',JSON.stringify({versao:1,registros},null,2),'application/json');
+  } catch (erro) { aviso(erro.message,true); }
 };
 $('csv').onclick = () => {
+  try {
+  conferirVersao();
   const decimal = valor => String(valor).replace('.',',');
   const linhas = [['Tipo','Data','Ganhos (R$)','Combustível no turno (R$)','Outros gastos (R$)','Entregas','Horas','Km de trabalho','Saldo (R$)','Hodômetro (km)','Litros','Valor no posto (R$)','Tanque']];
   for (const r of filtrados()) {
@@ -385,9 +477,12 @@ $('csv').onclick = () => {
       : ['Abastecimento',r.data,'','','','','','','',decimal(r.odometro/100),decimal(r.litros/1000),decimal(r.valor/100),r.tanque]);
   }
   baixar('minha-rodagem.csv','\uFEFF' + linhas.map(linha => linha.join(';')).join('\r\n'),'text/csv;charset=utf-8');
+  } catch (erro) { aviso(erro.message,true); }
 };
 $('restaurar').onclick = () => $('arquivo').click();
+let importacaoAtual = 0;
 $('arquivo').onchange = async evento => {
+  const importacao = ++importacaoAtual;
   const arquivo = evento.target.files[0];
   evento.target.value = '';
   if (!arquivo) return;
@@ -396,14 +491,16 @@ $('arquivo').onchange = async evento => {
     let dados;
     try { dados = JSON.parse(await arquivo.text()); }
     catch { throw Error('Escolha um backup JSON do Minha Rodagem.'); }
+    if (importacao !== importacaoAtual) return;
     const novos = validarBackup(dados);
     if (!await confirmar('Substituir os registros deste navegador pelos ' + novos.length + ' lançamentos do backup? Baixe uma cópia dos atuais antes, se quiser guardá-los.')) return;
-    persistir(novos,true);
+    if (importacao !== importacaoAtual) return;
+    await persistir(novos,true);
     limpar($('dia'));
     limpar($('posto'));
     renderizarHistorico();
     aviso('Backup restaurado.');
-  } catch (erro) { aviso(erro.message,true); }
+  } catch (erro) { if (importacao === importacaoAtual) aviso(erro.message,true); }
 };
 window.addEventListener('storage', evento => {
   if (evento.key !== chave && evento.key !== null) return;

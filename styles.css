@@ -264,6 +264,7 @@ dd { margin: 0; color: var(--mint); font-size: 17px; font-weight: 700; text-alig
 .notice { position: sticky; top: 12px; z-index: 25; margin-bottom: 20px; padding: 15px 18px; color: #d8f6e8; border: 1px solid #5b8c73; border-radius: 12px; background: #243f32; font-size: 12px; line-height: 1.6; box-shadow: 0 7px 25px #0004; animation: view-in .2s ease; }
 .notice[data-error="true"], .notice.error { color: #ffdbd9; border-color: #aa6a74; background: #4b2930; }
 [data-negative="true"] { color: #ffb1bb !important; }
+.live-summary[data-negative="true"] > strong { color: #ffb1bb; }
 .chart-bar[data-negative="true"], .chart-day[data-negative="true"] .chart-bar { background: linear-gradient(180deg, #ffb0c0, #a85671); }
 dialog { width: min(440px, calc(100% - 32px)); padding: 27px; border: 1px solid #5e5775; border-radius: 22px; color: var(--text); background: #212435; box-shadow: 0 30px 100px #0009; }
 dialog::backdrop { background: #080b13b8; backdrop-filter: blur(5px); }
