@@ -1,5 +1,5 @@
 const PREFIXO = 'rodagem-cache:' + self.registration.scope + ':';
-const CACHE = PREFIXO + '2.0.1';
+const CACHE = PREFIXO + '2.0.2';
 const ARQUIVOS = ['./index.html','./styles.css','./app.js','./experience.js','./manifest.webmanifest','./icon-192.png','./icon-512.png'];
 
 self.addEventListener('install', event => {

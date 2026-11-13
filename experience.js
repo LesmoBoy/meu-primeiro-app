@@ -208,14 +208,40 @@ function atualizarDicaPosto() {
       : 'O primeiro tanque cheio é seu ponto de partida. O próximo permite calcular o consumo.';
 }
 
-function atualizarConexaoRodagem() {
-  const online = navigator.onLine !== false;
+let tentativaConexaoRodagem = 0;
+let controladorConexaoRodagem = null;
+
+function mostrarConexaoRodagem(online) {
   const alvo = $('conexao');
   alvo.dataset.offline = String(!online);
   const ponto = document.createElement('span');
   ponto.className = 'status-dot';
   alvo.replaceChildren(ponto, document.createTextNode(online ? 'Online' : 'Sem internet'));
   alvo.title = online ? 'Conectado à internet. Os registros são salvos neste navegador.' : 'Sem internet. Continue registrando neste navegador.';
+}
+
+async function atualizarConexaoRodagem() {
+  const tentativa = ++tentativaConexaoRodagem;
+  controladorConexaoRodagem?.abort();
+  controladorConexaoRodagem = null;
+  const online = navigator.onLine !== false;
+  mostrarConexaoRodagem(online);
+  if (!online || typeof fetch !== 'function' || typeof AbortController !== 'function') return;
+
+  // navigator.onLine pode indicar apenas uma rede local. HEAD não passa pelo
+  // cache do app e confirma acesso sem baixar arquivos ou alterar registros.
+  const controlador = new AbortController();
+  controladorConexaoRodagem = controlador;
+  const timeout = setTimeout(() => controlador.abort(), 4000);
+  try {
+    await fetch('./sw.js', {method:'HEAD', cache:'no-store', signal:controlador.signal});
+    if (tentativa === tentativaConexaoRodagem) mostrarConexaoRodagem(true);
+  } catch {
+    if (tentativa === tentativaConexaoRodagem) mostrarConexaoRodagem(false);
+  } finally {
+    clearTimeout(timeout);
+    if (controladorConexaoRodagem === controlador) controladorConexaoRodagem = null;
+  }
 }
 
 $('perfil').addEventListener('input', () => { perfilAlterado = true; atualizarOpcoesRotina(); });
@@ -485,6 +511,7 @@ document.addEventListener('visibilitychange', () => {
     sincronizarJornadaRodagem();
     atualizarDiaRodagem();
     atualizarExperiencia();
+    atualizarConexaoRodagem();
   }
 });
 let diaExibidoRodagem = dataLocal();
