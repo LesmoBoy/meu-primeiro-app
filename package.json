@@ -1,6 +1,6 @@
 {
   "name": "minha-rodagem-browser-tests",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "private": true,
   "description": "Verificação do Minha Rodagem publicado em Chromium real, com dados isolados de teste.",
   "scripts": {

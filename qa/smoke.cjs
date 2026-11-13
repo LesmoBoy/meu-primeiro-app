@@ -75,6 +75,7 @@ async function acceptConfirmation(page) {
   page.on('pageerror', err => report.browserErrors.push(err.message));
   await page.clock.install({ time: new Date('2026-11-13T12:00:00Z') });
   await page.goto(base);
+  report.appVersion = await page.locator('.app-footer').innerText();
 
   await check('five routes, hashes and browser back', async () => {
     for (const panel of ['inicio', 'fechamento', 'consumo', 'historico', 'ajustes']) await navigate(page, panel);
@@ -301,24 +302,33 @@ async function acceptConfirmation(page) {
       console.log('OFFLINE_STATE', JSON.stringify(state));
       return state;
     };
-    await page.evaluate(async () => { await navigator.serviceWorker.ready; });
+    await page.waitForFunction(async () => {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      return registrations.some(registration => registration.active?.state === 'activated');
+    }, null, { timeout: 15000 });
     await page.reload();
-    await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller));
+    await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller), null, { timeout: 15000 });
     await context.setOffline(true);
     await snapshot('immediately-after-setOffline');
     await page.reload({ waitUntil: 'domcontentloaded' });
-    await snapshot('after-offline-reload');
+    const reloaded = await snapshot('after-offline-reload');
+    assert.equal(reloaded.uncachedNetworkReachable, false, 'offline proof must bypass the service-worker cache');
+    assert.ok(reloaded.controller && reloaded.cacheKeys.length, 'offline page must retain an active worker and installed cache');
     await navigate(page, 'historico');
     assert.equal((await readRecords(page)).length, finalCount);
     await snapshot('after-history-navigation');
     await navigate(page, 'inicio');
     const state = await snapshot('after-dashboard-navigation');
-    if (state.online === false) {
+    if (state.uncachedNetworkReachable === false) {
       await page.waitForFunction(() => document.querySelector('#conexao').textContent.includes('Sem internet'));
       await snapshot('after-label-event-wait');
     }
     assert.ok((await page.locator('#conexao').innerText()).includes('Sem internet'));
     await context.setOffline(false);
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => document.querySelector('#conexao').textContent.includes('Online'));
+    const recovered = await snapshot('after-online-recovery');
+    assert.equal(recovered.uncachedNetworkReachable, true, 'online recovery must restore real uncached network access');
   });
   await check('screenshots captured and no JavaScript runtime errors', async () => {
     await navigate(page, 'inicio');

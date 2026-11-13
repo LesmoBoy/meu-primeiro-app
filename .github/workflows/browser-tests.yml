@@ -35,7 +35,7 @@ jobs:
         run: |
           node <<'NODE'
           const fs = require('node:fs');
-          for (const name of ['failure.png','mobile-dashboard.png']) {
+          for (const name of ['failure-viewport.png','mobile-viewport.png','desktop-viewport.png']) {
             const path = 'qa/' + name;
             if (!fs.existsSync(path)) continue;
             const encoded = fs.readFileSync(path).toString('base64');
