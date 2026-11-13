@@ -283,24 +283,54 @@ async function acceptConfirmation(page) {
     await page.reload();
   });
   await check('PWA reloads and navigates offline under Pages subpath', async () => {
+    report.offlineEvidence = [];
+    const snapshot = async stage => {
+      const state = await page.evaluate(async stage => ({
+        stage,
+        online: navigator.onLine,
+        readyState: document.readyState,
+        label: document.querySelector('#conexao')?.textContent,
+        updaterType: typeof atualizarConexaoRodagem,
+        activeElement: document.activeElement?.tagName + '#' + (document.activeElement?.id || ''),
+        cacheKeys: await caches.keys(),
+        controller: navigator.serviceWorker.controller?.scriptURL || null,
+        panel: document.querySelector('.view:not([hidden])')?.id,
+        uncachedNetworkReachable: await fetch('./sw.js?browser-offline-proof=' + Date.now(),{cache:'no-store',signal:AbortSignal.timeout(3000)}).then(() => true,() => false)
+      }), stage);
+      report.offlineEvidence.push(state);
+      console.log('OFFLINE_STATE', JSON.stringify(state));
+      return state;
+    };
     await page.evaluate(async () => { await navigator.serviceWorker.ready; });
     await page.reload();
     await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller));
     await context.setOffline(true);
+    await snapshot('immediately-after-setOffline');
     await page.reload({ waitUntil: 'domcontentloaded' });
+    await snapshot('after-offline-reload');
     await navigate(page, 'historico');
     assert.equal((await readRecords(page)).length, finalCount);
+    await snapshot('after-history-navigation');
     await navigate(page, 'inicio');
+    const state = await snapshot('after-dashboard-navigation');
+    if (state.online === false) {
+      await page.waitForFunction(() => document.querySelector('#conexao').textContent.includes('Sem internet'));
+      await snapshot('after-label-event-wait');
+    }
     assert.ok((await page.locator('#conexao').innerText()).includes('Sem internet'));
     await context.setOffline(false);
   });
   await check('screenshots captured and no JavaScript runtime errors', async () => {
     await navigate(page, 'inicio');
-    await page.screenshot({ path: path.join(__dirname, 'mobile-dashboard.png'), fullPage: true });
+    await page.evaluate(() => scrollTo({top: 0, behavior: 'instant'}));
+    await page.screenshot({ path: path.join(__dirname, 'mobile-dashboard.png'), fullPage: true, animations: 'disabled' });
+    await page.screenshot({ path: path.join(__dirname, 'mobile-viewport.png'), animations: 'disabled' });
     await page.setViewportSize({ width: 1280, height: 960 });
-    await page.screenshot({ path: path.join(__dirname, 'desktop-dashboard.png'), fullPage: true });
+    await page.evaluate(() => scrollTo({top: 0, behavior: 'instant'}));
+    await page.screenshot({ path: path.join(__dirname, 'desktop-dashboard.png'), fullPage: true, animations: 'disabled' });
+    await page.screenshot({ path: path.join(__dirname, 'desktop-viewport.png'), animations: 'disabled' });
     await navigate(page, 'fechamento');
-    await page.screenshot({ path: path.join(__dirname, 'desktop-fechamento.png'), fullPage: true });
+    await page.screenshot({ path: path.join(__dirname, 'desktop-fechamento.png'), fullPage: true, animations: 'disabled' });
     assert.deepEqual(report.browserErrors, []);
   });
 })().catch(async error => {
@@ -317,7 +347,11 @@ async function acceptConfirmation(page) {
       }));
       console.error('FAILURE_STATE', JSON.stringify(report.failureState));
     } catch (diagnosticError) { report.diagnosticError = diagnosticError.message; }
-    try { await page.screenshot({ path: path.join(__dirname, 'failure.png'), fullPage: true, timeout: 10000 }); }
+    try {
+      await page.evaluate(() => scrollTo({top: 0, behavior: 'instant'}));
+      await page.screenshot({ path: path.join(__dirname, 'failure.png'), fullPage: true, animations: 'disabled', timeout: 10000 });
+      await page.screenshot({ path: path.join(__dirname, 'failure-viewport.png'), animations: 'disabled', timeout: 10000 });
+    }
     catch (captureError) { report.screenshotError = captureError.message; }
   }
   process.exitCode = 1;
