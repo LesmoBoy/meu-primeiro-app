@@ -1,0 +1,12 @@
+{
+  "name": "minha-rodagem-browser-tests",
+  "version": "2.0.1",
+  "private": true,
+  "description": "Verificação do Minha Rodagem publicado em Chromium real, com dados isolados de teste.",
+  "scripts": {
+    "test:browser": "node qa/smoke.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

@@ -1,0 +1,42 @@
+name: Testes reais do Minha Rodagem
+
+on:
+  push:
+    branches:
+      - 'codex/testes-navegador-*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  chromium:
+    name: Chromium · celular, desktop e offline
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      CI: 'true'
+      APP_URL: https://lesmoboy.github.io/meu-primeiro-app/
+    steps:
+      - name: Obter os arquivos do teste
+        uses: actions/checkout@v4
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Instalar ferramenta de teste
+        run: npm install --no-audit --no-fund
+      - name: Instalar Chromium e bibliotecas
+        run: npx playwright install --with-deps chromium
+      - name: Testar o app publicado com dados fictícios
+        run: npm run test:browser
+      - name: Guardar relatório e capturas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: minha-rodagem-chromium
+          path: |
+            qa/report.json
+            qa/*.png
+          if-no-files-found: warn
+          retention-days: 3
