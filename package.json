@@ -1,0 +1,16 @@
+{
+  "name": "minha-rodagem-browser-tests",
+  "version": "2.2.0",
+  "private": true,
+  "description": "Verificação do Minha Rodagem publicado em Chromium real, com dados isolados de teste.",
+  "scripts": {
+    "test:browser": "node qa/smoke.cjs",
+    "test:gps": "node qa/gps-browser.cjs",
+    "test:gps-core": "node qa/gps-core-test.cjs",
+    "test:profiles": "node qa/profiles-browser.cjs",
+    "test:profiles-core": "node qa/profiles-core-test.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

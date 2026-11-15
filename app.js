@@ -1,5 +1,10 @@
 const $ = id => document.getElementById(id);
-const chave = 'minha-rodagem-v1';
+const dadosDoPerfil = key => window.RodagemProfiles?.key(key) || key;
+const chave = dadosDoPerfil('minha-rodagem-v1');
+function conferirPerfilAtivo() {
+  if (window.RodagemProfiles) window.RodagemProfiles.assertCurrent();
+  else if (document.documentElement.hasAttribute('data-multi-profiles')) throw Error('Os perfis não foram carregados. Reabra o app com internet antes de salvar.');
+}
 const moeda = new Intl.NumberFormat('pt-BR', {style:'currency', currency:'BRL'});
 const numero = new Intl.NumberFormat('pt-BR', {maximumFractionDigits:2});
 const litrosFormatados = new Intl.NumberFormat('pt-BR', {maximumFractionDigits:3});
@@ -83,6 +88,7 @@ try {
   aviso('Não consegui abrir os registros. Se tiver uma cópia, restaure seu backup.');
 }
 function conferirVersao() {
+  conferirPerfilAtivo();
   if (erroLeitura) throw Error('Não foi possível ler os registros. Restaure um backup válido antes de continuar.');
   if (localStorage.getItem(chave) !== versaoLida) throw Error('Os registros mudaram em outra aba. Recarregue antes de salvar ou exportar.');
 }
@@ -90,6 +96,7 @@ async function persistir(novos, restaurando = false) {
   // Capture antes de aguardar a trava: outro salvamento pode concluir na fila.
   const esperado = versaoLida;
   const gravar = () => {
+    conferirPerfilAtivo();
     if (erroLeitura && !restaurando) throw Error('Restaure um backup antes de salvar novos registros.');
     if (localStorage.getItem(chave) !== esperado) {
       throw Error('Os registros mudaram em outra aba. Reabra a página antes de salvar.');
@@ -467,7 +474,10 @@ function baixar(nome, conteudo, tipo) {
 $('backup').onclick = () => {
   try {
     conferirVersao();
-    baixar('minha-rodagem-' + dataLocal() + '.json',JSON.stringify({versao:1,registros},null,2),'application/json');
+    const usuario = window.RodagemProfiles?.current();
+    const perfil = usuario ? {id:usuario.id,nome:usuario.name} : undefined;
+    const identificador = usuario && usuario.id !== 'principal' ? usuario.id.slice(0,8) + '-' : '';
+    baixar('minha-rodagem-' + identificador + dataLocal() + '.json',JSON.stringify({versao:1,registros,perfil},null,2),'application/json');
   } catch (erro) { aviso(erro.message,true); }
 };
 $('csv').onclick = () => {
@@ -497,7 +507,10 @@ $('arquivo').onchange = async evento => {
     catch { throw Error('Escolha um backup JSON do Minha Rodagem.'); }
     if (importacao !== importacaoAtual) return;
     const novos = validarBackup(dados);
-    if (!await confirmar('Substituir os registros deste navegador pelos ' + novos.length + ' lançamentos do backup? Baixe uma cópia dos atuais antes, se quiser guardá-los.')) return;
+    const usuario = window.RodagemProfiles?.current();
+    const origem = typeof dados.perfil?.nome === 'string' ? dados.perfil.nome.slice(0,32) : '';
+    const destino = usuario ? ' do perfil ' + usuario.name : ' deste navegador';
+    if (!await confirmar('Substituir os registros' + destino + ' pelos ' + novos.length + ' lançamentos do backup' + (origem ? ' de ' + origem : '') + '? Os outros perfis não serão alterados. Baixe uma cópia dos atuais antes, se quiser guardá-los.')) return;
     if (importacao !== importacaoAtual) return;
     await persistir(novos,true);
     limpar($('dia'));

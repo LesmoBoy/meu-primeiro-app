@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-multi-profiles>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -11,11 +11,14 @@
   <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="enhancements.css">
+  <link rel="stylesheet" href="profiles.css">
+  <script src="profiles-core.js" defer></script>
   <script src="app.js" defer></script>
   <script src="vendor/leaflet/leaflet.js" defer></script>
   <script src="gps-core.js" defer></script>
   <script src="tracking.js" defer></script>
   <script src="experience.js" defer></script>
+  <script src="profiles-ui.js" defer></script>
   <script src="interactions.js" defer></script>
   <title>Minha Rodagem · Sua rotina no controle</title>
 </head>
@@ -39,8 +42,9 @@
 <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
 <header class="app-header">
   <a class="brand" href="#inicio" aria-label="Minha Rodagem, início"><span class="brand-mark"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-road"/></svg></span><span>minha<span class="brand-light">rodagem</span><small>SEU CORRE, NO CONTROLE</small></span></a>
-  <div class="header-tools"><span id="conexao" class="connection"><span class="status-dot"></span>Online</span><button class="avatar" type="button" data-go="ajustes" aria-label="Abrir meu perfil">MR</button></div>
+  <div class="header-tools"><span id="conexao" class="connection"><span class="status-dot"></span>Online</span><button class="avatar" type="button" data-profiles-open aria-label="Trocar perfil">MR</button></div>
 </header>
+<div class="profile-strip" aria-label="Perfil em uso"><div><small>PERFIL NESTE APARELHO</small><strong id="perfil-atual-nome">Perfil principal</strong></div><button id="trocar-perfil" type="button" class="button secondary">Trocar perfil</button></div>
 <nav class="main-nav" aria-label="Navegação principal">
   <button type="button" data-panel="inicio" aria-controls="inicio" aria-pressed="true"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-home"/></svg><span>Início</span></button>
   <button type="button" data-panel="fechamento" aria-controls="fechamento" aria-pressed="false"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-wallet"/></svg><span>Fechar dia</span></button>
@@ -51,7 +55,7 @@
 <main id="conteudo" tabindex="-1">
   <div id="mensagem" class="notice" role="status" aria-live="polite" hidden></div>
   <section id="inicio" class="view" aria-labelledby="titulo-inicio">
-    <div class="page-heading"><div><p class="eyebrow" id="data-hoje">SEU PAINEL</p><h1 id="titulo-inicio">Bora fazer um bom dia<span class="accent">.</span></h1><p class="page-description">Cada entrega conta. Acompanhe o que fica para você.</p></div><img class="page-illustration" src="assets/inicio.svg" width="180" height="110" alt="" decoding="async"><span class="version-pill">RODAGEM · 2.1.0</span></div>
+    <div class="page-heading"><div><p class="eyebrow" id="data-hoje">SEU PAINEL</p><h1 id="titulo-inicio">Bora fazer um bom dia<span class="accent">.</span></h1><p class="page-description">Cada entrega conta. Acompanhe o que fica para você.</p></div><img class="page-illustration" src="assets/inicio.svg" width="180" height="110" alt="" decoding="async"><span class="version-pill">RODAGEM · 2.2.0</span></div>
     <div class="dashboard-top">
       <div class="hero-card"><div class="hero-content"><span class="eyebrow">SALDO DE HOJE</span><p class="hero-value" id="saldo-hoje">R$ 0,00</p><p class="hero-caption">Seus ganhos menos os gastos do fechamento.</p><div class="hero-mini"><span>Ganhos <strong id="ganhos-hoje">R$ 0,00</strong></span><span>Gastos <strong id="gastos-hoje">R$ 0,00</strong></span><span>Entregas <strong id="entregas-hoje">0</strong></span></div><button class="button hero-button" type="button" data-go="fechamento"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-plus"/></svg>Registrar fechamento<svg class="icon" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></button></div><div class="city-art" aria-hidden="true"><span class="sun"></span><span class="city"></span><span class="road-art"></span></div></div>
       <div class="card goal-card"><div class="card-top"><span class="icon-tile mint"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-spark"/></svg></span><button type="button" class="text-button" data-go="ajustes">Ajustar meta <span aria-hidden="true">↗</span></button></div><h2>Sua meta do dia</h2><p class="goal-amount" id="meta-valor">Defina sua meta</p><div class="progress-track" role="progressbar" aria-label="Meta de saldo do dia" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="meta-progresso"><span></span></div><p class="hint" id="meta-texto">Escolha quanto você quer ter de saldo ao fim do dia.</p><span class="small-label">Você define o ritmo. A gente organiza.</span></div>
@@ -76,7 +80,7 @@
   </section>
   <section id="historico" class="view" aria-labelledby="titulo-historico" hidden>
     <div class="page-heading"><div><p class="eyebrow">HISTÓRICO</p><h1 id="titulo-historico">Seu corre tem história<span class="accent">.</span></h1><p class="page-description">Reveja, ajuste e acompanhe cada lançamento.</p></div><img class="page-illustration" src="assets/historico.svg" width="180" height="110" alt="" decoding="async"><button type="button" class="button primary" data-go="fechamento"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-plus"/></svg>Novo fechamento</button></div>
-    <div class="card"><div class="history-filters"><label>Período<select id="filtro"><option value="todos">Todo o histórico</option><option value="hoje">Hoje</option><option value="semana">Esta semana</option><option value="mes">Este mês</option></select></label><label>Mostrar<select id="tipo-filtro"><option value="todos">Todos os lançamentos</option><option value="dia">Fechamentos</option><option value="posto">Abastecimentos</option></select></label></div><div id="periodo" class="period-summary"></div><div id="lista" class="history-list"></div><footer class="export-actions"><div><strong>Seus dados, com você</strong><p class="hint">O backup guarda os lançamentos e seus km. Perfil e percursos ficam neste aparelho; exporte o trajeto em GPX para guardar uma cópia.</p></div><div class="actions"><button id="csv" type="button" class="button secondary"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-download"/></svg>Exportar CSV</button><button id="backup" type="button" class="button secondary">Baixar backup</button><button id="restaurar" type="button" class="text-button">Restaurar backup</button><input id="arquivo" type="file" accept=".json,application/json" hidden></div></footer></div>
+    <div class="card"><div class="history-filters"><label>Período<select id="filtro"><option value="todos">Todo o histórico</option><option value="hoje">Hoje</option><option value="semana">Esta semana</option><option value="mes">Este mês</option></select></label><label>Mostrar<select id="tipo-filtro"><option value="todos">Todos os lançamentos</option><option value="dia">Fechamentos</option><option value="posto">Abastecimentos</option></select></label></div><div id="periodo" class="period-summary"></div><div id="lista" class="history-list"></div><footer class="export-actions"><div><strong>Seus dados, com você</strong><p class="hint">O backup guarda os lançamentos e os km apenas do perfil em uso. Perfil e percursos ficam neste aparelho; exporte o trajeto em GPX para guardar uma cópia.</p></div><div class="actions"><button id="csv" type="button" class="button secondary"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-download"/></svg>Exportar CSV</button><button id="backup" type="button" class="button secondary">Baixar backup</button><button id="restaurar" type="button" class="text-button">Restaurar backup</button><input id="arquivo" type="file" accept=".json,application/json" hidden></div></footer></div>
   </section>
   <section id="ajustes" class="view" aria-labelledby="titulo-ajustes" hidden>
     <div class="page-heading"><div><p class="eyebrow">MEU PERFIL</p><h1 id="titulo-ajustes">O seu jeito de rodar<span class="accent">.</span></h1><p class="page-description">Ajuste uma vez. Ganhe tempo em cada fechamento.</p></div><img class="page-illustration" src="assets/ajustes.svg" width="180" height="110" alt="" decoding="async"></div>
@@ -103,8 +107,9 @@
     <div class="route-privacy"><p id="gps-ajuda">A distância é uma estimativa por GPS. Sinais imprecisos e intervalos sem posição não viram quilômetros inventados.</p><p><strong>Bateria e precisão:</strong> o modo econômico pede menor precisão e usa intervalos maiores. Se o sinal estiver ruim, Mais precisão pode melhorar o registro, consumindo mais bateria. O consumo depende do aparelho e do navegador.</p><p><strong>Mantenha o app visível:</strong> tela bloqueada ou uso em segundo plano podem suspender a localização. Ao voltar, confira os trechos sem sinal. O app não substitui o hodômetro e permite corrigir os km no fechamento.</p><p><strong>Seu trajeto fica neste aparelho.</strong> São guardados até 10 percursos recentes. Ao exibir as ruas, a área visível é solicitada ao <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>. As ruas precisam de internet; a trilha registrada e os km continuam disponíveis sem elas.</p></div>
   </section>
 
-  <footer class="app-footer"><span>minharodagem <span aria-hidden="true">/</span> feito para quem está no corre.</span><span>Dados neste navegador · v2.1.0</span></footer>
+  <footer class="app-footer"><span>minharodagem <span aria-hidden="true">/</span> feito para quem está no corre.</span><span>Dados deste perfil neste navegador · v2.2.0</span></footer>
 </main>
+<dialog id="perfis-dialogo" aria-labelledby="perfis-titulo" aria-describedby="perfis-descricao"><div class="profiles-dialog-heading"><h2 id="perfis-titulo">Quem vai rodar?</h2><button id="perfis-fechar" type="button" aria-label="Fechar lista de perfis">×</button></div><p id="perfis-descricao">Cada pessoa tem seus lançamentos, moto e percursos separados neste navegador. São perfis locais, sem senha ou sincronização entre aparelhos.</p><div id="perfis-lista"></div><form id="novo-perfil"><label>Nome do novo perfil<input name="nome" maxlength="32" required autocomplete="off" placeholder="Ex.: Ana"></label><button type="submit" class="button primary">Criar perfil</button></form><p id="perfis-erro" role="alert" hidden></p></dialog>
 <dialog id="confirmacao" aria-labelledby="confirmacao-titulo" aria-describedby="confirmacao-texto"><form method="dialog"><span class="icon-tile violet"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-spark"/></svg></span><h2 id="confirmacao-titulo">Confirmar ação</h2><p id="confirmacao-texto"></p><div class="actions"><button value="cancelar" class="button secondary" autofocus>Voltar</button><button value="confirmar" class="button primary">Confirmar</button></div></form></dialog>
 <noscript>Ative o JavaScript no navegador para usar o Minha Rodagem.</noscript>
 </body>

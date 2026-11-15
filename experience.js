@@ -1,9 +1,10 @@
 'use strict';
 
 // Personalização e jornada ficam separadas dos lançamentos da versão 1.
-const perfilStorageKey = 'minha-rodagem-perfil-v2';
-const jornadaStorageKey = 'minha-rodagem-jornada-v2';
-const perfilPadrao = Object.freeze({versao: 1, nome: '', trabalho: 'apps', jornada: 0, meta: 0, moto: '110–160 cc', modelo: '', combustivel: 'Gasolina', configurado: false});
+const perfilStorageKey = dadosDoPerfil('minha-rodagem-perfil-v2');
+const jornadaStorageKey = dadosDoPerfil('minha-rodagem-jornada-v2');
+const usuarioInicial = window.RodagemProfiles?.current();
+const perfilPadrao = Object.freeze({versao: 1, nome: usuarioInicial && usuarioInicial.id !== 'principal' ? usuarioInicial.name : '', trabalho: 'apps', jornada: 0, meta: 0, moto: '110–160 cc', modelo: '', combustivel: 'Gasolina', configurado: false});
 let perfilRodagem = {...perfilPadrao};
 let perfilRaw = null;
 let perfilAlterado = false;
@@ -14,7 +15,8 @@ let jornadaInvalida = false;
 let perfilSalvando = false;
 
 function comTravaExperiencia(nome, acao) {
-  return navigator.locks?.request ? navigator.locks.request(nome, acao) : Promise.resolve().then(acao);
+  const protegida = () => { conferirPerfilAtivo(); return acao(); };
+  return navigator.locks?.request ? navigator.locks.request(nome, protegida) : Promise.resolve().then(protegida);
 }
 
 function lerPerfilRodagem(raw) {
@@ -171,7 +173,7 @@ function atualizarExperiencia() {
   titulo.append(ponto);
   const avatar = document.querySelector('.avatar');
   avatar.textContent = perfilRodagem.nome ? Array.from(perfilRodagem.nome.trim().split(/\s+/).map(p => p[0]).join('')).slice(0, 2).join('').toLocaleUpperCase('pt-BR') : 'MR';
-  avatar.setAttribute('aria-label', 'Abrir perfil' + (perfilRodagem.nome ? ' de ' + perfilRodagem.nome : ''));
+  avatar.setAttribute('aria-label', 'Trocar perfil' + (perfilRodagem.nome ? '. Atual: ' + perfilRodagem.nome : ''));
   const datasInconsistentes = abastecimentosForaDeOrdem(registros);
   const medidos = [...ciclos(registros.filter(r => r.data <= hoje)).values()];
   const ultimo = medidos.at(-1);
@@ -272,6 +274,7 @@ $('perfil').addEventListener('submit', async evento => {
     const raw = JSON.stringify(novo);
     lerPerfilRodagem(raw);
     const formularioEnviado = [...$('perfil').querySelectorAll('input,select')].map(campo => campo.value).join('\u0000');
+    if (novo.nome && window.RodagemProfiles && window.RodagemProfiles.current().name !== novo.nome) await window.RodagemProfiles.renameCurrent(novo.nome);
     const versaoPerfilEsperada = perfilRaw;
     await comTravaExperiencia(perfilStorageKey, () => {
       let atual;
