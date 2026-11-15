@@ -1,0 +1,9 @@
+{
+  "package": "@supabase/supabase-js",
+  "version": "2.119.0",
+  "source": "https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.119.0.tgz",
+  "packageIntegrity": "sha512-MKP49G6bJbPhvsZDegZ/IXS/ITApPgplDCF5+F65KZ5kIArS5Y90WFxwvWYALx2bsxdrSuHvkCiXHYr3dU8+sw==",
+  "browserSHA256": "a867edbcfb029370aeec7223dd6180b560b621fbe3bc64c6584fb0369d1b7bce",
+  "bytes": 219856,
+  "license": "MIT"
+}

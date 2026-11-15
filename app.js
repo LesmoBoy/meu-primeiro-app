@@ -4,6 +4,7 @@ const chave = dadosDoPerfil('minha-rodagem-v1');
 function conferirPerfilAtivo() {
   if (window.RodagemProfiles) window.RodagemProfiles.assertCurrent();
   else if (document.documentElement.hasAttribute('data-multi-profiles')) throw Error('Os perfis não foram carregados. Reabra o app com internet antes de salvar.');
+  if (localStorage.getItem(dadosDoPerfil('minha-rodagem-sync-journal-v1')) !== null) throw Error('A recuperação dos dados está pendente. Reabra o app antes de salvar.');
 }
 const moeda = new Intl.NumberFormat('pt-BR', {style:'currency', currency:'BRL'});
 const numero = new Intl.NumberFormat('pt-BR', {maximumFractionDigits:2});
@@ -138,6 +139,7 @@ function ler(form) {
       if (anterior?.jornadaId) r.jornadaId = anterior.jornadaId;
     }
   } else {
+    if (typeof perfilRodagem !== 'undefined' && window.RodagemVehicles && !window.RodagemVehicles.liquidFuel(perfilRodagem)) throw Error('Este veículo não usa a medição por litro. Registre os gastos no Fechamento; os abastecimentos anteriores continuam no Histórico.');
     r.odometro = campoNumerico(c.odometro,2);
     r.litros = campoNumerico(c.litros,3,false,1);
     r.valor = campoNumerico(c.valor,2);
@@ -153,6 +155,9 @@ function ler(form) {
   return r;
 }
 function saldo(r) { return r.ganhos - r.combustivel - r.outros; }
+function unidadesDeTrabalho() {
+  return window.RodagemVehicles?.workUnitDetails(typeof perfilRodagem === 'undefined' ? null : perfilRodagem) || {singular:'entrega',plural:'entregas',label:'Entregas'};
+}
 function abastecimentosForaDeOrdem(dados) {
   const postos = dados.filter(r => r.tipo === 'posto').sort((a,b) => a.odometro-b.odometro);
   return postos.some((r,i) => i > 0 && r.data < postos[i-1].data);
@@ -199,7 +204,7 @@ function calcular(r, novos) {
   const destino = $('resultado-' + r.tipo);
   if (r.tipo === 'dia') {
     const liquido = saldo(r)/100;
-    const linhas = [['Saldo do dia',moeda.format(liquido)], ['Saldo por entrega',r.entregas ? moeda.format(liquido/r.entregas) : '—']];
+    const linhas = [['Saldo do dia',moeda.format(liquido)], ['Saldo por ' + unidadesDeTrabalho().singular,r.entregas ? moeda.format(liquido/r.entregas) : '—']];
     if (r.horas) linhas.push(['Saldo por hora',moeda.format(liquido/(r.horas/100))]);
     if (r.km) linhas.push(['Saldo por km',moeda.format(liquido/(r.km/100))]);
     apresentar(destino,linhas);
@@ -215,7 +220,7 @@ function calcular(r, novos) {
   }
 }
 const paineis = ['inicio','fechamento','consumo','historico','ajustes','percurso'];
-const nomesPaineis = {inicio:'Início',fechamento:'Fechamento',consumo:'Minha moto',historico:'Histórico',ajustes:'Meu perfil',percurso:'Meu percurso'};
+const nomesPaineis = {inicio:'Início',fechamento:'Fechamento',consumo:'Meu veículo',historico:'Histórico',ajustes:'Meu perfil',percurso:'Meu percurso'};
 function abrir(painel, navegar = true) {
   if (!paineis.includes(painel)) painel = 'inicio';
   for (const aba of document.querySelectorAll('nav button')) {
@@ -307,6 +312,7 @@ $('estimar').onclick = async () => {
   aviso('');
   try {
     conferirVersao();
+    if (typeof perfilRodagem !== 'undefined' && window.RodagemVehicles && !window.RodagemVehicles.liquidFuel(perfilRodagem)) throw Error('A estimativa por litro não se aplica à energia deste veículo. Informe os gastos no Fechamento.');
     const form = $('dia');
     if (!dataValida(form.elements.data.value)) throw Error('Escolha uma data válida antes de estimar o combustível.');
     const km = campoNumerico(form.elements.km,2,false,1);
@@ -364,6 +370,10 @@ function filtrados() {
   }).sort((a,b) => b.data.localeCompare(a.data));
 }
 function editar(r) {
+  if (r.tipo === 'posto' && typeof perfilRodagem !== 'undefined' && window.RodagemVehicles && !window.RodagemVehicles.liquidFuel(perfilRodagem)) {
+    aviso('Este abastecimento anterior está preservado. Para editá-lo, selecione no perfil o veículo e o combustível líquido correspondentes ao registro.',true);
+    return;
+  }
   const form = $(r.tipo);
   limpar(form);
   form.dataset.id = r.id;
@@ -395,10 +405,10 @@ function renderizarHistorico() {
   const dias = dados.filter(r => r.tipo === 'dia');
   const somar = calcular => dias.reduce((total,r) => total + calcular(r),0);
   apresentar($('periodo'),[
-    ['Ganhos das entregas',moeda.format(somar(r => r.ganhos)/100)],
+    ['Ganhos do trabalho',moeda.format(somar(r => r.ganhos)/100)],
     ['Gastos lançados no fechamento',moeda.format(somar(r => r.combustivel+r.outros)/100)],
     ['Saldo dos fechamentos',moeda.format(somar(saldo)/100)],
-    ['Entregas',numero.format(somar(r => r.entregas))],
+    [unidadesDeTrabalho().label,numero.format(somar(r => r.entregas))],
     ['Km de trabalho',numero.format(somar(r => r.km)/100) + ' km'],
     ['Total pago no posto',moeda.format(dados.reduce((total,r) => total + (r.tipo === 'posto' ? r.valor : 0),0)/100)]
   ]);
@@ -436,7 +446,7 @@ function renderizarHistorico() {
     const consumo = consumos.get(r.id);
     titulo.textContent = tipos[r.tipo] + ' · ' + formatarData(r.data);
     detalhe.textContent = r.tipo === 'dia'
-      ? moeda.format(saldo(r)/100) + ' de saldo · ' + r.entregas + ' entregas' + (r.km ? ' · ' + numero.format(r.km/100) + ' km' : '')
+      ? moeda.format(saldo(r)/100) + ' de saldo · ' + r.entregas + ' ' + unidadesDeTrabalho().plural + (r.km ? ' · ' + numero.format(r.km/100) + ' km' : '')
       : numero.format(r.odometro/100) + ' km · ' + moeda.format(r.valor/100) + ' · ' +
         litrosFormatados.format(r.litros/1000) + ' L · ' +
         (consumo ? kmLitro(consumo.kmPorLitro) + ' · ' + moeda.format(consumo.custoPorKm) + '/km' : r.tanque === 'cheio' ? 'Tanque cheio' : 'Parcial');
@@ -484,7 +494,7 @@ $('csv').onclick = () => {
   try {
   conferirVersao();
   const decimal = valor => String(valor).replace('.',',');
-  const linhas = [['Tipo','Data','Ganhos (R$)','Combustível no turno (R$)','Outros gastos (R$)','Entregas','Horas','Km de trabalho','Saldo (R$)','Hodômetro (km)','Litros','Valor no posto (R$)','Tanque']];
+  const linhas = [['Tipo','Data','Ganhos (R$)','Combustível ou energia no turno (R$)','Outros gastos (R$)','Entregas/corridas/serviços','Horas','Km de trabalho','Saldo (R$)','Hodômetro (km)','Litros','Valor no posto (R$)','Tanque']];
   for (const r of filtrados()) {
     linhas.push(r.tipo === 'dia'
       ? ['Fechamento',r.data,decimal(r.ganhos/100),decimal(r.combustivel/100),decimal(r.outros/100),r.entregas,decimal(r.horas/100),decimal(r.km/100),decimal(saldo(r)/100),'','','','']

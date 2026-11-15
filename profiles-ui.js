@@ -76,6 +76,7 @@
   }
   async function prepareChange() {
     db.assertCurrent();
+    if (typeof conferirPerfilAtivo === 'function') conferirPerfilAtivo();
     const running = typeof jornadaRodagem !== 'undefined' && jornadaRodagem?.estado === 'running';
     const dirty = dirtyForms();
     if (running || dirty) {
