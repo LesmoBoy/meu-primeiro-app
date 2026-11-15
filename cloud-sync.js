@@ -281,10 +281,17 @@
     if (className) node.className = className;
     return node;
   }
+  function providerEnabled(provider) {
+    const providers = root.RodagemCloudConfig?.providers;
+    return !Array.isArray(providers) || providers.includes(provider);
+  }
   function button(text,action,provider) {
     const node = element('button',text,'button secondary'); node.type = 'button';
     if (provider) node.dataset.cloudProvider = provider;
-    node.addEventListener('click',() => run(action)); return node;
+    node.addEventListener('click',() => {
+      if (node.disabled || provider && !providerEnabled(provider)) return;
+      run(action);
+    }); return node;
   }
   function render() {
     if (!card) return;
@@ -295,7 +302,10 @@
     const unavailable = !configured || busy || stale || recoveryFailed || Boolean(problem);
     const buttons = [...actions.querySelectorAll('button')];
     for (const node of buttons) node.disabled = unavailable;
-    for (const node of buttons.filter(node => node.dataset.cloudProvider)) node.hidden = Boolean(session);
+    for (const node of buttons.filter(node => node.dataset.cloudProvider)) {
+      node.hidden = Boolean(session);
+      node.disabled = unavailable || !providerEnabled(node.dataset.cloudProvider);
+    }
     document.getElementById('cloud-link').hidden = !session || Boolean(binding);
     document.getElementById('cloud-upload').hidden = !session || !binding;
     document.getElementById('cloud-restore').hidden = !session || !binding;
