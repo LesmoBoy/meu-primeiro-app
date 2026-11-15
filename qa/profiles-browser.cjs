@@ -51,14 +51,17 @@ async function choose(p,id,{confirm=false}={}){
 }
 async function newContext(){
   const c=await browser.newContext({viewport:{width:390,height:844},acceptDownloads:true,locale:'pt-BR',timezoneId:'America/Sao_Paulo'});
-  c.on('page',p=>p.on('pageerror',error=>report.browserErrors.push(error.message)));
+  c.on('page',p=>p.on('pageerror',error=>report.browserErrors.push(error.stack||error.message)));
   await c.route('https://tile.openstreetmap.org/**',r=>r.abort());
-  await c.addInitScript(seed=>{
+  await c.addInitScript(({seed,origin})=>{
+    // Playwright also runs init scripts in a new tab's about:blank document,
+    // where storage has no origin. Seed only the app under test.
+    if(location.origin!==origin)return;
     if(!localStorage.getItem('__profiles_test_seeded')){
       for(const[key,value]of Object.entries(seed))localStorage.setItem(key,value);
       localStorage.setItem('__profiles_test_seeded','1');
     }
-  },seed);
+  },{seed,origin:new URL(base).origin});
   return c;
 }
 
