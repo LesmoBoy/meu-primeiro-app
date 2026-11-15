@@ -2,10 +2,12 @@
  * coordenadas e percursos não são enviados pelo app a um servidor próprio. */
 (() => {
   'use strict';
-  const PREFIX = 'minha-rodagem-rota-v1:';
-  const INDEX = 'minha-rodagem-rotas-indice-v1';
-  const PREFS = 'minha-rodagem-gps-preferencias-v1';
-  const LEASE = 'minha-rodagem-gps-lease-v1';
+  const scoped = key => globalThis.RodagemProfiles?.key(key) || key;
+  const assertProfile = () => typeof conferirPerfilAtivo === 'function' ? conferirPerfilAtivo() : globalThis.RodagemProfiles?.assertCurrent();
+  const PREFIX = scoped('minha-rodagem-rota-v1:');
+  const INDEX = scoped('minha-rodagem-rotas-indice-v1');
+  const PREFS = scoped('minha-rodagem-gps-preferencias-v1');
+  const LEASE = scoped('minha-rodagem-gps-lease-v1');
   const owner = globalThis.crypto?.randomUUID?.() || Date.now() + '-' + Math.random();
   const geo = () => globalThis.RodagemGeo;
   const el = id => document.getElementById(id);
@@ -53,6 +55,7 @@
     for (const entry of remove) localStorage.removeItem(PREFIX + entry.id);
   }
   function save(track, finished = journey?.estado !== 'running') {
+    assertProfile();
     const key = PREFIX + track.id;
     if (track.id === active?.id && localStorage.getItem(key) !== raw) throw Error('O percurso mudou em outra aba. O GPS desta aba foi interrompido para preservar o trajeto.');
     const canonical = geo().validate(track);
@@ -70,6 +73,7 @@
     } catch { return false; }
   }
   function renewLease() {
+    assertProfile();
     const now = Date.now();
     const previous = JSON.parse(localStorage.getItem(LEASE) || 'null');
     if (previous && previous.owner !== owner && previous.until > now) return false;
@@ -274,7 +278,7 @@
   function distanceMeters(id) { return (id === active?.id ? active : read(id))?.totalMeters || 0; }
   function getSummary(id) { const t = id === active?.id ? active : read(id); return t ? {meters:t.totalMeters,points:t.points.length,gaps:t.gaps,mode:t.mode,updatedAt:t.updatedAt} : null; }
   function persistPrefs() {
-    try { localStorage.setItem(PREFS,JSON.stringify(prefs)); }
+    try { assertProfile(); localStorage.setItem(PREFS,JSON.stringify(prefs)); }
     catch { warn('Não foi possível guardar a preferência de GPS. Ela vale apenas nesta tela.'); }
   }
   el('gps-usar')?.addEventListener('change',() => {
@@ -320,6 +324,7 @@
     if (!id || (!track && !invalidRoutes.has(id))) return;
     if (!await confirmar('Apagar somente este percurso GPS? Os km e valores já salvos nos fechamentos serão mantidos.')) return;
     try {
+      assertProfile();
       if (!track) {
         if (journey?.id === id) { stop(); active = null; raw = null; prefs.enabled = false; persistPrefs(); if (el('gps-usar')) el('gps-usar').checked = false; }
         localStorage.removeItem(PREFIX + id); invalidRoutes.delete(id);
@@ -343,6 +348,9 @@
   window.addEventListener('pageshow',() => { if (journey?.estado === 'running') start(journey,{requestPermission:false}).catch(() => {}); });
   window.addEventListener('offline',() => { roadsFailed = true; render(false); });
   window.addEventListener('online',() => { if (isMapVisible() && map) roads?.redraw(); });
-  window.RodagemGPS = {sync,start,distanceMeters,hasTrack:id => Boolean(read(id)?.points.length),openRoute,getSummary};
+  function suspend() { stop(); status = 'Captura pausada durante a troca de perfil.'; render(false); }
+  document.addEventListener('rodagem:profile-will-change',suspend);
+  document.addEventListener('rodagem:profile-stale',suspend);
+  window.RodagemGPS = {sync,start,distanceMeters,hasTrack:id => Boolean(read(id)?.points.length),openRoute,getSummary,suspend};
   render(false);
 })();
