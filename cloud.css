@@ -1,0 +1,9 @@
+.cloud-card { margin-top: 24px; }
+.cloud-card h2 { margin-bottom: 12px; }
+.cloud-account { font-weight: 650; color: var(--text,#edf1f8); overflow-wrap: anywhere; }
+.cloud-status { color: var(--muted,#acb5c8); line-height: 1.7; margin: 10px 0 18px; font-size: 13px; }
+.cloud-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
+.cloud-actions button { min-height: 46px; white-space: normal; text-align: left; }
+.cloud-actions button[hidden] { display: none !important; }
+.cloud-card .hint { line-height: 1.7; }
+@media (max-width: 420px) { .cloud-actions { display: grid; grid-template-columns: minmax(0,1fr); } .cloud-actions button { width: 100%; } }

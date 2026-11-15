@@ -1,5 +1,5 @@
-/* Captura local por jornada. O mapa pede somente os blocos de ruas visíveis;
- * coordenadas e percursos não são enviados pelo app a um servidor próprio. */
+/* Captura local por jornada. O mapa pede os blocos de ruas visíveis.
+ * O envio de percursos à conta depende da sincronização explícita. */
 (() => {
   'use strict';
   const scoped = key => globalThis.RodagemProfiles?.key(key) || key;

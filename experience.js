@@ -4,7 +4,7 @@
 const perfilStorageKey = dadosDoPerfil('minha-rodagem-perfil-v2');
 const jornadaStorageKey = dadosDoPerfil('minha-rodagem-jornada-v2');
 const usuarioInicial = window.RodagemProfiles?.current();
-const perfilPadrao = Object.freeze({versao: 1, nome: usuarioInicial && usuarioInicial.id !== 'principal' ? usuarioInicial.name : '', trabalho: 'apps', jornada: 0, meta: 0, moto: '110–160 cc', modelo: '', combustivel: 'Gasolina', configurado: false});
+const perfilPadrao = Object.freeze({versao: 2, nome: usuarioInicial && usuarioInicial.id !== 'principal' ? usuarioInicial.name : '', trabalho: 'apps', jornada: 0, meta: 0, categoria: 'moto', modelo: '', ano: null, combustivel: 'Gasolina', configurado: false});
 let perfilRodagem = {...perfilPadrao};
 let perfilRaw = null;
 let perfilAlterado = false;
@@ -20,18 +20,8 @@ function comTravaExperiencia(nome, acao) {
 }
 
 function lerPerfilRodagem(raw) {
-  if (!raw) return {...perfilPadrao};
-  const p = JSON.parse(raw);
-  if (!p || p.versao !== 1 || typeof p.nome !== 'string' || p.nome.length > 32 ||
-      typeof p.modelo !== 'string' || p.modelo.length > 40 ||
-      !['apps', 'restaurante', 'encomendas', 'misto'].includes(p.trabalho) ||
-      !['110–160 cc', '200–300 cc', 'Scooter', 'Outra moto'].includes(p.moto) ||
-      !['Gasolina', 'Etanol', 'Flex / alternado'].includes(p.combustivel) ||
-      !Number.isFinite(p.jornada) || p.jornada < 0 || p.jornada > 24 ||
-      !inteiro(p.meta) || typeof p.configurado !== 'boolean') throw Error('Perfil inválido.');
-  return {versao: 1, nome: p.nome.trim(), trabalho: p.trabalho, jornada: p.jornada,
-    meta: p.meta, moto: p.moto, modelo: p.modelo.trim(), combustivel: p.combustivel,
-    configurado: p.configurado};
+  if (!window.RodagemVehicles) throw Error('O cadastro de veículos não foi carregado. Reabra o app com internet.');
+  return window.RodagemVehicles.validateProfile(raw,perfilPadrao);
 }
 
 function lerJornadaRodagem(raw) {
@@ -92,11 +82,45 @@ function atualizarOpcoesRotina() {
 
 function preencherPerfilRodagem() {
   const form = $('perfil');
-  for (const campo of ['nome', 'trabalho', 'moto', 'modelo', 'combustivel']) form.elements[campo].value = perfilRodagem[campo];
+  for (const campo of ['nome', 'trabalho', 'categoria', 'modelo', 'combustivel']) form.elements[campo].value = perfilRodagem[campo];
+  form.elements.ano.value = perfilRodagem.ano === null ? '' : String(perfilRodagem.ano);
   form.elements.jornada.value = perfilRodagem.jornada ? String(perfilRodagem.jornada).replace('.', ',') : '';
   form.elements.meta.value = perfilRodagem.meta ? (perfilRodagem.meta / 100).toFixed(2).replace('.', ',') : '';
   perfilAlterado = false;
   atualizarOpcoesRotina();
+  atualizarCadastroVeiculoRodagem();
+}
+
+function atualizarCadastroVeiculoRodagem() {
+  const form = $('perfil');
+  const catalogo = window.RodagemVehicles;
+  if (!catalogo) return;
+  const categoria = form.elements.categoria.value;
+  const energia = form.elements.combustivel;
+  const obrigatoria = categoria === 'bicicleta' ? 'Sem combustível' : categoria === 'bicicleta-eletrica' ? 'Elétrico' : null;
+  if (obrigatoria) energia.value = obrigatoria;
+  energia.disabled = Boolean(obrigatoria);
+  const dica = $('categoria-dica');
+  if (dica) dica.textContent = catalogo.category(categoria)?.description || 'Escolha a categoria e escreva o nome ou modelo do seu veículo.';
+}
+
+function atualizarVeiculoRodagem() {
+  const catalogo = window.RodagemVehicles;
+  if (!catalogo) return;
+  const liquido = catalogo.liquidFuel(perfilRodagem);
+  const dica = $('veiculo-resumo-dica');
+  if (dica) { dica.textContent = catalogo.fuelHint(perfilRodagem); dica.dataset.unavailable = String(!liquido); }
+  const abastecimento = $('novo-abastecimento');
+  if (abastecimento) abastecimento.hidden = !liquido;
+  $('estimar').disabled = !liquido;
+  $('estimar').hidden = !liquido;
+  if (!liquido) $('estimativa').hidden = true;
+  const unidades = catalogo.workUnits(perfilRodagem);
+  for (const alvo of document.querySelectorAll('[data-work-units]')) alvo.textContent = unidades;
+  const rotulo = $('veiculo-unidade-entregas');
+  if (rotulo) rotulo.textContent = unidades + (unidades === 'Serviços' ? ' realizados' : ' realizadas');
+  const energia = $('gasto-energia-label');
+  if (energia) energia.textContent = perfilRodagem.combustivel === 'Elétrico' ? 'Energia do turno (R$)' : liquido || perfilRodagem.combustivel === 'GNV' ? 'Combustível do turno (R$)' : 'Gasto de deslocamento (R$)';
 }
 
 function graficoSemanaRodagem() {
@@ -177,19 +201,22 @@ function atualizarExperiencia() {
   const datasInconsistentes = abastecimentosForaDeOrdem(registros);
   const medidos = [...ciclos(registros.filter(r => r.data <= hoje)).values()];
   const ultimo = medidos.at(-1);
-  $('moto-consumo').textContent = ultimo ? kmLitro(ultimo.kmPorLitro) : '— km/L';
-  $('moto-consumo-dica').textContent = datasInconsistentes
+  const catalogoVeiculos = window.RodagemVehicles;
+  const combustivelLiquido = catalogoVeiculos?.liquidFuel(perfilRodagem);
+  $('moto-consumo').textContent = !combustivelLiquido ? 'Não se aplica' : ultimo ? kmLitro(ultimo.kmPorLitro) : '— km/L';
+  $('moto-consumo-dica').textContent = !combustivelLiquido ? 'Esta fonte de energia não é medida em litros.' : datasInconsistentes
     ? 'Há datas fora da ordem do hodômetro. Revise no Histórico; ciclos inconsistentes são ignorados.'
-    : ultimo ? 'Último ciclo entre tanques cheios, até hoje.' : 'Complete um ciclo para medir.';
-  $('moto-custo').textContent = ultimo ? moeda.format(ultimo.custoPorKm) : '—';
-  $('moto-nome').textContent = perfilRodagem.configurado ? (perfilRodagem.modelo || perfilRodagem.moto) : 'Do seu jeito';
-  $('moto-combustivel').textContent = perfilRodagem.configurado ? perfilRodagem.moto + ' · ' + perfilRodagem.combustivel : 'Cadastre no seu perfil.';
-  $('insight-titulo').textContent = ultimo ? kmLitro(ultimo.kmPorLitro) + ' na prática' : 'Conheça seu custo por km';
-  $('insight-texto').textContent = datasInconsistentes
+    : ultimo ? 'Último ciclo deste perfil, até hoje.' : 'Complete um ciclo para medir.';
+  $('moto-custo').textContent = combustivelLiquido && ultimo ? moeda.format(ultimo.custoPorKm) : '—';
+  $('moto-nome').textContent = perfilRodagem.configurado ? catalogoVeiculos?.vehicleLabel(perfilRodagem) || perfilRodagem.modelo || 'Seu veículo' : 'Do seu jeito';
+  $('moto-combustivel').textContent = perfilRodagem.configurado ? [catalogoVeiculos?.category(perfilRodagem.categoria)?.label,perfilRodagem.ano,perfilRodagem.combustivel].filter(Boolean).join(' · ') : 'Cadastre no seu perfil.';
+  $('insight-titulo').textContent = combustivelLiquido && ultimo ? kmLitro(ultimo.kmPorLitro) + ' na prática' : 'Conheça seu custo por km';
+  $('insight-texto').textContent = !catalogoVeiculos ? 'Reabra o app com internet para carregar o cadastro de veículos.' : !combustivelLiquido ? catalogoVeiculos.fuelHint(perfilRodagem) : datasInconsistentes
     ? 'Algumas datas de abastecimento estão fora da ordem do hodômetro. Confira os lançamentos no Histórico para corrigir o consumo.'
     : ultimo
     ? 'No último ciclo, cada km custou ' + moeda.format(ultimo.custoPorKm) + ' em combustível. Use essa referência no fechamento.'
-    : 'Dois tanques cheios ajudam a descobrir quanto a moto consome de verdade.';
+    : 'Dois tanques cheios ajudam a medir o consumo real nos abastecimentos deste perfil.';
+  atualizarVeiculoRodagem();
   atualizarDicaPosto();
   graficoSemanaRodagem();
   atualizarPrevia();
@@ -246,8 +273,8 @@ async function atualizarConexaoRodagem() {
   }
 }
 
-$('perfil').addEventListener('input', () => { perfilAlterado = true; atualizarOpcoesRotina(); });
-$('perfil').addEventListener('change', () => { perfilAlterado = true; });
+$('perfil').addEventListener('input', () => { perfilAlterado = true; atualizarOpcoesRotina(); atualizarCadastroVeiculoRodagem(); });
+$('perfil').addEventListener('change', () => { perfilAlterado = true; atualizarCadastroVeiculoRodagem(); });
 document.querySelectorAll('[data-rotina]').forEach(botao => botao.addEventListener('click', () => {
   $('perfil').elements.jornada.value = botao.dataset.rotina;
   perfilAlterado = true;
@@ -269,8 +296,10 @@ $('perfil').addEventListener('submit', async evento => {
     }
     const meta = moedaInputRodagem(c.meta.value);
     if (meta === null) { c.meta.focus(); throw Error('Confira a meta. Use um valor como 150,00.'); }
-    const novo = {versao: 1, nome: c.nome.value.trim(), trabalho: c.trabalho.value, jornada, meta,
-      moto: c.moto.value, modelo: c.modelo.value.trim(), combustivel: c.combustivel.value, configurado: true};
+    const textoAno = c.ano.value.trim();
+    if (textoAno && !/^\d{4}$/.test(textoAno)) { c.ano.focus(); throw Error('Informe o ano com quatro dígitos, como 2020, ou deixe em branco.'); }
+    const novo = {versao: 2, nome: c.nome.value.trim(), trabalho: c.trabalho.value, jornada, meta,
+      categoria: c.categoria.value, modelo: c.modelo.value.trim(), ano: textoAno ? Number(textoAno) : null, combustivel: c.combustivel.value, configurado: true};
     const raw = JSON.stringify(novo);
     lerPerfilRodagem(raw);
     const formularioEnviado = [...$('perfil').querySelectorAll('input,select')].map(campo => campo.value).join('\u0000');
@@ -286,6 +315,7 @@ $('perfil').addEventListener('submit', async evento => {
       perfilRaw = raw;
       perfilRodagem = novo;
     });
+    document.dispatchEvent(new CustomEvent('rodagem:profile-saved'));
     perfilAlterado = formularioEnviado !== [...$('perfil').querySelectorAll('input,select')].map(campo => campo.value).join('\u0000');
     atualizarExperiencia();
     aviso('Perfil salvo. Sua rotina está pronta para os próximos fechamentos.');

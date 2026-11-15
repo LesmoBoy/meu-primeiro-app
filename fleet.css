@@ -1,0 +1,23 @@
+/* Cadastro aberto para os veículos e atividades do perfil. */
+.vehicle-profile-card > .section-heading { align-items: flex-start; margin-bottom: 14px; }
+.vehicle-profile-card .section-heading h2 { margin: 0; font-size: 19px; }
+.vehicle-profile-card .section-heading .eyebrow { max-width: 210px; font-size: 9px; letter-spacing: 1.15px; }
+.vehicle-profile-card .icon-tile { width: 36px; height: 36px; }
+.vehicle-profile-card .fleet-intro { margin: 0 0 24px; color: #b7c1d4; font-size: 12px; line-height: 1.65; }
+.fleet-vehicle-fields { display: grid; grid-template-columns: minmax(0,.8fr) minmax(0,1.2fr); gap: 16px; margin-top: 22px; }
+.profile-layout .fleet-vehicle-fields label + label { margin-top: 0; }
+.fleet-vehicle-fields select { font-size: 14px; }
+.profile-side .fleet-profile-note { margin-top: 22px; }
+.fleet-energy-note { margin: 0 0 20px; border-color: #405d53; background: #20332d; color: #cae6d9; }
+.fleet-energy-note[data-unavailable="true"] { background: #2c2940; border-color: #62557b; color: #dfd3f3; }
+[data-work-units] { overflow-wrap: anywhere; }
+#perfil select optgroup { color: #d7e3dc; background: #1b2330; }
+#perfil select option { color: #edf1f9; background: #1b2330; }
+@media (min-width: 761px) and (max-width: 1050px) {
+  .fleet-vehicle-fields { grid-template-columns: minmax(0,1fr); }
+  .profile-layout .fleet-vehicle-fields label + label { margin-top: 0; }
+}
+@media (max-width: 380px) {
+  .fleet-vehicle-fields { grid-template-columns: minmax(0,1fr); gap: 20px; }
+  .vehicle-profile-card .section-heading h2 { font-size: 18px; }
+}
