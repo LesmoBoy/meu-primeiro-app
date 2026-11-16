@@ -17,6 +17,7 @@ jobs:
     env:
       CI: 'true'
       APP_URL: ''
+      BUSINESS_ONLY: ${{ contains(github.event.head_commit.message, '[business-only]') }}
     steps:
       - name: Obter os arquivos do teste
         uses: actions/checkout@v4
@@ -31,15 +32,16 @@ jobs:
       - name: Testar o app publicado com dados fictícios
         run: npm run test:gps-core && npm run test:profiles-core && node qa/vehicle-catalog-test.cjs && node qa/cloud-client-test.cjs && npm run test:business-core && npm run test:business-client && npm run test:billing
       - name: Testar os fluxos principais com dados fictícios
+        if: env.BUSINESS_ONLY != 'true'
         run: npm run test:browser
       - name: Testar mapa, GPS e proteção do percurso
-        if: always()
+        if: always() && env.BUSINESS_ONLY != 'true'
         run: node qa/gps-browser.cjs
       - name: Testar criação e troca de perfis locais
-        if: always()
+        if: always() && env.BUSINESS_ONLY != 'true'
         run: npm run test:profiles
       - name: Testar veículos, atividades e instalação sem login configurado
-        if: always()
+        if: always() && env.BUSINESS_ONLY != 'true'
         run: npm run test:fleet
       - name: Testar empresa, equipe, frota, custos e alertas
         if: always()

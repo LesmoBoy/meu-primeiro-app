@@ -20,8 +20,8 @@ async function workspace(){return page.evaluate(()=>RodagemBusiness.getCurrentWo
 async function rawBusiness(){return page.evaluate(key=>localStorage.getItem(RodagemProfiles.key(key)),businessKey);}
 async function fill(formId,values){for(const[name,value]of Object.entries(values)){const field=page.locator(`#${formId} [name="${name}"]`);if(await field.evaluate(e=>e.type==='checkbox'))await field.setChecked(Boolean(value));else if(await field.evaluate(e=>e.tagName==='SELECT'))await field.selectOption(String(value));else await field.fill(String(value));}}
 async function submit(formId){await page.locator(`#${formId} button[type="submit"]`).click();await settled();}
-async function confirm(){const dialog=page.locator('#confirmacao');await dialog.waitFor({state:'visible'});await dialog.locator('[value="confirmar"]').click();await dialog.waitFor({state:'hidden'});await settled();}
-async function tab(name){await page.locator(`[data-business-tab="${name}"]`).click();if(await page.locator('#confirmacao').isVisible())await confirm();await settled();}
+async function confirm(choice='confirmar'){const dialog=page.locator('#confirmacao');await dialog.waitFor({state:'visible'});await dialog.evaluate(el=>{window.__businessDialogClosed=new Promise(resolve=>el.addEventListener('close',()=>resolve(true),{once:true}));});await dialog.locator(`[value="${choice}"]`).click();await page.evaluate(()=>window.__businessDialogClosed);await dialog.waitFor({state:'hidden'});await settled();}
+async function tab(name){await page.locator(`[data-business-tab="${name}"]`).click();if(await page.locator('#confirmacao').isVisible())await confirm();await page.waitForFunction(name=>document.querySelector(`[data-business-tab="${name}"]`)?.getAttribute('aria-pressed')==='true',name);await settled();}
 async function selectCompany(id){await page.locator('#business-company').selectOption(id);if(await page.locator('#confirmacao').isVisible())await confirm();await page.waitForFunction(id=>RodagemBusiness.getCurrentWorkspace()?.company.id===id,id);await settled();}
 async function createCompany(name){await fill('business-company-form',{name});await submit('business-company-form');await page.waitForFunction(name=>RodagemBusiness.getCurrentWorkspace()?.company.name===name,name);return (await workspace()).company.id;}
 function row(list,id){return page.locator(`#business-${list} [data-business-id="${id}"]`);}
@@ -101,6 +101,7 @@ async function newTrip(values){await tab('trips');await fill('business-trip-form
   });
   await check('archiving a vehicle preserves its completed trip and removes new-assignment choices',async()=>{
     await tab('vehicles');await row('vehicles',vehicleA).getByRole('button',{name:'Arquivar',exact:true}).click();await confirm();
+    await page.waitForFunction(id=>Boolean(RodagemBusiness.getCurrentWorkspace().vehicles.find(v=>v.id===id)?.archivedAt),vehicleA);
     const ws=await workspace();assert.ok(ws.vehicles.find(v=>v.id===vehicleA).archivedAt);assert.equal(ws.trips.find(t=>t.id===completedTrip).vehicleId,vehicleA);
     await tab('trips');assert.equal(await page.locator(`#business-trip-form [name="vehicleId"] option[value="${vehicleA}"]`).count(),0);
     await tab('dashboard');assert.equal(textMoney(await page.locator('#business-revenue').innerText()),'R$860,00');
@@ -112,7 +113,7 @@ async function newTrip(values){await tab('trips');await fill('business-trip-form
   });
   await check('unsaved company form fields require confirmation before changing companies',async()=>{
     await tab('trips');await fill('business-trip-form',{title:'Rascunho que deve continuar'});await page.locator('#business-company').selectOption(companyB);
-    await page.locator('#confirmacao').waitFor({state:'visible'});await page.locator('#confirmacao [value="cancelar"]').click();await settled();
+    await confirm('cancelar');
     assert.equal((await workspace()).company.id,companyA);assert.equal(await page.locator('#business-trip-form [name="title"]').inputValue(),'Rascunho que deve continuar');
     await tab('dashboard');
   });
@@ -132,7 +133,7 @@ async function newTrip(values){await tab('trips');await fill('business-trip-form
   await check('an edit in another tab while restore confirmation waits cancels a stale import',async()=>{
     const restored=JSON.stringify(backupData);await page.locator('#business-import-file').setInputFiles({name:'business.json',mimeType:'application/json',buffer:Buffer.from(restored)});await page.locator('#confirmacao').waitFor({state:'visible'});
     await page.evaluate(({key,companyA})=>{const physical=RodagemProfiles.key(key),state=JSON.parse(localStorage.getItem(physical));state.companies.find(c=>c.id===companyA).name='Aurora atualizada em outra aba';localStorage.setItem(physical,JSON.stringify(state));},{key:businessKey,companyA});
-    const newer=await rawBusiness();await confirm();assert.equal(await rawBusiness(),newer);assert.match(await page.locator('#business-notice').innerText(),/mudaram|atualize/i);
+    const newer=await rawBusiness();await confirm();await page.waitForFunction(()=>/mudaram|atualize/i.test(document.querySelector('#business-notice')?.textContent||''));assert.equal(await rawBusiness(),newer);assert.match(await page.locator('#business-notice').innerText(),/mudaram|atualize/i);
     await page.reload();await ready();await page.locator('.main-nav [data-panel="empresa"]').click();await selectCompany(companyA);
   });
   await check('subscription setup stays honest and cannot start an unconfigured checkout',async()=>{
