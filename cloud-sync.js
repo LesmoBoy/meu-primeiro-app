@@ -102,6 +102,7 @@
   }
   const dataLocks = () => [profiles.registryKey,keys.records,keys.settings,keys.journey,keys.binding,keys.index,keys.gps];
   function dirty() {
+    if (window.RodagemBusinessUI?.isDirty()) return true;
     if (typeof perfilAlterado !== 'undefined' && perfilAlterado) return true;
     return ['dia','posto'].some(id => {
       const form = document.getElementById(id);
@@ -293,6 +294,10 @@
       run(action);
     }); return node;
   }
+  async function startProvider(provider) {
+    if (dirty() && !await confirmar('Entrar na conta vai reabrir o app. Os campos ainda não salvos serão descartados. Continuar?')) return null;
+    return cloud.signIn(provider);
+  }
   function render() {
     if (!card) return;
     const configured = Boolean(cloud?.configured());
@@ -339,7 +344,7 @@
     const heading = element('h2','Sua conta, seus dados'); heading.id = 'cloud-title';
     account = element('p',null,'cloud-account'); status = element('p',null,'cloud-status'); status.id = 'cloud-status'; status.setAttribute('role','status'); status.setAttribute('aria-live','polite');
     details = element('p',null,'hint'); actions = element('div',null,'actions cloud-actions');
-    actions.append(button('Entrar com Google',() => cloud.signIn('google'),'google'),button('Entrar com Facebook',() => cloud.signIn('facebook'),'facebook'));
+    actions.append(button('Entrar com Google',() => startProvider('google'),'google'),button('Entrar com Facebook',() => startProvider('facebook'),'facebook'));
     for (const [id,label,action] of [['cloud-link','Vincular este perfil à conta',bind],['cloud-upload','Salvar cópia na nuvem',upload],['cloud-restore','Recuperar cópia da conta',restore],['cloud-signout','Sair da conta',async () => { await cloud.signOut(); session = null; sessionEpoch++; return true; }]]) {
       const node = button(label,action); node.id = id; actions.append(node);
     }

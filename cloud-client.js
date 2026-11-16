@@ -159,5 +159,55 @@
     }
     return rpc('rodagem_save_snapshot',{expected_revision:expectedRevision,snapshot},false,expectedUserId);
   }
-  root.RodagemCloud = Object.freeze({configured,configurationIssue,ready:getSession,getSession,verifySession,onAuth,signIn,signOut,load,save});
+  const businessRPCs = new Set(['business_list_companies','business_create_company','business_load_workspace','business_save_entity','business_archive_entity','business_invite_member','business_accept_invite','business_save_member','business_revoke_invite']);
+  function profileGuard() {
+    const profiles = root.RodagemProfiles;
+    const id = profiles?.current().id;
+    return () => {
+      if (!profiles) return;
+      profiles.assertCurrent();
+      if (profiles.current().id !== id) throw new CloudError('SESSION_CHANGED','O perfil foi alterado. Reabra a área da empresa antes de continuar.');
+    };
+  }
+  function businessFailure(error) {
+    if (error?.code === '42501') return new CloudError('FORBIDDEN','Sua função nesta empresa não permite essa ação.');
+    if (error?.code === 'BILLING_NOT_CONFIGURED') return new CloudError('BILLING_NOT_CONFIGURED','A contratação online ainda não está disponível nesta instalação.');
+    if (error?.code === 'PROVIDER_ERROR') return new CloudError('PROVIDER_ERROR','O serviço de pagamento não respondeu. Tente novamente em alguns instantes.');
+    if (error?.code === 'PLAN_LIMIT' || (error?.code === 'P0001' && error?.message === 'PLAN_LIMIT')) return new CloudError('PLAN_LIMIT','O limite do plano desta empresa foi atingido. Confira o plano antes de continuar.');
+    return failure(error);
+  }
+  async function call(name,params,expectedUserId) {
+    if (!businessRPCs.has(name) || !params || typeof params !== 'object' || Array.isArray(params)) throw new CloudError('INVALID_DATA','Essa operação empresarial não está disponível.');
+    if (!UUID.test(expectedUserId || '')) throw new CloudError('SESSION_CHANGED','Confira a conta em uso antes de abrir sua empresa.');
+    const check = profileGuard(); check();
+    const session = await verifySession(expectedUserId); check();
+    try {
+      const {data,error} = await connection().rpc(name,{...params,expected_user_id:session.user.id});
+      if (error) throw error;
+      check();
+      const current = await getSession(); check();
+      if (current?.user.id !== session.user.id) throw new CloudError('SESSION_CHANGED','A conta foi alterada durante a operação. Confira a conta em uso antes de continuar.');
+      return data;
+    } catch (error) { throw businessFailure(error); }
+  }
+  async function invoke(name,body,expectedUserId) {
+    if (name !== 'rodagem-billing' || !body || typeof body !== 'object' || Array.isArray(body)) throw new CloudError('INVALID_DATA','Essa operação de contratação não está disponível.');
+    if (!UUID.test(expectedUserId || '')) throw new CloudError('SESSION_CHANGED','Confira a conta em uso antes de continuar.');
+    const check = profileGuard(); check();
+    const session = await verifySession(expectedUserId); check();
+    try {
+      const {data,error} = await connection().functions.invoke(name,{body:{...body,expected_user_id:session.user.id}});
+      if (error) {
+        let details = null;
+        try { details = await error.context?.clone?.().json(); } catch { /* Use uma mensagem pública sem o retorno bruto. */ }
+        if (details && typeof details.code === 'string') throw businessFailure({code:details.code,status:error.context?.status});
+        throw error;
+      }
+      check();
+      const current = await getSession(); check();
+      if (current?.user.id !== session.user.id) throw new CloudError('SESSION_CHANGED','A conta foi alterada durante a operação. Confira a conta em uso antes de continuar.');
+      return data;
+    } catch (error) { throw businessFailure(error); }
+  }
+  root.RodagemCloud = Object.freeze({configured,configurationIssue,ready:getSession,getSession,verifySession,onAuth,signIn,signOut,load,save,call,invoke});
 })();

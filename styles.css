@@ -303,7 +303,7 @@ noscript { display: block; padding: 20px; color: var(--peach); }
   .connection { font-size: 10px; }
   .avatar { min-width: 35px; height: 35px; font-size: 10px; }
   main { padding: 27px 20px calc(100px + env(safe-area-inset-bottom,0px)); }
-  .main-nav { position: fixed; z-index: 50; inset: auto 0 0; max-width: none; margin: 0; border-top: 1px solid #3b4257; border-bottom: 0; padding: 7px 10px calc(8px + env(safe-area-inset-bottom,0px)); display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 3px; background: #171c28f7; backdrop-filter: blur(18px); box-shadow: 0 -12px 35px #080b1226; }
+  .main-nav { position: fixed; z-index: 50; inset: auto 0 0; max-width: none; margin: 0; border-top: 1px solid #3b4257; border-bottom: 0; padding: 7px 10px calc(8px + env(safe-area-inset-bottom,0px)); display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: 3px; background: #171c28f7; backdrop-filter: blur(18px); box-shadow: 0 -12px 35px #080b1226; }
   .main-nav button { min-width: 0; min-height: 54px; display: flex; flex-direction: column; gap: 6px; padding: 7px 2px 6px; border-radius: 10px; font-size: 9px; font-weight: 580; white-space: nowrap; }
   .main-nav button .icon { width: 20px; height: 20px; }
   .main-nav button[aria-pressed="true"] { background: #243c35; border-color: #3a5d4e; }

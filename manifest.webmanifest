@@ -6,7 +6,7 @@
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "description": "Sua rotina de transporte no controle. Jornadas, ganhos, veículos e percursos.",
+  "description": "Gestão de jornadas, empresas, equipe, frota, viagens e manutenção.",
   "theme_color": "#11131c",
   "background_color": "#11131c",
   "icons": [
