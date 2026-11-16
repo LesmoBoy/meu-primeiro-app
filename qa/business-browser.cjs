@@ -49,7 +49,7 @@ async function newTrip(values){await tab('trips');await fill('business-trip-form
   await check('business opens as an empty local workspace without rewriting personal history',async()=>{
     assert.equal(await rawBusiness(),null);assert.equal(await page.evaluate(key=>localStorage.getItem(key),recordKey),seed[recordKey]);
     assert.equal(await page.locator('.main-nav [data-panel]').count(),6);assert.equal(await page.evaluate(()=>RodagemBusiness.getMode()),'local');
-    assert.match(await page.locator('#business-app').innerText(),/neste aparelho/i);assert.equal(await page.locator('#business-mode option[value="cloud"]').isDisabled(),true);
+    assert.match(await page.locator('#business-app').innerText(),/neste aparelho/i);assert.equal(await page.locator('#business-mode option[value="cloud"]').evaluate(option=>option.disabled),true);
   });
   await check('two companies are created through the interface with independent empty ledgers',async()=>{
     companyA=await createCompany('Entregas Aurora');assert.equal((await workspace()).trips.length,0);
