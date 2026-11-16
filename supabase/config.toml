@@ -1,0 +1,3 @@
+[functions.rodagem-billing]
+# The webhook validates Stripe's raw signature. Other actions verify the JWT with Auth.
+verify_jwt = false

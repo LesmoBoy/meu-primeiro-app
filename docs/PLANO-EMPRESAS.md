@@ -1,22 +1,26 @@
-# Caminho para um produto para empresas
+# Minha Rodagem 3.0: módulos empresariais
 
-## O que esta versão entrega
+## Implementado
 
-O Minha Rodagem 2.3 cadastra um veículo por perfil: categoria, nome ou modelo livre, ano opcional, atividade e fonte de energia. Há jornadas, histórico financeiro, GPS e backup local. O login com Google/Facebook e a cópia manual por conta estão preparados para um projeto Supabase próprio; ficam indisponíveis até a configuração do proprietário.
+- Empresas e equipe com responsável, gestor, financeiro e motorista. O acesso por conta é validado no banco; o modo local organiza apenas os dados do aparelho.
+- Frota com vários veículos por empresa, categoria, nome/modelo livre, ano, identificação e hodômetro. Arquivar um veículo ou pessoa mantém os vínculos das viagens anteriores.
+- Viagens com receita, sete categorias de gastos e distância. Relatórios por data, veículo e motorista, com resultado calculado em centavos e exportação CSV.
+- Manutenção e documentos com vencimento por data ou quilometragem, conclusão e reativação. Os alertas são mostrados no app; esta versão não envia notificações em segundo plano.
+- Integração de assinatura Stripe por empresa ou por vaga de veículo ativo, checkout e portal do responsável, confirmação por webhook e cotas opcionais no servidor.
+- Backup empresarial próprio dos dados locais, separado do backup dos lançamentos pessoais. Abrir uma empresa não envia os dados pessoais nem os importa automaticamente.
 
-A cópia na nuvem usa conta individual, revisão e confirmação antes de substituir dados. Entrar não importa lançamentos, nem transforma os perfis locais em contas protegidas por senha. Esta versão ainda não oferece um painel de empresa ou uma frota com vários veículos dentro da mesma conta.
+## Para usar online e contratar
 
-## Próximas entregas que mais ajudam a vender
+O modo local funciona sem contratar serviços. Login, convites autenticados entre pessoas, dados empresariais compartilhados e cobrança precisam da ativação de um projeto Supabase e de contas Google/Meta/Stripe do proprietário.
 
-1. **Empresa, equipe e permissões.** Criar empresas e convites; separar gestor, financeiro e motorista; aplicar isolamento por empresa no banco e nos arquivos. Testar sempre duas empresas sem acesso cruzado.
-2. **Frota com veículos identificados.** Vincular cada jornada, abastecimento, manutenção e viagem a um veículo permanente. Permitir troca de motorista e veículo sem misturar hodômetros ou consumo.
-3. **Custo e margem por serviço.** Pedágios, estacionamento, comissões, ajudante, pneus, manutenção e depreciação. Comparar receita, custo e margem por veículo, cliente e rota.
-4. **Manutenção e documentos.** Alertas por data ou hodômetro para revisão, pneus, seguro, licenciamento e habilitação. Registrar quem resolveu cada pendência.
-5. **Operação do dia.** Agenda de serviços, responsáveis e estados (agendado, em andamento, concluído). Comprovantes opcionais com foto e assinatura, enviados apenas quando solicitados.
-6. **Relatórios e cobrança.** Resumos por período e exportação contábil; assinatura por empresa ou veículo ativo, limites claros e cobrança recorrente. Recursos comerciais dependem de implementação específica.
+1. [Ativar autenticação e Supabase](SUPABASE.md).
+2. [Ativar empresas, funções e frota](EMPRESAS.md).
+3. [Configurar preços, checkout, webhook e portal Stripe](ASSINATURAS.md).
 
-## Ordem recomendada
+A configuração distribuída mantém nuvem e cobrança desativadas, sem preços fictícios, período de teste inventado ou indicação de assinatura paga. Somente a confirmação verificada do provedor altera a assinatura. Os testes usam dados fictícios; não foram efetuadas cobranças reais.
 
-Validar primeiro com algumas empresas de um segmento, por exemplo entregas urbanas ou fretes leves. Ativar autenticação e backups reais, medir uso e recuperação e, depois, implementar empresa/equipe e veículos individualizados. Adicionar custos e manutenção antes de ampliar o painel e a cobrança.
+## Validação para colocar empresas em produção
 
-Para sincronização automática futura, usar uma fila offline durável por usuário e registro, identificadores e revisões próprios, resolução de conflitos e indicação do que ainda não foi enviado. A cópia manual atual não deve ser apresentada como sincronização automática em tempo real.
+Depois de configurar os serviços, homologue duas empresas com contas de funções diferentes, confirme o isolamento e a recuperação dos dados e teste a cobrança no ambiente de testes da Stripe. Defina os preços e os canais de suporte, privacidade e exclusão de conta antes de receber clientes reais.
+
+A implantação do código no GitHub Pages não cria automaticamente o projeto Supabase, os aplicativos OAuth ou a conta de pagamentos. As instruções e funções de servidor estão incluídas no repositório para essa ativação.

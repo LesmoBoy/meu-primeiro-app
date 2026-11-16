@@ -68,6 +68,7 @@
   }
 
   function dirtyForms() {
+    if (window.RodagemBusinessUI?.isDirty()) return true;
     if (typeof perfilAlterado !== 'undefined' && perfilAlterado) return true;
     return ['dia','posto'].some(id => {
       const target = el(id);

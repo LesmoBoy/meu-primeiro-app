@@ -219,11 +219,11 @@ function calcular(r, novos) {
     destino.hidden = false;
   }
 }
-const paineis = ['inicio','fechamento','consumo','historico','ajustes','percurso'];
-const nomesPaineis = {inicio:'Início',fechamento:'Fechamento',consumo:'Meu veículo',historico:'Histórico',ajustes:'Meu perfil',percurso:'Meu percurso'};
+const paineis = ['inicio','fechamento','consumo','historico','ajustes','percurso','empresa'];
+const nomesPaineis = {inicio:'Início',fechamento:'Fechamento',consumo:'Meu veículo',historico:'Histórico',ajustes:'Meu perfil',percurso:'Meu percurso',empresa:'Minha empresa'};
 function abrir(painel, navegar = true) {
   if (!paineis.includes(painel)) painel = 'inicio';
-  for (const aba of document.querySelectorAll('nav button')) {
+  for (const aba of document.querySelectorAll('.main-nav [data-panel]')) {
     const ativa = aba.dataset.panel === painel || (painel === 'percurso' && aba.dataset.panel === 'inicio');
     aba.setAttribute('aria-pressed',ativa);
   }
@@ -337,7 +337,7 @@ $('estimar').onclick = async () => {
     if (!ciclos(registros).size) $('estimativa').hidden = false;
   }
 };
-document.querySelectorAll('nav button').forEach(aba => aba.onclick = () => abrir(aba.dataset.panel));
+document.querySelectorAll('.main-nav [data-panel]').forEach(aba => aba.onclick = () => abrir(aba.dataset.panel));
 document.addEventListener('click', evento => {
   if (evento.target.closest('.skip-link')) {
     evento.preventDefault();
