@@ -1,0 +1,28 @@
+/* Arte original de transportes, com contraste para os dados da jornada. */
+.hero-card.transport-hero { background: #22162e; border-color: #79506e; }
+.transport-hero .city-art { inset: 0; background: #261735 url('assets/transportes.webp') 65% 63% / cover no-repeat; }
+.transport-hero .hero-content { background: linear-gradient(90deg,#181526f5 0%,#241b35ed 43%,#271a369e 66%,#281a3645 100%); }
+.transport-hero .hero-caption { color: #f0dfef; }
+.transport-hero .hero-value { overflow-wrap: anywhere; }
+.transport-hero .hero-mini > span { color: #efdeeb; }
+.transport-panorama { position: relative; isolation: isolate; overflow: hidden; margin: 0 0 24px; border: 1px solid #704761; border-radius: var(--radius,22px); background: #241831; box-shadow: 0 16px 45px #090b152b; }
+.transport-panorama img { display: block; width: 100%; height: auto; aspect-ratio: 2.35; object-fit: cover; object-position: center 80%; }
+.transport-caption { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; padding: 20px 24px; border-top: 1px solid #65475e; background: linear-gradient(110deg,#2b2039,#212b34); }
+.transport-caption .eyebrow { color: #f3b8d6; margin-bottom: 7px; }
+.transport-caption h2 { margin: 0; font-size: 21px; color: #fff0e8; letter-spacing: -.5px; }
+.transport-caption .button { min-height: 46px; border-color: #6a9b89; color: #c5f6e2; background: #28463d; }
+.transport-company { margin-bottom: 26px; }
+@media (max-width: 760px) {
+  .transport-hero .city-art { background-position: 65% center; }
+  .transport-hero .hero-content { background: linear-gradient(90deg,#181526f5 0%,#21182eea 52%,#251731a8 78%,#281a3670 100%); }
+  .transport-panorama { margin-bottom: 19px; border-radius: 19px; }
+  .transport-panorama img { aspect-ratio: 16/9; object-position: center; }
+  .transport-caption { padding: 18px 20px; gap: 15px; }
+  .transport-caption h2 { font-size: 19px; }
+  .transport-caption .button { font-size: 12px; }
+}
+@media (max-width: 380px) {
+  .transport-caption { padding: 16px; }
+  .transport-caption h2 { font-size: 18px; }
+}
+@media print { .transport-panorama, .transport-hero .city-art { display: none; } }
