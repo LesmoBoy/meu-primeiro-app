@@ -47,6 +47,8 @@ create table if not exists public.business_invites (
   created_at timestamptz not null default now()
 );
 create index if not exists business_invites_company on public.business_invites(company_id,email);
+create index if not exists business_companies_created_by on public.business_companies(created_by);
+create index if not exists business_invites_invited_by on public.business_invites(invited_by);
 
 -- Preserve staff and vehicle history when a former team member deletes an account.
 -- These ALTERs also repair an earlier, partially applied draft of this migration.

@@ -1,5 +1,33 @@
 # Ativar Google, Facebook e sincronização
 
+## Instalação do Minha Rodagem — 24/11/2026
+
+O projeto **MRB** (`ivoszoawhknwbiszjvfv`) já recebeu `schema.sql` e `enterprise.sql`, com as cinco tabelas protegidas por RLS. As verificações de acesso anônimo, UID esperado e associação à empresa passaram no projeto real, usando transações de teste sem gravar dados de pessoas.
+
+`cloud-config.js` contém a URL e a chave pública do projeto. A lista `providers` está vazia porque Google e Facebook ainda estão desativados no Supabase e seus aplicativos OAuth ainda não foram criados. O app mantém os perfis locais funcionando até essa configuração terminar.
+
+Ainda é necessário conferir as [URLs do Auth](https://supabase.com/dashboard/project/ivoszoawhknwbiszjvfv/auth/url-configuration), cadastrar os aplicativos nas contas Google/Meta e configurar os [provedores do projeto](https://supabase.com/dashboard/project/ivoszoawhknwbiszjvfv/auth/providers). A conexão de administração do Supabase não fornece acesso às contas Google Cloud ou Meta for Developers.
+
+Valores desta instalação:
+
+```text
+Nome: Minha Rodagem
+Site URL e Redirect URL do Supabase:
+https://lesmoboy.github.io/meu-primeiro-app/
+
+Origem JavaScript no Google:
+https://lesmoboy.github.io
+
+Callback OAuth no Google e na Meta:
+https://ivoszoawhknwbiszjvfv.supabase.co/auth/v1/callback
+```
+
+Os segredos dos provedores devem ser preenchidos diretamente no Supabase. Depois de configurar e homologar cada provedor, inclua somente o nome correspondente em `providers` e publique a atualização do app.
+
+O código empresarial inclui RPCs privilegiadas com verificação de UID e papel na empresa. O aviso do [Advisor sobre funções SECURITY DEFINER](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable) exige manter essas verificações; o acesso é intencional e restrito ao papel `authenticated`. A tabela de convites mantém RLS sem leitura direta, acessível somente pelas operações autorizadas do servidor.
+
+## Guia de configuração
+
 O Minha Rodagem continua funcionando com perfis locais. Esta versão inclui o código de conexão e o esquema do banco, mas a entrada social permanece indisponível até o proprietário criar e configurar seu projeto Supabase e os aplicativos dos provedores. Um botão visível não significa que a autenticação esteja ativa.
 
 Entrar com Google usa uma conta Google, inclusive um endereço Gmail. O app não precisa acessar mensagens do Gmail ou publicações do Facebook. Configure apenas a identificação básica e o e-mail necessários ao login.
