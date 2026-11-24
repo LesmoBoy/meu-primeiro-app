@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#241c3b">
+  <title>Privacidade · Minha Rodagem</title>
+  <style>
+    :root{color-scheme:light;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#252536;background:#f5f4f9;font-synthesis:none}*{box-sizing:border-box}body{margin:0;line-height:1.7}a{color:#6033a2;text-underline-offset:3px;overflow-wrap:anywhere}a:focus-visible{outline:3px solid #197d70;outline-offset:4px}header{background:#241c3b;color:#fff;padding:28px max(20px,calc((100% - 900px)/2))}header a{color:#d5fff1;text-decoration:none;font-weight:750}.brand{letter-spacing:-.04em;font-size:1.35rem}header small{display:block;color:#d4cce5;margin-top:3px}main{max-width:940px;margin:auto;padding:26px 20px 56px}h1{font-size:clamp(2rem,7vw,3.2rem);line-height:1.1;letter-spacing:-.055em;margin:14px 0}h2{font-size:1.3rem;line-height:1.3;letter-spacing:-.025em;margin:0 0 12px}h3{font-size:1rem;margin:20px 0 5px}p{margin:0 0 14px}.intro{font-size:1.1rem;color:#55546b;max-width:62ch}.meta{font-size:.87rem;color:#666178}.card{background:#fff;border:1px solid #e1dce9;border-radius:16px;padding:clamp(18px,4vw,30px);margin:18px 0}.summary{border-left:5px solid #278d7c;background:#f0fbf7}ul,ol{padding-left:22px;margin:10px 0 0}li{margin-bottom:9px}li:last-child{margin-bottom:0}.label{display:inline-block;border-radius:20px;background:#ede7f8;color:#5b367f;padding:3px 12px;font-size:.78rem;font-weight:750;letter-spacing:.08em}code{font:inherit;overflow-wrap:anywhere;background:#f0edf5;border-radius:4px;padding:1px 5px}.contact{padding:14px;background:#f5f2fa;border-radius:10px}.links{display:flex;gap:20px;flex-wrap:wrap;margin-top:25px}footer{color:#6c6679;font-size:.85rem;margin-top:26px;padding-top:20px;border-top:1px solid #dcd7e5}@media(max-width:430px){main{padding-inline:14px}.card{padding:19px}.links{display:grid;gap:12px}}
+  </style>
+</head>
+<body>
+  <header><a class="brand" href="https://lesmoboy.github.io/meu-primeiro-app/">minharodagem</a><small>Informações sobre privacidade</small></header>
+  <main>
+    <span class="label">PRIVACIDADE</span>
+    <h1>Seus dados, com clareza.</h1>
+    <p class="intro">O Minha Rodagem organiza jornadas, resultados de trabalho, abastecimentos, percursos e operações de equipes. Esta página explica quais informações o aplicativo utiliza e o que muda quando você escolhe conectar uma conta.</p>
+    <p class="meta">Atualizado em 24/11/2026 · Atendimento: <a href="mailto:rodadiaempresas@gmail.com">rodadiaempresas@gmail.com</a></p>
+
+    <section class="card summary" aria-labelledby="resumo">
+      <h2 id="resumo">O essencial</h2>
+      <ul>
+        <li>Você pode usar os recursos locais sem entrar com Google ou Facebook. Os registros ficam no armazenamento do navegador.</li>
+        <li>A localização depende da permissão do navegador e da opção de GPS da jornada. É possível trabalhar informando os quilômetros manualmente.</li>
+        <li>Quando a conexão estiver disponível, entrar na conta não envia automaticamente todos os dados do aparelho. A cópia pessoal na nuvem exige vincular o perfil e confirmar o envio.</li>
+        <li>Dados de empresas conectadas são enviados ao servidor nas operações que você realiza nesse modo e ficam acessíveis à equipe conforme as funções autorizadas.</li>
+        <li>Sair da conta, apagar um percurso ou limpar o navegador são ações diferentes. Nenhuma delas, sozinha, significa excluir todos os dados existentes em outros lugares.</li>
+      </ul>
+    </section>
+
+    <section class="card" aria-labelledby="dados">
+      <h2 id="dados">1. Informações utilizadas e para quê</h2>
+      <h3>Seu perfil e o veículo</h3>
+      <p>Você pode informar um nome para o perfil, nome de uso, atividade de trabalho, duração habitual da jornada, meta de saldo, categoria, modelo, ano e combustível ou energia do veículo. Esses dados personalizam o painel e ajudam a preencher os lançamentos.</p>
+      <h3>Trabalho, abastecimentos e jornada</h3>
+      <p>Os registros podem conter datas, ganhos, quantidade de entregas, corridas ou serviços, horas, quilômetros, gastos, hodômetro, litros, valor abastecido e tipo de abastecimento. A jornada guarda horários de início, tempo acumulado, pausas e estado da atividade. O app usa essas informações para calcular saldos, consumo, custos, metas e histórico.</p>
+      <h3>Percursos opcionais</h3>
+      <p>Com GPS autorizado, o app pode guardar latitude, longitude, horário, precisão da posição, distância estimada e indicação de trechos sem sinal. Os percursos servem para consultar a trajetória e aproveitar os quilômetros no fechamento.</p>
+      <h3>Conta conectada, quando disponível</h3>
+      <p>Ao escolher Google ou Facebook, o provedor e o Supabase realizam a autenticação. A conta pode disponibilizar identificador, e-mail, nome e endereço da imagem de perfil. O aplicativo utiliza a identificação confirmada para vincular a cópia pessoal e verificar o acesso às empresas. A sessão, seus tokens e sua validade também são processados para manter a conexão.</p>
+      <p>O Minha Rodagem não pede a senha do Google ou do Facebook em seus próprios formulários. A integração foi preparada para identificação básica e e-mail; ela não solicita acesso às mensagens do Gmail nem às publicações do Facebook.</p>
+      <h3>Empresas e equipes</h3>
+      <p>Se você usar a área empresarial, os dados podem incluir nome da empresa, nomes e e-mails de membros ou convidados, funções e vínculos de acesso, veículos, placas ou identificações, hodômetros, viagens, cliente ou descrição informados, motorista, receitas, custos e alertas de manutenção ou documentos. Não inclua dados de outras pessoas em textos livres sem necessidade para a operação.</p>
+    </section>
+
+    <section class="card" aria-labelledby="local">
+      <h2 id="local">2. Dados neste aparelho e cópias na nuvem</h2>
+      <p>O app utiliza armazenamento local do navegador para perfis, registros, preferências, jornadas, percursos e empresas locais. Também utiliza cache para os arquivos necessários ao funcionamento offline. Com uma conta conectada, o SDK de autenticação pode manter a sessão no navegador e renová-la pela internet.</p>
+      <p>Os perfis locais organizam dados separados, mas não são contas com senha nem uma barreira de segurança para quem tem acesso ao mesmo navegador. A sessão conectada pertence a este navegador; confira a conta e o perfil em uso antes de enviar ou receber dados.</p>
+      <p>Quando você confirmar <strong>Salvar cópia na nuvem</strong>, a cópia pessoal poderá incluir registros, preferências e veículo do perfil vinculado, preferências de GPS, até dez percursos com suas posições e uma jornada pausada ou pendente. Essa cópia não é atualizada automaticamente a cada alteração. Os demais perfis e as empresas locais não entram automaticamente nesse envio.</p>
+      <p>As empresas abertas no modo conectado usam operações próprias do servidor. As alterações autorizadas de equipe, frota, viagens e alertas são gravadas nesse ambiente conforme você as realiza; elas não dependem do botão de cópia pessoal.</p>
+    </section>
+
+    <section class="card" aria-labelledby="gps">
+      <h2 id="gps">3. Localização e mapa</h2>
+      <p>O navegador controla a permissão de localização. Com a opção de GPS ligada, uma jornada pode pedir essa permissão; se ela já tiver sido concedida, a captura pode começar ou ser retomada sem um novo pedido. Você pode desligar o GPS no app ou revogar a permissão nas configurações do site no navegador.</p>
+      <p>O app consulta a posição em intervalos, com modos de economia e maior precisão. Pausar ou encerrar a jornada interrompe a captura daquela atividade. Tela bloqueada, segundo plano, falta de sinal e limitações do aparelho podem interromper o registro; o aplicativo não garante rastreamento contínuo em segundo plano.</p>
+      <p>Ao abrir o mapa com internet, o navegador solicita as imagens das ruas ao <strong>OpenStreetMap</strong>. Esse serviço recebe dados técnicos da conexão, como endereço IP, e os pedidos dos blocos de mapa, que indicam a área visualizada. Essas solicitações não são o envio de uma cópia completa dos seus percursos ao OpenStreetMap. O envio das posições guardadas ao Supabase depende da confirmação da cópia pessoal na nuvem.</p>
+    </section>
+
+    <section class="card" aria-labelledby="servicos">
+      <h2 id="servicos">4. Serviços envolvidos e acesso aos dados</h2>
+      <ul>
+        <li><strong>GitHub Pages:</strong> entrega o site, imagens e arquivos do app. Recebe os dados técnicos necessários às requisições de acesso, como IP e informações do navegador. Os lançamentos locais não são enviados ao repositório pelo app.</li>
+        <li><strong>Supabase:</strong> quando a conexão for utilizada, processa autenticação, sessões, cópias pessoais e dados das empresas conectadas, além das informações técnicas das operações.</li>
+        <li><strong>Google ou Meta/Facebook:</strong> ao escolher o respectivo login, o provedor processa a autenticação e o consentimento e disponibiliza os dados de identidade permitidos. Cada provedor também aplica suas próprias práticas.</li>
+        <li><strong>OpenStreetMap:</strong> fornece as imagens de ruas quando o mapa é exibido, nas condições explicadas acima.</li>
+        <li><strong>Equipe da empresa:</strong> no modo conectado, responsáveis, gestores, financeiro e motoristas podem consultar ou alterar informações conforme as permissões da empresa. Participar de uma empresa envolve compartilhar os dados operacionais pertinentes com as pessoas autorizadas.</li>
+      </ul>
+      <h3>Se a cobrança for ativada no futuro</h3>
+      <p>A contratação está desativada nesta publicação. Se for disponibilizada e você confirmar uma contratação como responsável, o checkout e o portal da <strong>Stripe</strong> processarão os dados necessários ao pagamento. A integração do app foi preparada para guardar identificadores de cliente e assinatura, plano, situação, vagas e eventos de confirmação. Os dados de cartão são preenchidos no serviço de pagamento, não nos formulários de jornada ou fechamento.</p>
+      <p>O código atual não inclui ferramentas de publicidade ou análise de audiência de terceiros. Isso não elimina os registros técnicos mantidos pelos provedores que entregam o site ou operam os serviços acima.</p>
+      <p>Consulte também: <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener noreferrer" target="_blank">GitHub</a>, <a href="https://supabase.com/privacy" rel="noopener noreferrer" target="_blank">Supabase</a>, <a href="https://policies.google.com/privacy" rel="noopener noreferrer" target="_blank">Google</a>, <a href="https://www.facebook.com/privacy/policy/" rel="noopener noreferrer" target="_blank">Meta</a>, <a href="https://osmfoundation.org/wiki/Privacy_Policy" rel="noopener noreferrer" target="_blank">OpenStreetMap Foundation</a> e, se aplicável, <a href="https://stripe.com/privacy" rel="noopener noreferrer" target="_blank">Stripe</a>. Esses serviços podem operar infraestrutura e tratar informações em outros países conforme suas próprias condições.</p>
+    </section>
+
+    <section class="card" aria-labelledby="retencao">
+      <h2 id="retencao">5. Conservação, exportação e exclusão</h2>
+      <p>Os lançamentos e preferências locais não têm prazo automático de apagamento definido no app. Permanecem enquanto estiverem no navegador, até exclusão, substituição confirmada ou limpeza dos dados do site. O navegador e o sistema também podem remover dados por suas próprias regras de armazenamento.</p>
+      <p>O app mantém uma lista limitada de percursos recentes, com remoção dos concluídos mais antigos para manter até dez entradas, preservando percursos em andamento quando necessário. A trilha pode ser simplificada para limitar a quantidade de pontos. Esse limite não é uma política de apagamento de todas as cópias: uma cópia na nuvem ou um arquivo exportado pode conter um percurso já removido localmente.</p>
+      <p>Não há rotina de expiração automática configurada no aplicativo para as cópias pessoais e os registros empresariais do servidor. Convites empresariais deixam de valer após sete dias; isso não significa apagar todos os registros do convite. Arquivar uma entidade ou desativar uma pessoa também não apaga o histórico operacional.</p>
+      <p>O Histórico permite exportar CSV e baixar um backup JSON dos lançamentos do perfil. Percursos podem ser exportados em GPX. Empresas locais têm backup JSON próprio. Esses arquivos ficam sob seu controle depois de baixados e não são apagados quando você sai da conta ou limpa o navegador.</p>
+      <p>Para detalhes sobre dados locais, conta, cópia na nuvem e histórico empresarial, consulte as <a href="exclusao-dados.html">instruções de exclusão</a>. Pedidos relativos à conta e à nuvem são tratados manualmente pelo atendimento do Minha Rodagem. O atendimento informa o alcance da remoção e eventuais limitações. Cópias de segurança e registros técnicos dos provedores estão sujeitos às práticas e aos prazos desses serviços; não são eliminados por um botão local do aplicativo.</p>
+    </section>
+
+    <section class="card" aria-labelledby="contato">
+      <h2 id="contato">6. Contato e atualização desta página</h2>
+      <p>Você pode pedir esclarecimentos, correção, acesso ou exclusão ao atendimento do Minha Rodagem pelo e-mail abaixo. Poderá ser necessário confirmar a titularidade da conta e especificar quais dados e empresas estão envolvidos. Não envie senhas, tokens de sessão, segredos de aplicativos ou números completos de cartão.</p>
+      <p class="contact"><strong>Atendimento e privacidade do Minha Rodagem:</strong> <a href="mailto:rodadiaempresas@gmail.com">rodadiaempresas@gmail.com</a></p>
+      <p>Os pedidos são analisados manualmente. O prazo e as etapas necessários ao seu caso são informados no atendimento, sem promessa de conclusão imediata. Esta página será revista quando houver mudanças relevantes nos recursos ou no uso de dados; a data no início indica a atualização mais recente.</p>
+    </section>
+
+    <nav class="links" aria-label="Links úteis"><a href="https://lesmoboy.github.io/meu-primeiro-app/">← Voltar ao Minha Rodagem</a><a href="exclusao-dados.html">Instruções de exclusão</a></nav>
+    <footer>Minha Rodagem · Privacidade e atendimento: <a href="mailto:rodadiaempresas@gmail.com">rodadiaempresas@gmail.com</a></footer>
+  </main>
+</body>
+</html>
+
