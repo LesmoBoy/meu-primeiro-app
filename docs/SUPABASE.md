@@ -1,34 +1,34 @@
 # Ativar Google, Facebook e sincronização
 
-## Instalação do Minha Rodagem — 24/11/2026
+## Instalação 3.2.0 — Google Identity Services — 24/11/2026
 
-O projeto **MRB** (`ivoszoawhknwbiszjvfv`) já recebeu `schema.sql` e `enterprise.sql`, com as cinco tabelas protegidas por RLS. As verificações de acesso anônimo, UID esperado e associação à empresa passaram no projeto real, usando transações de teste sem gravar dados de pessoas.
+O projeto **MRB** (`ivoszoawhknwbiszjvfv`) recebeu `schema.sql` e `enterprise.sql`, com cinco tabelas protegidas por RLS. A configuração pública aponta para esse projeto e oferece somente Google; Facebook permanece desativado enquanto seu cadastro na Meta está pendente.
 
-`cloud-config.js` contém a URL e a chave pública do projeto. A lista `providers` está vazia porque Google e Facebook ainda estão desativados no Supabase e seus aplicativos OAuth ainda não foram criados. O app mantém os perfis locais funcionando até essa configuração terminar.
+O Google usa seu botão oficial **Google Identity Services (GIS)**. A credencial assinada pelo Google é trocada por uma sessão Supabase com `signInWithIdToken`. Este fluxo usa o Client ID público e **não depende de Client Secret**. O SDK do Google só é carregado quando a pessoa escolhe entrar.
 
-Ainda é necessário conferir as [URLs do Auth](https://supabase.com/dashboard/project/ivoszoawhknwbiszjvfv/auth/url-configuration), cadastrar os aplicativos nas contas Google/Meta e configurar os [provedores do projeto](https://supabase.com/dashboard/project/ivoszoawhknwbiszjvfv/auth/providers). A conexão de administração do Supabase não fornece acesso às contas Google Cloud ou Meta for Developers.
-
-Valores desta instalação:
+Projeto Google existente: `minha-rodagem-515711` (External / Testing). Cliente Web: **Minha Rodagem Web**. Client ID público:
 
 ```text
-Nome: Minha Rodagem
-Site URL e Redirect URL do Supabase:
-https://lesmoboy.github.io/meu-primeiro-app/
-
-Origem JavaScript no Google:
-https://lesmoboy.github.io
-
-Callback OAuth no Google e na Meta:
-https://ivoszoawhknwbiszjvfv.supabase.co/auth/v1/callback
+421909197196-td982abtadcdh70hesfc3ucp2fe0qqii.apps.googleusercontent.com
 ```
 
-Os segredos dos provedores devem ser preenchidos diretamente no Supabase. Depois de configurar e homologar cada provedor, inclua somente o nome correspondente em `providers` e publique a atualização do app.
+No [provedor Google do MRB](https://supabase.com/dashboard/project/ivoszoawhknwbiszjvfv/auth/providers), o Client ID deve corresponder ao arquivo público, Google deve estar habilitado e **Skip nonce checks deve permanecer desligado**. A assinatura, o emissor e a audiência são verificados pelo Supabase. Por tentativa, o app gera 32 bytes aleatórios; envia ao Google o hash SHA-256 hexadecimal do nonce e ao Supabase o nonce original. O callback é consumido uma vez e nenhuma credencial é incluída nos backups.
 
-O código empresarial inclui RPCs privilegiadas com verificação de UID e papel na empresa. O aviso do [Advisor sobre funções SECURITY DEFINER](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable) exige manter essas verificações; o acesso é intencional e restrito ao papel `authenticated`. A tabela de convites mantém RLS sem leitura direta, acessível somente pelas operações autorizadas do servidor.
+As [URLs do Auth](https://supabase.com/dashboard/project/ivoszoawhknwbiszjvfv/auth/url-configuration) foram salvas e verificadas com Site URL e Redirect URL `https://lesmoboy.github.io/meu-primeiro-app/`. O login GIS retorna a credencial ao app por callback JavaScript, sem colocar o ID token na URL. O callback OAuth `https://ivoszoawhknwbiszjvfv.supabase.co/auth/v1/callback` continua cadastrado no cliente para os fluxos de redirecionamento, que exigem configuração própria.
 
-## Guia de configuração
+Páginas públicas e contato aprovados:
 
-O Minha Rodagem continua funcionando com perfis locais. Esta versão inclui o código de conexão e o esquema do banco, mas a entrada social permanece indisponível até o proprietário criar e configurar seu projeto Supabase e os aplicativos dos provedores. Um botão visível não significa que a autenticação esteja ativa.
+- Privacidade: https://lesmoboy.github.io/meu-primeiro-app/privacidade.html
+- Exclusão de dados: https://lesmoboy.github.io/meu-primeiro-app/exclusao-dados.html
+- Atendimento: rodadiaempresas@gmail.com
+
+Antes de oferecer uma nova versão, confirme a configuração do provedor, a origem JavaScript autorizada e o login real no domínio publicado. Os testes automatizados usam contas e SDK simulados; não iniciam uma autorização real nem enviam registros ao projeto. Facebook não deve ser anunciado como ativo até sua configuração e verificação próprias.
+
+O código empresarial inclui RPCs privilegiadas com verificação de UID e papel na empresa. O aviso do [Advisor sobre funções SECURITY DEFINER](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable) exige manter essas verificações; a execução por `authenticated` é intencional. Convites mantêm RLS sem leitura direta e usam somente as operações autorizadas do servidor.
+
+## Guia para configuração e instalações futuras
+
+O Minha Rodagem continua funcionando com perfis locais. Os passos abaixo também servem para novas instalações; no MRB, não recrie o projeto Supabase nem o projeto Google já informados acima. Cada provedor só deve ser publicado após sua configuração e homologação. Um botão visível não comprova que a autenticação esteja ativa.
 
 Entrar com Google usa uma conta Google, inclusive um endereço Gmail. O app não precisa acessar mensagens do Gmail ou publicações do Facebook. Configure apenas a identificação básica e o e-mail necessários ao login.
 
@@ -54,7 +54,7 @@ Redirect URLs:
 https://lesmoboy.github.io/meu-primeiro-app/
 ```
 
-Adicione apenas os endereços exatos usados em produção. O retorno do app remove a consulta e o fragmento da URL antes de iniciar OAuth. Um ambiente de desenvolvimento precisa de uma entrada própria e de um projeto de teste; evite curingas amplos em produção.
+Adicione apenas os endereços exatos usados em produção. O fluxo Google GIS desta versão usa callback JavaScript. Nos fluxos OAuth de redirecionamento, o app remove a consulta e o fragmento antes de iniciar a autorização. Um ambiente de desenvolvimento precisa de uma entrada própria e de um projeto de teste; evite curingas amplos em produção.
 
 O endereço do aplicativo é diferente do endereço de retorno do provedor. No Google e no Facebook, o callback é o mostrado pelo Supabase, normalmente:
 
@@ -66,17 +66,16 @@ Copie esse endereço da tela do provedor no Supabase. Trocar o domínio do app e
 
 ## 3. Configurar Google
 
-1. Abra [Google Cloud Console](https://console.cloud.google.com/), selecione ou crie um projeto e entre na configuração de **Google Auth Platform / OAuth consent screen**.
-2. Informe o nome do app, um e-mail real de suporte e os domínios/links solicitados pelo Google. Em fase de testes, inclua as contas que vão participar em **Test users**.
-3. Crie um **OAuth client ID** do tipo **Web application**.
-4. Em **Authorized JavaScript origins**, informe a origem do site: `https://lesmoboy.github.io`.
-5. Em **Authorized redirect URIs**, informe o callback exato copiado do Supabase, terminado em `/auth/v1/callback`.
-6. Em **Supabase → Authentication → Sign In / Providers → Google**, ative o provedor, cole **Client ID** e **Client secret** e salve.
-7. Antes de abrir para clientes, conclua os requisitos de publicação e verificação que o Google mostrar para esse aplicativo. O modo de testes pode restringir quem consegue entrar.
+1. Abra [Google Cloud Console](https://console.cloud.google.com/) e use o projeto existente desta instalação; não crie um projeto duplicado.
+2. Em **Google Auth Platform**, configure o nome do app, suporte e contato reais, público External e somente a identificação básica. No modo Testing, o Google documenta uma exceção às restrições de testadores para somente `openid`, e-mail e perfil; escopos adicionais têm requisitos próprios. Nome/logo públicos e domínio podem exigir verificação de marca.
+3. Use o cliente do tipo **Web application**. Para este app, **Authorized JavaScript origins** deve conter `https://lesmoboy.github.io`, sem o caminho `/meu-primeiro-app/`.
+4. Copie o **Client ID público** para `googleClientId` no arquivo público e para **Supabase → Authentication → Sign In / Providers → Google → Client IDs**. Ative Google e mantenha **Skip nonce checks desligado**.
+5. O campo **Client Secret (for OAuth)** pode ficar vazio para o fluxo GIS/ID token. Não use um valor fictício. O fluxo legado `signInWithOAuth` é diferente e precisa de um segredo verdadeiro no servidor.
+6. Confira o botão no site publicado, cancelamento, entrada, recarga e saída. Entrar não vincula nem envia automaticamente os perfis locais.
 
-O **Client secret** fica nas configurações do provedor no Supabase. Ele não é o `publishableKey` do site.
+O app exige Web Crypto: nonce aleatório novo a cada tentativa, hash SHA-256 hexadecimal entregue ao GIS e nonce original entregue ao `signInWithIdToken`. Não altere essa combinação nem pule a validação de nonce para resolver um erro. Os dados do JWT não concedem permissões pela simples leitura no navegador; a autenticação ocorre no Supabase, e as operações verificam a identidade no servidor.
 
-Referência: [Google Login no Supabase](https://supabase.com/docs/guides/auth/social-login/auth-google).
+Referências: [Google Login no Supabase](https://supabase.com/docs/guides/auth/social-sign-in/auth-google), [botão Google Identity Services](https://developers.google.com/identity/gsi/web/guides/display-button).
 
 ## 4. Configurar Facebook
 
@@ -93,19 +92,23 @@ Referência: [Facebook Login no Supabase](https://supabase.com/docs/guides/auth/
 
 ## 5. Preencher o arquivo público
 
-Edite `cloud-config.js` na raiz do repositório:
+A configuração desta versão usa somente os identificadores públicos:
 
 ```js
 window.RodagemCloudConfig = Object.freeze({
   url: 'https://SEU-PROJECT-REF.supabase.co',
   publishableKey: 'SUA_CHAVE_PUBLICA_PUBLISHABLE_OU_ANON',
-  providers: Object.freeze(['google', 'facebook'])
+  providers: Object.freeze(['google']),
+  googleAuthMode: 'id_token',
+  googleClientId: 'SEU_CLIENT_ID_WEB.apps.googleusercontent.com'
 });
 ```
 
-Use a chave pública verdadeira copiada do projeto. Se apenas Google estiver configurado e homologado, publique `providers: Object.freeze(['google'])` até terminar Facebook. Não habilite um provedor no arquivo antes de configurá-lo no Supabase.
+Use a chave pública verdadeira e o Client ID da mesma instalação. `google-identity.js` deve ser carregado antes do cliente de nuvem. Não inclua Client Secret, chave de serviço, senha do banco, ID token ou sessão nesse arquivo, no ZIP ou no GitHub.
 
-Envie a alteração ao GitHub, espere o Pages terminar e reabra o app com internet. O SDK Supabase está incluído nos arquivos do aplicativo; o login e a transferência de dados precisam de conexão com o Supabase e com o provedor.
+A lista `providers` controla quais entradas ficam disponíveis. Facebook só deve ser incluído depois de configurar o aplicativo da Meta e o segredo do provedor no Supabase. O driver mantém OAuth/PKCE para os fluxos legados; `googleAuthMode: 'id_token'` seleciona o botão GIS nesta instalação.
+
+Depois de publicar, reabra o app com internet. O SDK Supabase está incluído no pacote; o botão oficial Google é carregado pela internet sob demanda. O funcionamento local continua disponível sem login, e as páginas de privacidade e exclusão fazem parte do cache offline.
 
 ## 6. Como os dados são sincronizados
 
@@ -159,10 +162,10 @@ Use dados fictícios e duas contas distintas, A e B:
 
 Os testes locais reproduzíveis ficam em [supabase/test-postgres.sh](../supabase/test-postgres.sh). Eles executam PostgreSQL 17 real em um contêiner sem portas externas, simulando somente o contexto Auth necessário para testar as políticas. Não testam a aceitação dos provedores Google/Meta nem a configuração do seu projeto remoto.
 
-## Próxima etapa para vender a empresas
+## Operação empresarial e cobrança
 
-Este esquema sincroniza uma conta pessoal. Uma operação empresarial com gestores e vários motoristas precisa de empresas, membros, convites, papéis e veículos individualizados, além de políticas de banco que verifiquem a associação à empresa em cada acesso. Um e-mail com determinado domínio ou uma seleção de “empresa” no formulário não concede esse acesso.
+O esquema pessoal sincroniza uma conta. `enterprise.sql`, aplicado depois de `schema.sql`, acrescenta empresas, membros, convites, papéis, frota, viagens e alertas com verificação de associação em cada acesso. Ambos já foram instalados no MRB. Um domínio de e-mail ou a seleção de empresa no formulário não concede acesso.
 
-Evoluções úteis: painel do gestor, custos por veículo e motorista, manutenção preventiva, vencimento de documentos, centros de custo, comprovantes de despesas, trilha de alterações, controle de assinaturas e restauração de backups. Essas funções precisam ser implementadas e testadas antes de serem anunciadas como disponíveis.
+A cobrança permanece desativada. `billing.sql` e as funções de pagamento precisam de configuração e validação próprias antes de qualquer contratação real. Empresas locais e cópias pessoais usam armazenamentos e operações diferentes; não envie os dados empresariais como se fossem parte do snapshot pessoal.
 
 Para excluir uma conta, o proprietário pode usar **Authentication → Users → Delete user** no projeto; a chave estrangeira remove o snapshot dessa conta. Dados locais e tokens já guardados em um aparelho precisam ser removidos/encerrados nesse aparelho também. Defina o atendimento e o fluxo de exclusão da conta antes da operação comercial.
