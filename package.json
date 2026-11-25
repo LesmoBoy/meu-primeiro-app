@@ -1,0 +1,23 @@
+{
+  "name": "minha-rodagem-browser-tests",
+  "version": "3.1.2",
+  "private": true,
+  "description": "Verifica\u00e7\u00e3o do Minha Rodagem publicado em Chromium real, com dados isolados de teste.",
+  "scripts": {
+    "test:browser": "node qa/smoke.cjs",
+    "test:gps": "node qa/gps-browser.cjs",
+    "test:gps-core": "node qa/gps-core-test.cjs",
+    "test:profiles": "node qa/profiles-browser.cjs",
+    "test:profiles-core": "node qa/profiles-core-test.cjs",
+    "test:fleet": "node qa/fleet-browser.cjs",
+    "test:vehicles": "node qa/vehicle-catalog-test.cjs && node qa/vehicle-integration.mjs",
+    "test:cloud": "node qa/cloud-client-test.cjs && node qa/cloud-sync-test.mjs",
+    "test:business-core": "node qa/business-core-test.cjs",
+    "test:business-client": "node qa/business-client-test.cjs",
+    "test:business": "node qa/business-browser.cjs",
+    "test:billing": "node qa/billing-test.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

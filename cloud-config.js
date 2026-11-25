@@ -3,5 +3,5 @@
 window.RodagemCloudConfig = Object.freeze({
   url: 'https://ivoszoawhknwbiszjvfv.supabase.co',
   publishableKey: 'sb_publishable_qEm6CQdVSGoeVlYPKQekDQ_TvGFvQ5m',
-  providers: Object.freeze([])
+  providers: Object.freeze(['google'])
 });
