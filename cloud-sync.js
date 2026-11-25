@@ -314,6 +314,12 @@
     for (const node of buttons.filter(node => node.dataset.cloudProvider)) {
       node.hidden = Boolean(session);
       node.disabled = unavailable || !providerEnabled(node.dataset.cloudProvider);
+      if (node.dataset.cloudProvider === 'facebook') {
+        const enabled = providerEnabled('facebook');
+        node.textContent = enabled ? 'Entrar com Facebook' : 'Facebook em configuração';
+        if (enabled) node.removeAttribute('title');
+        else node.title = 'A entrada com Facebook ainda não está disponível nesta instalação.';
+      }
     }
     document.getElementById('cloud-link').hidden = !session || Boolean(binding);
     document.getElementById('cloud-upload').hidden = !session || !binding;

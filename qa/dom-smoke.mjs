@@ -7,6 +7,11 @@ import {boot,recordKey,legacy,flush} from './harness.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const report={mode:'Simulated DOM integration; no visual/browser/offline claim',passed:[],failures:[]};
 async function check(name,fn){await fn();report.passed.push(name);console.log('PASS',name);}
+function holdWrites(app) {
+  const pending=[];
+  app.window.navigator.locks={request(_name,_options,callback){return new Promise((resolve,reject)=>pending.push(()=>{try{resolve(callback());}catch(error){reject(error);}}));}};
+  return async()=>{assert.equal(pending.length,1,'one write is waiting for its lock');pending.shift()();await flush();};
+}
 
 try {
   await check('empty app boots and all five routes are exclusive',async()=>{
@@ -114,6 +119,44 @@ try {
     await importing;
     assert.equal(a.records().length,6);
     assert.ok(a.get('lista').textContent.includes('11/11/2026'));
+  });
+  await check('a duplicate-day confirmation cannot erase a pending fuel save in the same tab',async()=>{
+    const local=new Map([[recordKey,JSON.stringify({versao:1,registros:[legacy]})]]),b=boot(local),finishWrite=holdWrites(b);
+    b.fill('posto',{data:'2026-11-12',odometro:'1000',litros:'10',valor:'50',tanque:'cheio'});await b.submit('posto');
+    b.fill('dia',{data:legacy.data,ganhos:'20',entregas:'2'});await b.submit('dia');
+    assert.equal(b.get('confirmacao').open,true);
+    await finishWrite();const saved=local.get(recordKey);
+    assert.deepEqual(b.records().map(r=>r.tipo),['dia','posto']);
+    await b.confirm();await finishWrite();
+    assert.equal(local.get(recordKey),saved,'the completed fuel save must remain byte-for-byte intact');
+    assert.equal(b.get('mensagem').dataset.error,'true');
+    assert.equal(b.get('dia').elements.ganhos.value,'20','the rejected daily draft remains available');
+  });
+  await check('backup reading and confirmation cannot erase a pending save in the same tab',async()=>{
+    for(const phase of ['reading','confirmation']) {
+      const local=new Map([[recordKey,JSON.stringify({versao:1,registros:[legacy]})]]),b=boot(local),finishWrite=holdWrites(b);
+      b.fill('dia',{data:'2026-11-12',ganhos:'12',entregas:'1'});await b.submit('dia');
+      const input=b.get('arquivo'),backup=JSON.stringify({versao:1,registros:[legacy]});let finishReading;
+      input.files=[{size:backup.length,text:phase==='reading'?()=>new Promise(resolve=>finishReading=resolve):async()=>backup}];
+      const restoring=input.onchange({target:input});await flush();
+      assert.equal(b.get('confirmacao').open,phase==='confirmation');
+      await finishWrite();const saved=local.get(recordKey);assert.equal(b.records().length,2);
+      if(phase==='reading') {finishReading(backup);await flush();assert.equal(b.get('confirmacao').open,false);}
+      else {await b.confirm();await finishWrite();}
+      await restoring;
+      assert.equal(local.get(recordKey),saved,'the completed save survives backup '+phase);
+      assert.equal(b.get('mensagem').dataset.error,'true');
+    }
+  });
+  await check('a valid backup still recovers corrupt storage and canceling never changes it',async()=>{
+    const local=new Map([[recordKey,'{broken json']]),b=boot(local),input=b.get('arquivo');
+    const backup=JSON.stringify({versao:1,registros:[legacy]});
+    input.files=[{size:backup.length,text:async()=>backup}];
+    const canceled=input.onchange({target:input});await flush();await b.confirm(false);await canceled;
+    assert.equal(local.get(recordKey),'{broken json');
+    input.files=[{size:backup.length,text:async()=>backup}];
+    const restoring=input.onchange({target:input});await flush();await b.confirm();await restoring;
+    assert.deepEqual(b.records(),[legacy]);assert.equal(b.get('mensagem').textContent,'Backup restaurado.');
   });
   await check('journey pauses, reload, pending recovery and associated save',async()=>{
     a.route('inicio');

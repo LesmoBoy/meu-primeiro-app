@@ -1,10 +1,10 @@
 # Ativar Google, Facebook e sincronização
 
-## Instalação 3.2.0 — Google Identity Services — 24/11/2026
+## Instalação 3.2.1 — Google Identity Services — 25/11/2026
 
 O projeto **MRB** (`ivoszoawhknwbiszjvfv`) recebeu `schema.sql` e `enterprise.sql`, com cinco tabelas protegidas por RLS. A configuração pública aponta para esse projeto e oferece somente Google; Facebook permanece desativado enquanto seu cadastro na Meta está pendente.
 
-O Google usa seu botão oficial **Google Identity Services (GIS)**. A credencial assinada pelo Google é trocada por uma sessão Supabase com `signInWithIdToken`. Este fluxo usa o Client ID público e **não depende de Client Secret**. O SDK do Google só é carregado quando a pessoa escolhe entrar.
+O Google usa seu botão oficial **Google Identity Services (GIS)**. A credencial assinada pelo Google é trocada por uma sessão Supabase com `signInWithIdToken`. Este fluxo usa o Client ID público e **não depende de Client Secret**. O SDK do Google só é carregado quando a pessoa escolhe entrar. A entrada real na conta conectada foi confirmada em navegador remoto e persistiu após recarregar a página; a confirmação MFA foi feita pelo titular. Isso não equivale a um teste físico do aplicativo no Android. A revisão 3.2.1 também impede que uma gravação pendente seja sobrescrita ao confirmar um backup ou fechamento duplicado.
 
 Projeto Google existente: `minha-rodagem-515711` (External / Testing). Cliente Web: **Minha Rodagem Web**. Client ID público:
 

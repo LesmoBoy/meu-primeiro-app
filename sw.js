@@ -1,5 +1,5 @@
 const PREFIXO = 'rodagem-cache:' + self.registration.scope + ':';
-const CACHE = PREFIXO + '3.2.0';
+const CACHE = PREFIXO + '3.2.1';
 const ARQUIVOS = ['./index.html','./privacidade.html','./exclusao-dados.html','./transport-art.css','./assets/transportes.webp','./styles.css','./enhancements.css','./profiles.css','./business-core.js','./business-client.js','./business-ui.js','./business.css','./billing-config.js','./billing.js','./fleet.css','./cloud.css','./cloud-config.js','./google-identity.js','./cloud-client.js','./cloud-sync.js','./vendor/supabase/supabase.js','./vehicle-catalog.js','./profiles-core.js','./app.js','./gps-core.js','./tracking.js','./experience.js','./profiles-ui.js','./interactions.js','./vendor/leaflet/leaflet.js','./vendor/leaflet/leaflet.css','./assets/inicio.svg','./assets/fechamento.svg','./assets/consumo.svg','./assets/historico.svg','./assets/ajustes.svg','./manifest.webmanifest','./icon-192.png','./icon-512.png'];
 
 self.addEventListener('install', event => {

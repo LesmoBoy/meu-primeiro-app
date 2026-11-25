@@ -93,14 +93,14 @@ function conferirVersao() {
   if (erroLeitura) throw Error('Não foi possível ler os registros. Restaure um backup válido antes de continuar.');
   if (localStorage.getItem(chave) !== versaoLida) throw Error('Os registros mudaram em outra aba. Recarregue antes de salvar ou exportar.');
 }
-async function persistir(novos, restaurando = false) {
-  // Capture antes de aguardar a trava: outro salvamento pode concluir na fila.
-  const esperado = versaoLida;
+async function persistir(novos, restaurando = false, esperado = versaoLida) {
+  // Quem preparou dados antes de aguardar uma confirmação passa a versão
+  // daquele momento. A trava não pode tornar atual um snapshot já antigo.
   const gravar = () => {
     conferirPerfilAtivo();
     if (erroLeitura && !restaurando) throw Error('Restaure um backup antes de salvar novos registros.');
-    if (localStorage.getItem(chave) !== esperado) {
-      throw Error('Os registros mudaram em outra aba. Reabra a página antes de salvar.');
+    if (versaoLida !== esperado || localStorage.getItem(chave) !== esperado) {
+      throw Error('Os registros mudaram durante a operação, nesta página ou em outra aba. Reabra a página antes de salvar.');
     }
     const validados = validarBackup({versao:1,registros:novos});
     const conteudo = JSON.stringify({versao:1, registros:validados});
@@ -283,6 +283,7 @@ for (const tipo of Object.keys(tipos)) {
       const assinatura = assinaturaFormulario(form);
       const identidade = {id:form.dataset.id,jornada:form.dataset.jornada};
       let manterRascunho = false;
+      const versaoBase = versaoLida;
       const novos = [...registros.filter(r => r.id !== registro.id),registro];
       if (evento.submitter?.value === 'salvar') {
         const editando = Boolean(form.dataset.id);
@@ -290,7 +291,7 @@ for (const tipo of Object.keys(tipos)) {
           if (!await confirmar('Já existe um fechamento nesta data. Adicionar outro lançamento ao mesmo dia? Você também pode voltar e editar o anterior no Histórico.')) return;
         }
         const jornadaId = form.dataset.jornada;
-        await persistir(novos);
+        await persistir(novos,false,versaoBase);
         manterRascunho = assinaturaFormulario(form) !== assinatura;
         if (!manterRascunho) limpar(form);
         else if (form.dataset.id === identidade.id && form.dataset.jornada === identidade.jornada) {
@@ -510,6 +511,7 @@ $('arquivo').onchange = async evento => {
   const arquivo = evento.target.files[0];
   evento.target.value = '';
   if (!arquivo) return;
+  const versaoBase = versaoLida;
   try {
     if (arquivo.size > 5_000_000) throw Error('O arquivo excede 5 MB.');
     let dados;
@@ -517,12 +519,14 @@ $('arquivo').onchange = async evento => {
     catch { throw Error('Escolha um backup JSON do Minha Rodagem.'); }
     if (importacao !== importacaoAtual) return;
     const novos = validarBackup(dados);
+    conferirPerfilAtivo();
+    if (versaoLida !== versaoBase || localStorage.getItem(chave) !== versaoBase) throw Error('Os registros mudaram durante a leitura do backup. Reabra a página antes de restaurar.');
     const usuario = window.RodagemProfiles?.current();
     const origem = typeof dados.perfil?.nome === 'string' ? dados.perfil.nome.slice(0,32) : '';
     const destino = usuario ? ' do perfil ' + usuario.name : ' deste navegador';
     if (!await confirmar('Substituir os registros' + destino + ' pelos ' + novos.length + ' lançamentos do backup' + (origem ? ' de ' + origem : '') + '? Os outros perfis não serão alterados. Baixe uma cópia dos atuais antes, se quiser guardá-los.')) return;
     if (importacao !== importacaoAtual) return;
-    await persistir(novos,true);
+    await persistir(novos,true,versaoBase);
     limpar($('dia'));
     limpar($('posto'));
     renderizarHistorico();
