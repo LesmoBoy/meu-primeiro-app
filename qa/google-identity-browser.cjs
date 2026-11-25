@@ -86,6 +86,12 @@ async function readyDialog(){
   const dialog=page.locator('.google-identity-dialog');
   try{
     await dialog.waitFor({state:'visible'});
+    // A URL-like glob such as 'https://**' is normalized by Playwright and
+    // misses /gsi/client. Require the intercepted fake before any button wait.
+    await page.waitForFunction(()=>Boolean(window.__fakeGoogle?.scriptExecutions)||window.__outcomes?.at(-1)?.status==='rejected');
+    const sdk=await uiDiagnostic();
+    assert.ok(sdk.interceptedFakeSDKRequests>0,'Google SDK request must be intercepted: '+JSON.stringify(sdk));
+    assert.ok(sdk.fakeScriptExecutions>0,'Only the fake Google SDK may render in this fixture: '+JSON.stringify(sdk));
     // A rejected helper promise is a useful failure, not a reason to wait for
     // a button that can no longer appear. Preserve the visible-button check.
     await page.waitForFunction(()=>Boolean(document.querySelector('[data-fake-official-google]'))||window.__outcomes?.at(-1)?.status==='rejected');
@@ -119,7 +125,7 @@ async function noModal(){assert.equal(await page.locator('.google-identity-dialo
   browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||(process.env.CI?undefined:'/usr/bin/chromium'),headless:true,args:['--no-sandbox','--disable-crashpad-for-testing','--disable-breakpad']});
   report.browserVersion=browser.version();
   context=await browser.newContext({viewport:{width:390,height:844},locale:'pt-BR',reducedMotion:'reduce'});
-  await context.route('https://**',async route=>{
+  await context.route(/^https:\/\//,async route=>{
     if(route.request().url()!==SDK_URL){report.unexpectedExternalRequests++;await route.abort();return;}
     sdkRequests++;
     const mode=nextSDK;nextSDK='ok';
