@@ -16,6 +16,7 @@ const heldRoutes=[];
 const fakeSDK=`(() => {
   const state=window.__fakeGoogle||{configs:[],renders:[],throwInitialize:false,throwRender:false};
   window.__fakeGoogle=state;
+  state.scriptExecutions=(state.scriptExecutions||0)+1;
   const enc=value=>btoa(JSON.stringify(value)).replace(/=/g,'').replace(/\\+/g,'-').replace(/\\//g,'_');
   state.response=(sourceIndex,overrides={})=>{
     const cfg=state.configs[sourceIndex];
@@ -62,7 +63,41 @@ async function openFixture(){await page.goto(report.fixtureURL);await page.waitF
 async function begin(selector='#start'){
   const index=await page.evaluate(()=>__outcomes.length);await page.locator(selector).click();return index;
 }
-async function readyDialog(){const dialog=page.locator('.google-identity-dialog');await dialog.waitFor({state:'visible'});await page.locator('[data-fake-official-google]').waitFor({state:'visible'});return dialog;}
+async function uiDiagnostic(){
+  const ui=await page.evaluate(()=>{
+    const dialog=document.querySelector('.google-identity-dialog'),button=document.querySelector('[data-fake-official-google]');
+    const result=window.__outcomes?.at(-1);
+    return{
+      outcome:result?{status:result.status,code:result.code||null,settlements:result.settlements}:null,
+      dialogCount:document.querySelectorAll('.google-identity-dialog').length,dialogOpen:Boolean(dialog?.open),
+      status:dialog?.querySelector('[role="status"]')?.textContent||null,
+      sdkScriptCount:document.querySelectorAll('script[data-rodagem-google-sdk]').length,
+      fakeScriptExecutions:window.__fakeGoogle?.scriptExecutions||0,
+      hasInitialize:typeof window.google?.accounts?.id?.initialize==='function',
+      fakeConfigCount:window.__fakeGoogle?.configs?.length||0,fakeRenderCount:window.__fakeGoogle?.renders?.length||0,
+      fakeButtonCount:document.querySelectorAll('[data-fake-official-google]').length,
+      buttonDisplay:button?getComputedStyle(button).display:null,buttonVisibility:button?getComputedStyle(button).visibility:null,
+      buttonHostHidden:button?.parentElement?.hidden??null
+    };
+  });
+  return{...ui,interceptedFakeSDKRequests:sdkRequests};
+}
+async function readyDialog(){
+  const dialog=page.locator('.google-identity-dialog');
+  try{
+    await dialog.waitFor({state:'visible'});
+    // A rejected helper promise is a useful failure, not a reason to wait for
+    // a button that can no longer appear. Preserve the visible-button check.
+    await page.waitForFunction(()=>Boolean(document.querySelector('[data-fake-official-google]'))||window.__outcomes?.at(-1)?.status==='rejected');
+    const state=await uiDiagnostic();
+    assert.notEqual(state.outcome?.status,'rejected','GIS helper rejected before rendering: '+JSON.stringify(state));
+    await page.locator('[data-fake-official-google]').waitFor({state:'visible'});
+    return dialog;
+  }catch(failure){
+    const state=await uiDiagnostic().catch(()=>({diagnosticUnavailable:true}));
+    throw new Error('Google button readiness failed: '+failure.message+'; safe UI diagnostic: '+JSON.stringify(state));
+  }
+}
 async function outcome(index,status){await page.waitForFunction(({index,status})=>__outcomes[index]?.status===status,{index,status});return page.evaluate(index=>({...__outcomes[index]}),index);}
 async function latestConfig(){return page.evaluate(()=>__fakeGoogle.configs.length-1);}
 async function cancel(){await page.locator('.google-identity-cancel').click();await page.locator('.google-identity-dialog').waitFor({state:'detached'});}
@@ -216,10 +251,17 @@ async function noModal(){assert.equal(await page.locator('.google-identity-dialo
     assert.equal(report.unexpectedExternalRequests,0);assert.deepEqual(report.browserErrors,[]);
     report.interceptedFakeSDKRequests=sdkRequests;
   });
-})().catch(failure=>{report.errors.push(failure.stack||failure.message);console.error(failure.stack||failure);process.exitCode=1;}).finally(async()=>{
+})().catch(async failure=>{
+  report.errors.push(failure.stack||failure.message);console.error(failure.stack||failure);process.exitCode=1;
+  if(page&&!page.isClosed()){
+    report.failureDiagnostic=await uiDiagnostic().catch(()=>({diagnosticUnavailable:true}));
+    try{await page.screenshot({path:path.join(__dirname,'google-identity-failure.png'),fullPage:true});report.failureScreenshot='qa/google-identity-failure.png';}catch{}
+  }
+}).finally(async()=>{
   for(const route of heldRoutes){try{await route.abort();}catch{}}
   if(context)await context.close();if(browser)await browser.close();
   if(server)await new Promise(resolve=>server.close(resolve));
+  report.interceptedFakeSDKRequests=sdkRequests;
   await fs.writeFile(path.join(__dirname,'google-identity-report.json'),JSON.stringify(report,null,2));
   console.log('GOOGLE_IDENTITY_BROWSER_REPORT '+JSON.stringify(report));
 });

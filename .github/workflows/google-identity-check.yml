@@ -1,0 +1,41 @@
+name: Verificar botão Google
+on:
+  push:
+    branches:
+      - 'codex/testes-google-botao-*'
+permissions:
+  contents: read
+jobs:
+  google:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    env:
+      CI: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm ci --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:google-identity-dom && npm run test:google-identity
+      - name: Exibir captura
+        if: always()
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          for (const name of ['google-identity-failure.png','google-identity-mobile.png','google-identity-desktop.png']) {
+            const path='qa/'+name;
+            if (!fs.existsSync(path)) continue;
+            const data=fs.readFileSync(path).toString('base64');
+            for(let start=0,part=0;start<data.length;start+=4000,part++) console.log('BROWSER_IMAGE:'+name+':'+part+':'+data.slice(start,start+4000));
+          }
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: google-identity
+          path: |
+            qa/google-identity-report.json
+            qa/google-identity-*.png
+          retention-days: 3
