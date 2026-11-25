@@ -1,11 +1,12 @@
-/* Autenticação oficial por PKCE e sincronização com revisão no servidor.
+/* Autenticação oficial por OAuth/PKCE ou ID token e revisão no servidor.
  * A configuração vazia mantém o app local funcionando sem pedidos de rede. */
 (() => {
   'use strict';
   const root = window;
   const TIMEOUT = 15000;
   const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  let client = null;
+  const GOOGLE_CLIENT_ID = /^\d+-[A-Za-z0-9_-]+\.apps\.googleusercontent\.com$/;
+  let client = null, googleAttempt = null;
 
   class CloudError extends Error {
     constructor(code, message) { super(message); this.name = 'RodagemCloudError'; this.code = code; }
@@ -35,8 +36,14 @@
     if (!Array.isArray(value.providers) || !value.providers.length || value.providers.some(p => !['google','facebook'].includes(p))) {
       return {issue:'Nenhuma forma de entrada válida foi ativada nesta instalação.'};
     }
+    const googleAuthMode = value.googleAuthMode === undefined ? 'oauth' : value.googleAuthMode;
+    if (!['oauth','id_token'].includes(googleAuthMode)) return {issue:'A forma de entrada com Google desta instalação está inválida.'};
+    const googleClientId = value.googleClientId === undefined ? '' : typeof value.googleClientId === 'string' ? value.googleClientId.trim() : null;
+    if (googleClientId === null || googleClientId && (googleClientId.length > 256 || !GOOGLE_CLIENT_ID.test(googleClientId)) || googleAuthMode === 'id_token' && !googleClientId) {
+      return {issue:'O identificador público de entrada com Google desta instalação está inválido.'};
+    }
     if (typeof root.supabase?.createClient !== 'function') return {issue:'A conexão não foi carregada. Reabra o app com internet para tentar novamente.'};
-    return {url:parsed.origin,key,providers:[...new Set(value.providers)],issue:''};
+    return {url:parsed.origin,key,providers:[...new Set(value.providers)],googleAuthMode,googleClientId,issue:''};
   }
   function configured() { return !configuration().issue; }
   function configurationIssue() { return configuration().issue; }
@@ -119,10 +126,59 @@
     const config = configuration();
     if (config.issue) throw new CloudError('CONFIGURATION',config.issue);
     if (!config.providers.includes(provider)) throw new CloudError('PROVIDER','Essa forma de entrada não está disponível nesta instalação.');
+    if (provider === 'google' && config.googleAuthMode === 'id_token') return signInGoogleIdToken(config);
     try {
       const {error} = await connection().auth.signInWithOAuth({provider,options:{redirectTo:redirectURL(),...(provider === 'facebook' ? {scopes:'email'} : {})}});
       if (error) throw error;
+      return null;
     } catch (error) { throw failure(error,'Não foi possível iniciar a entrada. Tente novamente com internet.'); }
+  }
+  async function signInGoogleIdToken(config) {
+    if (googleAttempt) throw new CloudError('AUTH_PENDING','Já existe uma entrada com Google em andamento. Conclua ou cancele a janela aberta.');
+    const attempt = {}; googleAttempt = attempt;
+    try {
+      const guard = profileGuard();
+      const check = () => { try { guard(); } catch { throw new CloudError('SESSION_CHANGED','O perfil mudou durante a entrada. Reabra o perfil antes de tentar novamente.'); } };
+      check();
+      const encoder = root.TextEncoder || (typeof TextEncoder === 'function' ? TextEncoder : null);
+      if (typeof root.crypto?.getRandomValues !== 'function' || typeof root.crypto.subtle?.digest !== 'function' || typeof encoder !== 'function') {
+        throw new CloudError('UNSUPPORTED_BROWSER','Este navegador não oferece a conexão segura necessária para entrar com Google. Atualize-o e tente novamente.');
+      }
+      if (typeof root.RodagemGoogleIdentity?.requestCredential !== 'function') {
+        throw new CloudError('GOOGLE_UNAVAILABLE','A conexão com Google não foi carregada. Reabra o app com internet e tente novamente.');
+      }
+      const hex = bytes => Array.from(bytes,byte => byte.toString(16).padStart(2,'0')).join('');
+      const rawNonce = hex(root.crypto.getRandomValues(new Uint8Array(32)));
+      const hash = await root.crypto.subtle.digest('SHA-256',new encoder().encode(rawNonce));
+      check();
+      let credential;
+      try { credential = await root.RodagemGoogleIdentity.requestCredential({clientId:config.googleClientId,nonce:hex(new Uint8Array(hash))}); }
+      catch (cause) {
+        if (cause?.code === 'CANCELLED' || cause?.name === 'AbortError') throw new CloudError('CANCELLED','A entrada com Google foi cancelada. Seus dados locais foram mantidos.');
+        throw new CloudError('GOOGLE_UNAVAILABLE','Não foi possível receber a confirmação do Google. Confira sua conexão e tente novamente.');
+      }
+      check();
+      if (!validIdTokenShape(credential)) {
+        throw new CloudError('INVALID_CREDENTIAL','O Google não retornou uma identificação válida. Tente entrar novamente.');
+      }
+      const {error} = await connection().auth.signInWithIdToken({provider:'google',token:credential,nonce:rawNonce});
+      if (error) throw error;
+      check();
+      return null;
+    } catch (cause) { throw failure(cause,'Não foi possível concluir a entrada com Google. Tente novamente com internet.'); }
+    finally { if (googleAttempt === attempt) googleAttempt = null; }
+  }
+  function validIdTokenShape(value) {
+    if (typeof value !== 'string' || value.length > 65536 || !/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(value)) return false;
+    try {
+      const parts = value.split('.').slice(0,2).map(part => {
+        const encoded = part.replace(/-/g,'+').replace(/_/g,'/');
+        return JSON.parse(root.atob(encoded.padEnd(Math.ceil(encoded.length/4)*4,'=')));
+      });
+      // Apenas formato: assinatura, issuer, audience e nonce são autenticados
+      // pelo Supabase. Decodificar o JWT não torna suas claims confiáveis.
+      return parts.every(part => part && typeof part === 'object' && !Array.isArray(part)) && typeof parts[0].alg === 'string';
+    } catch { return false; }
   }
   async function signOut() {
     try {

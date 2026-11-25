@@ -3,5 +3,7 @@
 window.RodagemCloudConfig = Object.freeze({
   url: 'https://ivoszoawhknwbiszjvfv.supabase.co',
   publishableKey: 'sb_publishable_qEm6CQdVSGoeVlYPKQekDQ_TvGFvQ5m',
-  providers: Object.freeze([])
+  providers: Object.freeze(['google']),
+  googleAuthMode: 'id_token',
+  googleClientId: '421909197196-td982abtadcdh70hesfc3ucp2fe0qqii.apps.googleusercontent.com'
 });

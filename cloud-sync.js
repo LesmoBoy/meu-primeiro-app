@@ -295,7 +295,11 @@
     }); return node;
   }
   async function startProvider(provider) {
-    if (dirty() && !await confirmar('Entrar na conta vai reabrir o app. Os campos ainda não salvos serão descartados. Continuar?')) return null;
+    const navigates = provider !== 'google' || root.RodagemCloudConfig?.googleAuthMode !== 'id_token';
+    const warning = navigates
+      ? 'Entrar na conta vai reabrir o app. Os campos ainda não salvos serão descartados. Continuar?'
+      : 'Há campos ainda não salvos. Entrar com outra conta pode atualizar a tela e os dados da empresa. Continuar a entrada?';
+    if (dirty() && !await confirmar(warning)) return null;
     return cloud.signIn(provider);
   }
   function render() {
@@ -331,12 +335,21 @@
   }
   async function run(action) {
     if (busy || stale || recoveryFailed) return;
+    const focused = document.activeElement;
     busy = true; notice = ''; render();
     try {
       const result = await action();
       if (result !== null) notice = 'Operação concluída. Seus dados locais foram mantidos, salvo a recuperação que você confirmou.';
     } catch (failure) { notice = failure.code === 'CONFLICT' ? 'A cópia da conta mudou em outro aparelho. Recupere a versão mais recente antes de enviar novamente.' : failure.message || 'Não foi possível concluir. Confira sua conexão e tente novamente.'; }
-    finally { busy = false; render(); }
+    finally {
+      busy = false; render();
+      if (!stale && focused?.isConnected && !focused.disabled && !focused.hidden && !focused.closest?.('[hidden], [inert], fieldset[disabled]')) {
+        const style = root.getComputedStyle?.(focused);
+        const visible = (!style || !['hidden','collapse'].includes(style.visibility) && style.display !== 'none') &&
+          (typeof focused.getClientRects !== 'function' || focused.getClientRects().length > 0);
+        if (visible) focused.focus?.({preventScroll:true});
+      }
+    }
   }
   function mount() {
     const form = document.getElementById('perfil'); if (!form) return;
