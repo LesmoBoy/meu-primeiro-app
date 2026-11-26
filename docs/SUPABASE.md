@@ -12,7 +12,7 @@ Projeto Google existente: `minha-rodagem-515711` (External / Testing). Cliente W
 421909197196-td982abtadcdh70hesfc3ucp2fe0qqii.apps.googleusercontent.com
 ```
 
-A auditoria completa desta revisão conferiu o código de frontend, SQL remoto e módulos de cobrança preparados. O provedor Email/senha foi desativado no servidor após confirmar que só existia identidade Google. Google permanece habilitado; Facebook e cobranças continuam desativados. A validação incremental de percursos GPS está em `supabase/migrations/20261126083412_rodagem_track_snapshot_validation.sql` e preserva os registros existentes.
+A auditoria completa desta revisão conferiu o código de frontend, SQL remoto e módulos de cobrança preparados. O provedor Email/senha foi desativado no servidor após confirmar que só existia identidade Google. Google permanece habilitado; Facebook e cobranças continuam desativados. A validação incremental de percursos GPS está em `supabase/migrations/20261126211001_rodagem_track_snapshot_validation.sql` e preserva os registros existentes.
 
 As correções desta revisão abrangem consentimento GPS durante esperas, restauração empresarial de armazenamento corrompido, limites Unicode coerentes entre SQL e app, limpeza de convites e o código de cobrança ainda não implantado. Os testes PostgreSQL isolados agora integram o CI.
 
