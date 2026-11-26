@@ -12,7 +12,7 @@ trap cleanup EXIT HUP INT TERM
 command -v docker >/dev/null 2>&1 || { echo 'Docker is required for isolated PostgreSQL tests.' >&2; exit 64; }
 docker run -d --rm --network none --name "$container_name" -e POSTGRES_HOST_AUTH_METHOD=trust postgres:17-alpine >/dev/null
 attempt=0
-until docker exec "$container_name" pg_isready -U postgres >/dev/null 2>&1; do
+until docker exec "$container_name" pg_isready -h 127.0.0.1 -U postgres >/dev/null 2>&1; do
   attempt=$((attempt+1)); [ "$attempt" -lt 30 ] || { echo 'PostgreSQL did not start.' >&2; exit 1; }
   sleep 1
 done

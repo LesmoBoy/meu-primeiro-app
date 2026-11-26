@@ -56,6 +56,16 @@ let passed=0;async function check(name,fn){await fn();passed++;console.log('PASS
  await check('a backup confirmation snapshot cannot erase another edit made while confirmation was open',async()=>{
   const b=boot();await b.api.createCompany('Before');const expected=b.api.exportLocal();await b.api.createCompany('Added later');await assert.rejects(b.api.importLocal(core.emptyState(),expected),e=>e.code==='CONFLICT');assert.equal((await b.api.listCompanies()).length,2);
  });
+ await check('raw version recovery accepts corrupt storage but rejects concurrent replacement before the commit',async()=>{
+  const source=boot();await source.api.createCompany('Recovered');const backup=source.api.exportLocal();
+  const b=boot({store:new Map([[KEY,'{corrupt']])});const captured=b.api.captureLocalVersion();assert.equal(captured,'{corrupt');
+  await b.api.importLocal(backup,undefined,captured);assert.equal((await b.api.listCompanies())[0].name,'Recovered');
+  const c=boot({store:new Map([[KEY,'{corrupt']])});const original=c.api.captureLocalVersion();
+  const changed=JSON.stringify(backup);c.store.set(KEY,changed);
+  await assert.rejects(c.api.importLocal(core.emptyState(),undefined,original),e=>e.code==='CONFLICT');assert.equal(c.store.get(KEY),changed);
+  const empty=boot();const absent=empty.api.captureLocalVersion();assert.equal(absent,null);await empty.api.createCompany('Added while confirming');const before=empty.store.get(KEY);
+  await assert.rejects(empty.api.importLocal(core.emptyState(),undefined,absent),e=>e.code==='CONFLICT');assert.equal(empty.store.get(KEY),before);
+ });
  await check('unconfigured cloud mode sends nothing and never uploads local companies automatically',async()=>{
   const b=boot();await b.api.createCompany('Local');await assert.rejects(b.api.selectMode('cloud'),e=>e.code==='CONFIGURATION');assert.equal(b.api.getMode(),'local');assert.equal(b.calls.length,0);
   const c=boot({configured:true});await c.api.createCompany('Stays here');c.setRemote([]);await c.api.selectMode('cloud');assert.deepEqual(await c.api.listCompanies(),[]);assert.equal(c.calls.length,1);assert.equal(c.calls[0].name,'business_list_companies');assert.equal(c.calls[0].uid,A);await c.api.selectMode('local');assert.equal((await c.api.listCompanies())[0].name,'Stays here');

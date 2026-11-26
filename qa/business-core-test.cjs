@@ -125,4 +125,11 @@ check('role capabilities never grant billing or fleet administration to finance 
   assert.equal(core.can('unknown','fleet.write'),false);assert.equal(core.can('owner','invented.permission'),false);
   assert.equal(core.can('vehicles.write','manager'),true);
 });
+check('text limits match PostgreSQL Unicode code points so valid remote workspaces remain readable',()=>{
+  const data=state();data.companies[0].name='🛵'.repeat(80);data.members[0].name='🛵'.repeat(80);data.vehicles[0].name='🛵'.repeat(60);data.vehicles[0].plate='🛵'.repeat(20);data.trips[0].title='🛵'.repeat(120);data.trips[0].customer='🛵'.repeat(120);data.reminders[0].title='🛵'.repeat(120);
+  const workspace={company:data.companies[0],membership:{role:'driver',userId:null,memberId:id(11)},members:data.members,vehicles:data.vehicles,trips:data.trips,reminders:data.reminders};
+  assert.equal(core.validateWorkspace(workspace).trips[0].title.length,240);
+  assert.throws(()=>core.validateTrip({...data.trips[0],title:'🛵'.repeat(121)}));assert.throws(()=>core.validateTrip({...data.trips[0],title:'a'.repeat(121)}));
+  assert.throws(()=>core.validateCompany({...data.companies[0],name:'🛵'.repeat(81)}));assert.throws(()=>core.validateVehicle({...data.vehicles[0],name:'🛵'.repeat(61)}));
+});
 console.log('PASS '+passed+' business core suites');

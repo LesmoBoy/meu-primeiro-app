@@ -196,7 +196,7 @@ function atualizarExperiencia() {
   ponto.textContent = '.';
   titulo.append(ponto);
   const avatar = document.querySelector('.avatar');
-  avatar.textContent = perfilRodagem.nome ? Array.from(perfilRodagem.nome.trim().split(/\s+/).map(p => p[0]).join('')).slice(0, 2).join('').toLocaleUpperCase('pt-BR') : 'MR';
+  avatar.textContent = perfilRodagem.nome ? Array.from(perfilRodagem.nome.trim().split(/\s+/).map(p => Array.from(p)[0]).join('')).slice(0, 2).join('').toLocaleUpperCase('pt-BR') : 'MR';
   avatar.setAttribute('aria-label', 'Trocar perfil' + (perfilRodagem.nome ? '. Atual: ' + perfilRodagem.nome : ''));
   const datasInconsistentes = abastecimentosForaDeOrdem(registros);
   const medidos = [...ciclos(registros.filter(r => r.data <= hoje)).values()];

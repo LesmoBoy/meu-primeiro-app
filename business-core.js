@@ -16,7 +16,7 @@
     return value.toLowerCase();
   }
   function text(value,limit,label,optional = false) {
-    if (typeof value !== 'string' || /[\u0000-\u001f\u007f]/.test(value) || value.length > limit || (!optional && !value.trim())) fail('Confira ' + label + '.');
+    if (typeof value !== 'string' || /[\u0000-\u001f\u007f]/.test(value) || Array.from(value).length > limit || (!optional && !value.trim())) fail('Confira ' + label + '.');
     return value.trim();
   }
   function uint(value,label,maximum = MAX) {

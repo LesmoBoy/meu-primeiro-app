@@ -86,7 +86,9 @@ create or replace function public.business_billing_release(company_id uuid,lease
 returns void language sql security definer set search_path='' as $$
   delete from public.business_billing_leases l where l.company_id=$1 and l.token=$2;
 $$;
-create or replace function public.business_billing_apply(company_id uuid,lease_token uuid,event_id text,customer_id text,subscription_id text,plan_id text,subscription_status text,quantity integer,period_end_at timestamptz)
+-- Remove the former signature when upgrading this optional, disabled module.
+drop function if exists public.business_billing_apply(uuid,uuid,text,text,text,text,text,integer,timestamptz);
+create or replace function public.business_billing_apply(company_id uuid,lease_token uuid,event_id text,customer_id text,subscription_id text,plan_id text,subscription_status text,quantity integer,period_end_at timestamptz,confirmed_checkout_id text default null)
 returns void language plpgsql security definer set search_path='' as $$
 begin
   perform 1 from public.business_billing_leases l where l.company_id=business_billing_apply.company_id and l.token=lease_token and l.expires_at>now() for update;
@@ -96,16 +98,21 @@ begin
   if plan_id is null or plan_id not in ('company','vehicle') or subscription_status is null or subscription_status not in ('active','trialing','past_due','canceled','unpaid','incomplete','incomplete_expired','paused') or quantity is null or quantity not between 1 and 10000 or subscription_id is null or customer_id is null then raise exception 'Assinatura inválida.'; end if;
   insert into public.business_entitlements(company_id,plan,status,vehicle_quantity,period_end) values(company_id,plan_id,subscription_status,quantity,period_end_at)
     on conflict on constraint business_entitlements_pkey do update set plan=excluded.plan,status=excluded.status,vehicle_quantity=excluded.vehicle_quantity,period_end=excluded.period_end,revision=public.business_entitlements.revision+1,updated_at=clock_timestamp();
-  update public.business_billing_accounts a set stripe_subscription_id=subscription_id,checkout_id=null,checkout_url=null,checkout_plan=null,checkout_expires_at=null where a.company_id=business_billing_apply.company_id;
+  update public.business_billing_accounts a set stripe_subscription_id=subscription_id,
+    checkout_id=case when a.checkout_id=confirmed_checkout_id then null else a.checkout_id end,
+    checkout_url=case when a.checkout_id=confirmed_checkout_id then null else a.checkout_url end,
+    checkout_plan=case when a.checkout_id=confirmed_checkout_id then null else a.checkout_plan end,
+    checkout_expires_at=case when a.checkout_id=confirmed_checkout_id then null else a.checkout_expires_at end
+    where a.company_id=business_billing_apply.company_id;
   update public.business_billing_events e set processed_at=clock_timestamp() where e.id=event_id and e.company_id=business_billing_apply.company_id;
   delete from public.business_billing_leases l where l.company_id=business_billing_apply.company_id and l.token=lease_token;
 end; $$;
-revoke all on function public.business_assert_vehicle_entitlement(uuid,integer),public.business_billing_acquire(uuid,text),public.business_billing_release(uuid,uuid),public.business_billing_apply(uuid,uuid,text,text,text,text,text,integer,timestamptz),public.business_billing_vehicle_count(uuid) from public,anon,authenticated;
+revoke all on function public.business_assert_vehicle_entitlement(uuid,integer),public.business_billing_acquire(uuid,text),public.business_billing_release(uuid,uuid),public.business_billing_apply(uuid,uuid,text,text,text,text,text,integer,timestamptz,text),public.business_billing_vehicle_count(uuid) from public,anon,authenticated;
 do $$ begin
   if exists(select 1 from pg_roles where rolname='service_role') then
     grant select on public.business_companies,public.business_members to service_role;
     grant all on public.business_billing_settings,public.business_entitlements,public.business_billing_accounts,public.business_billing_events,public.business_billing_leases to service_role;
-    grant execute on function public.business_assert_vehicle_entitlement(uuid,integer),public.business_billing_acquire(uuid,text),public.business_billing_release(uuid,uuid),public.business_billing_apply(uuid,uuid,text,text,text,text,text,integer,timestamptz),public.business_billing_vehicle_count(uuid) to service_role;
+    grant execute on function public.business_assert_vehicle_entitlement(uuid,integer),public.business_billing_acquire(uuid,text),public.business_billing_release(uuid,uuid),public.business_billing_apply(uuid,uuid,text,text,text,text,text,integer,timestamptz,text),public.business_billing_vehicle_count(uuid) to service_role;
   end if;
 end $$;
 commit;

@@ -266,7 +266,14 @@
     if (mode !== 'local') throw error('MODE','Selecione Empresas neste aparelho para exportar o backup local.');
     return copy(read().state);
   }
-  async function importLocal(value,expectedSnapshot) {
+  function captureLocalVersion() {
+    assertProfile();
+    if (mode !== 'local') throw error('MODE','Selecione Empresas neste aparelho para recuperar o backup local.');
+    // A recuperação precisa capturar também armazenamento que não pode ser
+    // interpretado. Não confunda um JSON corrompido com uma versão vazia.
+    return root.localStorage.getItem(key);
+  }
+  async function importLocal(value,expectedSnapshot,expectedRaw) {
     const context = scope();
     if (mode !== 'local') throw error('MODE','O backup local só pode ser recuperado em Empresas neste aparelho.');
     let canonical;
@@ -276,6 +283,7 @@
     return locked(() => {
       check(context);
       const rawBefore = root.localStorage.getItem(key);
+      if (expectedRaw !== undefined && rawBefore !== expectedRaw) throw error('CONFLICT','Os dados mudaram enquanto você confirmava o backup. Atualize antes de recuperar.');
       if (expectedSnapshot !== undefined) {
         let expectedText;
         try { expectedText = sized(core.validateState(expectedSnapshot)); }
@@ -296,5 +304,5 @@
   root.addEventListener('storage',event => { if (event.key === key || event.key === null) emit('external'); });
   root.RodagemBusiness = Object.freeze({getMode:()=>mode,selectMode,listCompanies,createCompany,loadCompany,
     getCurrentWorkspace:() => { assertProfile(); return copy(workspace); },getCloudUserId:()=>userId,getSession:()=>remoteSession(),
-    saveEntity,archiveEntity,saveMember,archiveMember,inviteMember,revokeInvite,acceptInvite,exportLocal,importLocal,subscribe});
+    saveEntity,archiveEntity,saveMember,archiveMember,inviteMember,revokeInvite,acceptInvite,exportLocal,captureLocalVersion,importLocal,subscribe});
 })();

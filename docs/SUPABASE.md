@@ -1,6 +1,6 @@
 # Ativar Google, Facebook e sincronização
 
-## Instalação 3.2.1 — Google Identity Services — 25/11/2026
+## Instalação 3.2.2 — Google Identity Services — 26/11/2026
 
 O projeto **MRB** (`ivoszoawhknwbiszjvfv`) recebeu `schema.sql` e `enterprise.sql`, com cinco tabelas protegidas por RLS. A configuração pública aponta para esse projeto e oferece somente Google; Facebook permanece desativado enquanto seu cadastro na Meta está pendente.
 
@@ -11,6 +11,12 @@ Projeto Google existente: `minha-rodagem-515711` (External / Testing). Cliente W
 ```text
 421909197196-td982abtadcdh70hesfc3ucp2fe0qqii.apps.googleusercontent.com
 ```
+
+A auditoria completa desta revisão conferiu o código de frontend, SQL remoto e módulos de cobrança preparados. O provedor Email/senha foi desativado no servidor após confirmar que só existia identidade Google. Google permanece habilitado; Facebook e cobranças continuam desativados. A validação incremental de percursos GPS está em `supabase/migrations/20261126083412_rodagem_track_snapshot_validation.sql` e preserva os registros existentes.
+
+As correções desta revisão abrangem consentimento GPS durante esperas, restauração empresarial de armazenamento corrompido, limites Unicode coerentes entre SQL e app, limpeza de convites e o código de cobrança ainda não implantado. Os testes PostgreSQL isolados agora integram o CI.
+
+Limites de compatibilidade: históricos importados antigos ainda podem ter horas superiores às 24h permitidas em novos formulários. O teto de 5 MiB usa o tamanho JSONB no servidor, que pode ser maior que o JSON compacto do navegador; uma rejeição preserva a cópia anterior e os dados locais.
 
 No [provedor Google do MRB](https://supabase.com/dashboard/project/ivoszoawhknwbiszjvfv/auth/providers), o Client ID deve corresponder ao arquivo público, Google deve estar habilitado e **Skip nonce checks deve permanecer desligado**. A assinatura, o emissor e a audiência são verificados pelo Supabase. Por tentativa, o app gera 32 bytes aleatórios; envia ao Google o hash SHA-256 hexadecimal do nonce e ao Supabase o nonce original. O callback é consumido uma vez e nenhuma credencial é incluída nos backups.
 

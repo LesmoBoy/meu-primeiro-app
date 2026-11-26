@@ -20,7 +20,7 @@ function setup(){
     async account(){return account;},async accountByCustomer(id){return account?.stripe_customer_id===id?account:null;},async countActiveVehicles(){return count;},
     async updateAccount(id,patch){account={...account,company_id:id,...patch};return account;},
     async acquire(id,event){if(processed.has(event))return {state:'processed'};return busy?{state:'busy'}:{state:'claimed',token:other};},async release(){},
-    async apply(data){applied.push(data);processed.add(data.event_id);entitlement={company_id:company,plan:data.plan_id,status:data.subscription_status,vehicle_quantity:data.quantity};}
+    async apply(data){applied.push(data);processed.add(data.event_id);entitlement={company_id:company,plan:data.plan_id,status:data.subscription_status,vehicle_quantity:data.quantity};account={...account,stripe_subscription_id:data.subscription_id,...(account.checkout_id&&account.checkout_id===data.confirmed_checkout_id?{checkout_id:null,checkout_url:null,checkout_plan:null,checkout_expires_at:null}:{})};}
   };
   const stripe={async get(path){calls.push(['GET',path]);if(path==='/prices/price_company')return price('price_company',5000);if(path==='/prices/price_vehicle')return price('price_vehicle',2000);if(path.startsWith('/subscriptions/'))return subs.get(path.split('/').at(-1));if(path.startsWith('/checkout/sessions/'))return sessions.get(path.split('/').at(-1));throw Error('Unexpected Stripe GET');},
     async post(path,body,key){calls.push(['POST',path,body,key]);if(path==='/customers')return {id:'cus_current'};if(path==='/billing_portal/sessions')return {url:'https://billing.stripe.com/p/session_fixture'};if(path.endsWith('/expire'))return {status:'expired'};if(path==='/checkout/sessions'){const session={id:'cs_test_fixture',url:'https://checkout.stripe.com/c/pay/cs_test_fixture',expires_at:stamp/1000+86400,status:'open',metadata:{quantity:body['metadata[quantity]']}};sessions.set(session.id,session);return session;}throw Error('Unexpected Stripe POST');}};
@@ -80,6 +80,22 @@ await test('a webhook refreshes the company mapping after its lease to avoid an 
   const a=setup();a.setAccount({company_id:company,stripe_customer_id:'cus_current',stripe_subscription_id:'sub_old'});a.subs.set('sub_old',subscription('sub_old','canceled',1));
   a.db.acquire=async()=>{a.setAccount({company_id:company,stripe_customer_id:'cus_current',stripe_subscription_id:'sub_current'});return {state:'claimed',token:other};};
   assert.equal((await a.webhook(event('evt_mappingrace','sub_old'))).status,200);assert.equal(a.applied[0].subscription_id,'sub_current');assert.equal(a.applied[0].subscription_status,'active');
+});
+await test('a delayed cancellation preserves a newer open checkout and retry reuses its URL',async()=>{
+  const a=setup();a.setAccount({company_id:company,stripe_customer_id:'cus_current',stripe_subscription_id:'sub_old'});a.subs.set('sub_old',subscription('sub_old','canceled',1));
+  const first=await a.request({action:'checkout',plan:'vehicle'});assert.equal(first.status,200);const checkoutId=a.getAccount().checkout_id;
+  assert.equal((await a.webhook(event('evt_delayed_cancellation','sub_old'))).status,200);
+  assert.equal(a.getAccount().checkout_id,checkoutId);assert.equal(a.applied[0].confirmed_checkout_id,null);
+  const second=await a.request({action:'checkout',plan:'vehicle'});assert.equal(second.body.url,first.body.url);
+  assert.equal(a.calls.filter(x=>x[0]==='POST'&&x[1]==='/checkout/sessions').length,1);
+});
+await test('a webhook clears only a completed checkout for its confirmed customer and subscription',async()=>{
+  for(const [status,customer,sub,clears] of [['open','cus_current','sub_current',false],['complete','cus_current','sub_unrelated',false],['complete','cus_other','sub_current',false],['complete','cus_current','sub_current',true]]){
+    const a=setup();a.setAccount({company_id:company,stripe_customer_id:'cus_current',stripe_subscription_id:'sub_current',checkout_id:'cs_test_pending'});
+    a.sessions.set('cs_test_pending',{id:'cs_test_pending',status,customer,subscription:sub});
+    assert.equal((await a.webhook(event())).status,200);assert.equal(a.getAccount().checkout_id,clears?null:'cs_test_pending');
+    assert.equal(a.applied[0].confirmed_checkout_id,clears?'cs_test_pending':null);
+  }
 });
 await test('a multi-month Stripe price is not mislabeled as a monthly plan',async()=>{
   const a=setup(),get=a.stripe.get;a.stripe.get=async path=>{const value=await get(path);if(path==='/prices/price_company')value.recurring.interval_count=6;return value;};assert.equal((await a.request({action:'status'})).body.code,'BILLING_NOT_CONFIGURED');

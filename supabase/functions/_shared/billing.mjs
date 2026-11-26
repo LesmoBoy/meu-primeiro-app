@@ -86,7 +86,17 @@ export function createBillingHandler({config,db,stripe,now=()=>Date.now()}){
         if(!finalStatuses.has(current.status)||finalStatuses.has(subscription.status))subscription=current;
       }
       const info=subscriptionInfo(subscription,account,config);
-      await db.apply({company_id:account.company_id,lease_token:claim.token,event_id:event.id,customer_id:customer,subscription_id:info.subscriptionId,plan_id:info.plan,subscription_status:info.status,quantity:info.quantity,period_end_at:info.periodEnd});
+      // A delayed event for an old subscription must not orphan a newer open
+      // checkout. Only the provider can confirm which checkout completed this
+      // subscription; SQL compares the same checkout ID while holding the lease.
+      let confirmedCheckoutId=null;
+      if(account.checkout_id){
+        const checkout=await stripe.get('/checkout/sessions/'+account.checkout_id);
+        const checkoutCustomer=typeof checkout?.customer==='string'?checkout.customer:checkout?.customer?.id;
+        const checkoutSubscription=typeof checkout?.subscription==='string'?checkout.subscription:checkout?.subscription?.id;
+        if(checkout?.id===account.checkout_id&&checkout.status==='complete'&&checkoutCustomer===customer&&checkoutSubscription===info.subscriptionId)confirmedCheckoutId=checkout.id;
+      }
+      await db.apply({company_id:account.company_id,lease_token:claim.token,event_id:event.id,customer_id:customer,subscription_id:info.subscriptionId,plan_id:info.plan,subscription_status:info.status,quantity:info.quantity,period_end_at:info.periodEnd,confirmed_checkout_id:confirmedCheckoutId});
       return respond({received:true});
     }finally{await db.release(account.company_id,claim.token).catch(()=>{});}
   }

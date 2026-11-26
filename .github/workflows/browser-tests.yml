@@ -31,7 +31,7 @@ jobs:
       - name: Instalar Chromium e bibliotecas
         run: npx playwright install --with-deps chromium
       - name: Testar o app publicado com dados fictícios
-        run: npm run test:gps-core && npm run test:profiles-core && node qa/vehicle-catalog-test.cjs && npm run test:cloud && npm run test:google-identity-dom && npm run test:dom && npm run test:connection && node qa/sw-test.cjs && npm run test:business-core && npm run test:business-client && npm run test:billing
+        run: npm run test:gps-core && npm run test:profiles-core && node qa/vehicle-catalog-test.cjs && npm run test:cloud && npm run test:google-identity-dom && npm run test:dom && npm run test:connection && node qa/sw-test.cjs && npm run test:business-core && npm run test:business-client && npm run test:billing && node qa/tracking-test.mjs && node qa/math-audit.cjs && node qa/deep-audit-data-gps-consent-test.mjs && node qa/deep-audit-ui-probes.mjs && node qa/deep-audit-integrations-auth.cjs && node qa/deep-audit-integrations-ui.mjs && node qa/deep-audit-integrations-invite-context.mjs && node qa/deep-audit-payments-boundaries.mjs && node qa/deep-audit-payments-checkout-race.mjs
       - name: Testar os fluxos principais com dados fictícios
         if: env.BUSINESS_ONLY != 'true'
         run: npm run test:browser
@@ -78,4 +78,27 @@ jobs:
             qa/google-identity-report.json
             qa/*.png
           if-no-files-found: warn
+          retention-days: 3
+
+  postgres:
+    name: PostgreSQL 17 · sincronização, empresas e cobrança isolada
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Obter os arquivos do teste
+        uses: actions/checkout@v4
+      - name: Testar sincronização pessoal em banco descartável
+        run: bash supabase/test-postgres.sh 2>&1 | tee qa/postgres-personal-ci.log
+      - name: Testar empresas, concorrência e cobrança desativada
+        run: bash supabase/test-enterprise.sh 2>&1 | tee qa/postgres-enterprise-ci.log
+      - name: Conferir migrações e definições finais do banco
+        run: python qa/migrations-chain-test.py
+      - name: Guardar evidências PostgreSQL
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: minha-rodagem-postgres
+          path: |
+            qa/postgres-*-ci.log
+            qa/migrations-chain-report.json
           retention-days: 3

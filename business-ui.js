@@ -18,7 +18,7 @@
   let pendingInvitation='';
   try {
     const incoming=new URL(location.href).searchParams.get('convite');
-    if(incoming&&/^[0-9a-f]{64}$/i.test(incoming)){pendingInvitation=incoming;sessionStorage.setItem(invitationKey,incoming);const url=new URL(location.href);url.searchParams.delete('convite');history.replaceState(null,'',url.href);}
+    if(incoming&&/^[0-9a-f]{64}$/i.test(incoming)){pendingInvitation=incoming;try{sessionStorage.setItem(invitationKey,incoming);}catch{/* Mantenha o convite em memória sem deixar o código na URL. */}const url=new URL(location.href);url.searchParams.delete('convite');history.replaceState(null,'',url.href);}
     else {const stored=sessionStorage.getItem(invitationKey);if(stored&&/^[0-9a-f]{64}$/i.test(stored))pendingInvitation=stored;}
   }catch { /* O código ainda pode ser colado manualmente quando o armazenamento temporário não está disponível. */ }
   let edit = {member:null,vehicle:null,trip:null,reminder:null};
@@ -48,7 +48,7 @@
   function field(form,label,name,value='',settings={}) {
     const wrap=node('label'), title=node('span',label); let el;
     if(settings.options){el=node('select');for(const item of settings.options)el.append(option(item.value,item.label,String(value??'')));}
-    else {el=node('input');el.type=settings.type||'text';el.value=value??'';if(settings.inputMode)el.inputMode=settings.inputMode;if(settings.maxLength)el.maxLength=settings.maxLength;if(settings.pattern)el.pattern=settings.pattern;if(settings.placeholder)el.placeholder=settings.placeholder;}
+    else {el=node('input');el.type=settings.type||'text';el.value=value??'';if(settings.inputMode)el.inputMode=settings.inputMode;if(settings.maxLength){const unicodeText=el.type==='text'&&!settings.pattern&&name!=='token';el.maxLength=settings.maxLength*(unicodeText?2:1);if(unicodeText){const checkLength=()=>el.setCustomValidity?.(Array.from(el.value).length>settings.maxLength?'Use até '+settings.maxLength+' caracteres.':'');el.addEventListener('input',checkLength);checkLength();}}if(settings.pattern)el.pattern=settings.pattern;if(settings.placeholder)el.placeholder=settings.placeholder;}
     el.name=name;if(settings.required)el.required=true;if(settings.disabled)el.disabled=true;if(settings.readOnly)el.readOnly=true;
     wrap.append(title,el);if(settings.hint)wrap.append(node('small',settings.hint));form.append(wrap);return el;
   }
@@ -97,7 +97,7 @@
   async function chooseCompany(value) {
     const previous=workspace?.company.id||'';
     if(!await discard()){companySelect.value=previous;return;}
-    await run(async()=>{workspace=value?await R.loadCompany(value):null;edit={member:null,vehicle:null,trip:null,reminder:null};tab='dashboard';});
+    await run(async()=>{workspace=value?await R.loadCompany(value):null;inviteBox=null;edit={member:null,vehicle:null,trip:null,reminder:null};tab='dashboard';});
   }
   async function chooseMode(value) {
     const previous=currentMode();
@@ -262,7 +262,7 @@
     const section=card('Cópia das empresas deste perfil','O backup empresarial inclui equipe, veículos, viagens e alertas locais deste perfil. Os lançamentos pessoais têm backup próprio no Histórico.');const actions=node('div',null,'actions');
     const download=button('Baixar backup das empresas',()=>{try{const data=R.exportLocal();baixar('minha-rodagem-empresas-'+today()+'.json',JSON.stringify(data,null,2),'application/json');setNotice('Backup das empresas baixado.');}catch(error){setNotice(error.message,true);}});download.id='business-backup';actions.append(download);
     const file=node('input');file.type='file';file.accept='.json,application/json';file.hidden=true;file.id='business-import-file';
-    const restore=button('Restaurar empresas',()=>file.click());restore.id='business-import';actions.append(restore,file);file.addEventListener('change',async()=>{const operation=++importEpoch,selected=file.files[0];file.value='';if(!selected)return;try{const before=R.exportLocal();if(selected.size>5*1024*1024)throw Error('Escolha um backup empresarial de até 5 MB.');const data=C.validateState(JSON.parse(await selected.text()));if(operation!==importEpoch)return;if(!await confirmar('Substituir as empresas locais deste perfil pelo backup? Equipe, veículos, viagens e alertas locais serão substituídos. Os lançamentos pessoais e outros perfis serão mantidos. Baixe uma cópia dos atuais antes se quiser guardá-los.'))return;if(operation!==importEpoch)return;if(!await discard())return;if(operation!==importEpoch)return;await run(async()=>{await R.importLocal(data,before);workspace=null;await refreshCompanies();edit={member:null,vehicle:null,trip:null,reminder:null};setNotice('Empresas restauradas. Selecione a empresa que deseja abrir.');});}catch(error){if(operation===importEpoch)setNotice(error.message||'Escolha um backup empresarial válido.',true);}});
+    const restore=button('Restaurar empresas',()=>file.click());restore.id='business-import';actions.append(restore,file);file.addEventListener('change',async()=>{const operation=++importEpoch,selected=file.files[0];file.value='';if(!selected)return;try{const before=R.captureLocalVersion();if(selected.size>5*1024*1024)throw Error('Escolha um backup empresarial de até 5 MB.');const data=C.validateState(JSON.parse(await selected.text()));if(operation!==importEpoch)return;if(!await confirmar('Substituir as empresas locais deste perfil pelo backup? Equipe, veículos, viagens e alertas locais serão substituídos. Os lançamentos pessoais e outros perfis serão mantidos. Baixe uma cópia dos atuais antes se quiser guardá-los.'))return;if(operation!==importEpoch)return;if(!await discard())return;if(operation!==importEpoch)return;await run(async()=>{await R.importLocal(data,undefined,before);workspace=null;await refreshCompanies();edit={member:null,vehicle:null,trip:null,reminder:null};setNotice('Empresas restauradas. Selecione a empresa que deseja abrir.');});}catch(error){if(operation===importEpoch)setNotice(error.message||'Escolha um backup empresarial válido.',true);}});
     section.append(actions);host.append(section);
   }
   function renderInviteAccept() {
@@ -273,8 +273,8 @@
     const f=form('business-accept-invite','Aceitar convite',formEl=>{let value=valueOf(formEl,'token');try{if(value.includes('://'))value=new URL(value).searchParams.get('convite')||'';}catch{setNotice('Confira o link do convite.',true);return;}run(async()=>{const ws=await R.acceptInvite(value);pendingInvitation='';try{sessionStorage.removeItem(invitationKey);}catch{}await refreshCompanies(ws.company.id);const url=new URL(location.href);url.searchParams.delete('convite');history.replaceState(null,'',url.href);setNotice('Convite aceito. Empresa aberta.');});});field(f,'Código ou link do convite','token',pendingInvitation,{required:true,maxLength:2000});formActions(f,'Aceitar convite');panel.append(f);host.append(panel);
   }
   root.RodagemBusinessUI=Object.freeze({isDirty:()=>drafts.size>0,refresh:async()=>{if(!await discard())return false;await run(async()=>refreshCompanies(workspace?.company.id));return true;}});
-  document.addEventListener('rodagem:profile-stale',()=>{stale=true;drafts.clear();billingCache.clear();workspace=null;companies=[];setNotice('O perfil mudou. Recarregue para abrir os dados corretos.',true);render();});
+  document.addEventListener('rodagem:profile-stale',()=>{stale=true;inviteBox=null;drafts.clear();billingCache.clear();workspace=null;companies=[];setNotice('O perfil mudou. Recarregue para abrir os dados corretos.',true);render();});
   document.addEventListener('rodagem:profile-will-change',()=>{stale=true;});
-  R.subscribe?.(event=>{if(['auth','access','stale'].includes(event?.type)){workspace=null;companies=[];drafts.clear();billingCache.clear();if(event.type==='stale')stale=true;setNotice('A conta ou o contexto da empresa mudou. Selecione novamente a empresa.',true);render();return;}if(busy)return;const current=R.getCurrentWorkspace();if(workspace&&!current){workspace=null;companies=[];drafts.clear();billingCache.clear();setNotice('A conta ou o contexto da empresa mudou. Selecione novamente a empresa.',true);render();}});
+  R.subscribe?.(event=>{if(['company','mode','auth','access','stale'].includes(event?.type))inviteBox=null;if(['auth','access','stale'].includes(event?.type)){workspace=null;companies=[];drafts.clear();billingCache.clear();if(event.type==='stale')stale=true;setNotice('A conta ou o contexto da empresa mudou. Selecione novamente a empresa.',true);render();return;}if(busy)return;const current=R.getCurrentWorkspace();if(workspace&&!current){workspace=null;companies=[];drafts.clear();billingCache.clear();setNotice('A conta ou o contexto da empresa mudou. Selecione novamente a empresa.',true);render();}});
   render();run(async()=>{await refreshCompanies();},{reset:true});
 })();

@@ -80,6 +80,61 @@ $$;
 do $$
 declare
   s jsonb := current_setting('rodagem.qa_snapshot')::jsonb;
+  track jsonb := '{"version":1,"id":"route-valid","mode":"eco","enabled":true,"totalMeters":100,"points":[{"lat":-23.55,"lng":-46.63,"t":1000,"accuracy":5,"break":true},{"lat":-23.5491,"lng":-46.63,"t":16000,"accuracy":5,"break":false}],"gaps":0,"lastFix":{"lat":-23.5491,"lng":-46.63,"t":16000,"accuracy":5,"break":false,"speed":5},"lastSampleAt":16000,"lastSeenAt":25000,"createdAt":1000,"updatedAt":25000}';
+  entry jsonb;
+  bad_track jsonb;
+  bad jsonb;
+  original jsonb := public.rodagem_load_snapshot(auth.uid());
+  saved jsonb;
+  variants jsonb[];
+begin
+  entry := jsonb_build_object('id','route-valid','updatedAt',25000,'finished',true,'track',track);
+  if not public.rodagem_track_valid(track) or not public.rodagem_snapshot_valid(jsonb_set(s,'{routes}',jsonb_build_array(entry))) then raise exception 'Valid GPS route rejected'; end if;
+  -- Exercise the actual CHECK/RPC, then roll back only this synthetic save so
+  -- the later two-session CAS fixture still starts at revision 2.
+  begin
+    saved := public.rodagem_save_snapshot(auth.uid(),2,jsonb_set(s,'{routes}',jsonb_build_array(entry)));
+    if saved->>'revision'<>'3' then raise exception 'Valid route was not saved'; end if;
+    raise exception using errcode='PZ001',message='Rollback successful GPS fixture';
+  exception when sqlstate 'PZ001' then null; end;
+  if public.rodagem_load_snapshot(auth.uid())<>original then raise exception 'Successful GPS fixture rollback failed'; end if;
+  if not public.rodagem_track_valid(track-'lastSeenAt') then raise exception 'Legacy route without lastSeenAt rejected'; end if;
+  if not public.rodagem_track_valid(jsonb_set(jsonb_set(jsonb_set(track,'{lastFix}','null'),'{lastSampleAt}','25000'),'{lastSeenAt}','25000')) then raise exception 'Valid paused GPS route rejected'; end if;
+  if not public.rodagem_track_valid(jsonb_set(track,'{id}','"v"')) then raise exception 'Valid ASCII route identifier rejected'; end if;
+  if not public.rodagem_track_valid(track || '{"points":[],"lastFix":null,"totalMeters":0,"lastSampleAt":0,"lastSeenAt":0}') then raise exception 'Valid empty baseline route rejected'; end if;
+  raise notice 'PASS normal and paused GPS routes save; legacy lastSeenAt remains compatible';
+  variants := array[
+    jsonb_build_object('version',1,'id','route-valid','points',jsonb_build_array(jsonb_build_object('lat',999))),
+    track-'mode',jsonb_set(track,'{mode}','"invalid"'),track-'enabled',jsonb_set(track,'{enabled}','"true"'),
+    track-'totalMeters',jsonb_set(track,'{totalMeters}','-1'),jsonb_set(track,'{totalMeters}','100000001'),
+    jsonb_set(track,'{gaps}','1000001'),jsonb_set(track,'{gaps}','0.5'),
+    jsonb_set(track,'{points,0,lat}','91'),jsonb_set(track,'{points,0,lng}','181'),
+    jsonb_set(track,'{points,0,accuracy}','-1'),jsonb_set(track,'{points,0,accuracy}','10000001'),
+    (track#-'{points,0,break}'),jsonb_set(track,'{points,0,t}','999'),jsonb_set(track,'{points,1,t}','1000'),
+    jsonb_set(track,'{updatedAt}','999'),jsonb_set(track,'{lastSampleAt}','25001'),jsonb_set(track,'{lastSeenAt}','15999'),
+    jsonb_set(track,'{lastSeenAt}','25001'),jsonb_set(track,'{lastSeenAt}','null'),
+    track-'lastFix',jsonb_set(track,'{lastFix,lat}','0'),jsonb_set(track,'{lastFix,t}','16001'),
+    jsonb_set(track,'{points}','[]'),jsonb_set(track,'{id}','" "')
+  ];
+  foreach bad_track in array variants loop
+    if public.rodagem_track_valid(bad_track) then raise exception 'Unreadable GPS track accepted'; end if;
+    bad := jsonb_set(s,'{routes}',jsonb_build_array(entry||jsonb_build_object('track',bad_track)));
+    if public.rodagem_snapshot_valid(bad) then raise exception 'Unreadable GPS snapshot accepted'; end if;
+    begin
+      perform public.rodagem_save_snapshot(auth.uid(),2,bad);
+      raise exception 'Unreadable GPS snapshot saved';
+    exception when invalid_parameter_value then null; end;
+    if public.rodagem_load_snapshot(auth.uid())<>original then raise exception 'Rejected GPS snapshot changed original'; end if;
+  end loop;
+  if public.rodagem_snapshot_valid(jsonb_set(s,'{routes}',jsonb_build_array(jsonb_set(entry,'{updatedAt}','24999')))) then raise exception 'Inconsistent route timestamp accepted'; end if;
+  if public.rodagem_snapshot_valid(jsonb_set(s,'{routes}',jsonb_build_array(jsonb_set(entry,'{id}','"other-route"')))) then raise exception 'Inconsistent route identifier accepted'; end if;
+  raise notice 'PASS GPS shape, numeric bounds, timestamps and lastFix reject unreadable snapshots (27 track cases plus entry correlations)';
+end;
+$$;
+
+do $$
+declare
+  s jsonb := current_setting('rodagem.qa_snapshot')::jsonb;
   profile jsonb := '{"versao":2,"nome":"Ana","modelo":"Meu veículo","trabalho":"taxi","jornada":8,"meta":20000,"categoria":"carro","ano":2020,"combustivel":"Gasolina","configurado":true}';
   invalid_profile jsonb;
 begin
@@ -168,6 +223,10 @@ begin
   begin
     perform public.rodagem_save_snapshot('11111111-1111-4111-8111-111111111111',0,current_setting('rodagem.qa_snapshot')::jsonb);
     raise exception 'Anonymous save should be denied';
+  exception when insufficient_privilege then null; end;
+  begin
+    perform public.rodagem_track_valid('{}'::jsonb);
+    raise exception 'Anonymous GPS validator should be denied';
   exception when insufficient_privilege then null; end;
   raise notice 'PASS anonymous role has neither table nor RPC access';
 end;

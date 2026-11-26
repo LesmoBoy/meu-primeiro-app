@@ -4,6 +4,8 @@ A versão 3.0 contém a integração para assinatura recorrente com Stripe, por 
 
 Os recursos locais continuam disponíveis. Para cobrar clientes, o proprietário precisa configurar os projetos, os produtos, o retorno do pagamento e o webhook, testar o fluxo completo e só então ativar os controles descritos abaixo.
 
+A revisão 3.2.2 corrige a preservação de um checkout novo quando chega uma confirmação atrasada de uma assinatura antiga. O servidor confere o checkout no provedor e o SQL remove seu rastreio somente quando o identificador corresponde, dentro da mesma transação. Antes de uma futura ativação, implante `billing.sql` e a Edge Function da mesma revisão e homologue o fluxo completo na Stripe. Esta auditoria não ativou nem publicou o módulo de cobrança.
+
 ## 1. Projetos e banco
 
 Primeiro configure a autenticação conforme [SUPABASE.md](SUPABASE.md), e as empresas conforme [EMPRESAS.md](EMPRESAS.md). Execute no SQL Editor, nesta ordem:

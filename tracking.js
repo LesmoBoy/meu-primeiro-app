@@ -24,6 +24,7 @@
   let lastState = '', lastDraw = '', map = null, line = null, marker = null, roads = null;
   let follow = true, roadsFailed = false, acquiring = false;
   const invalidRoutes = new Set();
+  const consented = () => prefs.enabled && (!el('gps-usar') || el('gps-usar').checked);
 
   function warn(message) { if (typeof aviso === 'function') aviso(message,true); }
   function read(id) {
@@ -109,6 +110,7 @@
   }
   function poll(attempt) {
     if (attempt !== token || pending || !capturing || journey?.estado !== 'running' || active?.enabled === false) return;
+    if (!consented()) { stop(); status = 'Jornada sem GPS. Você pode ativar quando quiser.'; render(); return; }
     try {
       if (!renewLease()) { stop(); status = 'GPS em outra aba. Continue nela ou toque em Ativar GPS.'; render(); return; }
     } catch { stop(); status = 'Sem espaço para guardar o trajeto. Os lançamentos existentes foram preservados.'; render(); warn(status); return; }
@@ -119,7 +121,7 @@
       if (attempt !== token) return;
       pending = false;
       try {
-        if (journey?.estado !== 'running') { stop(); render(); return; }
+        if (journey?.estado !== 'running' || !consented()) { stop(); render(); return; }
         if (!renewLease()) { stop(); status = 'GPS em outra aba. Continue nela ou toque em Ativar GPS.'; render(); return; }
         const result = geo().accept(active,position,Date.now());
         active = result.track;
@@ -143,7 +145,7 @@
   async function start(j, options = {}) {
     if (!j?.id || j.estado !== 'running' || !geo()) return;
     journey = {...j};
-    if (!prefs.enabled || (el('gps-usar') && !el('gps-usar').checked)) { status = 'Jornada sem GPS. Você pode ativar quando quiser.'; render(); return; }
+    if (!consented()) { status = 'Jornada sem GPS. Você pode ativar quando quiser.'; render(); return; }
     if (capturing && active?.id === j.id) return;
     if (acquiring) return;
     if (!navigator.geolocation) { status = 'Este navegador não oferece GPS. Informe os km no fechamento.'; render(); return; }
@@ -152,7 +154,7 @@
         if (!navigator.permissions?.query || (await navigator.permissions.query({name:'geolocation'})).state !== 'granted') { status = 'Toque em Ativar GPS para retomar o percurso.'; render(); return; }
       } catch { status = 'Toque em Ativar GPS para retomar o percurso.'; render(); return; }
     }
-    if (capturing || acquiring || journey?.id !== j.id || journey.estado !== 'running' || !prefs.enabled) return;
+    if (capturing || acquiring || journey?.id !== j.id || journey.estado !== 'running' || !consented()) return;
     stop();
     const attempt = token;
     try {
@@ -170,7 +172,7 @@
     acquiring = true;
     const granted = await acquire(j.id,attempt);
     acquiring = false;
-    if (attempt !== token || journey?.id !== j.id || journey.estado !== 'running') {
+    if (attempt !== token || journey?.id !== j.id || journey.estado !== 'running' || !consented()) {
       if (lockToken === attempt) { releaseLock?.(); releaseLock = null; lockToken = null; }
       return;
     }
@@ -283,7 +285,7 @@
   }
   el('gps-usar')?.addEventListener('change',() => {
     prefs.enabled = el('gps-usar').checked; persistPrefs();
-    if (!prefs.enabled && capturing) disable();
+    if (!prefs.enabled) disable();
     else if (prefs.enabled && journey?.estado === 'running') enable().catch(error => warn(error.message));
   });
   if (el('gps-usar')) el('gps-usar').checked = prefs.enabled;

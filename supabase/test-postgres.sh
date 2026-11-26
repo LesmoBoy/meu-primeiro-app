@@ -15,7 +15,7 @@ docker run -d --rm --network none --name "$container_name" -e POSTGRES_HOST_AUTH
 ready=0
 attempt=0
 while [ "$attempt" -lt 30 ]; do
-  if docker exec "$container_name" pg_isready -U postgres >/dev/null 2>&1; then ready=1; break; fi
+  if docker exec "$container_name" pg_isready -h 127.0.0.1 -U postgres >/dev/null 2>&1; then ready=1; break; fi
   attempt=$((attempt + 1))
   sleep 1
 done

@@ -27,6 +27,16 @@ select qa.reject(format('select public.business_billing_apply(%L,%L,''evt_test_c
 select public.business_billing_apply(:'company_a',:'lease_token','evt_test_confirmed','cus_test_company_a','sub_test','vehicle','active',2,now()+interval '1 month');
 select qa.check((select status='active' and plan='vehicle' and vehicle_quantity=2 from public.business_entitlements where company_id=:'company_a'),'only the service confirmation records the purchased vehicle quantity');
 select qa.check(public.business_billing_acquire(:'company_a','evt_test_confirmed')->>'state'='processed','a provider event is acknowledged once');
+update public.business_billing_accounts set checkout_id='cs_pending_new',checkout_url='https://checkout.stripe.com/fixture',checkout_plan='vehicle',checkout_expires_at=now()+interval '1 day' where company_id=:'company_a';
+select public.business_billing_acquire(:'company_a','evt_delayed_cancellation')->>'token' as delayed_lease \gset
+select public.business_billing_apply(:'company_a',:'delayed_lease','evt_delayed_cancellation','cus_test_company_a','sub_test','vehicle','canceled',2,now()+interval '1 month');
+select qa.check((select checkout_id='cs_pending_new' and checkout_url='https://checkout.stripe.com/fixture' and checkout_plan='vehicle' and checkout_expires_at is not null from public.business_billing_accounts where company_id=:'company_a'),'a delayed old subscription event preserves a newer pending checkout');
+select public.business_billing_acquire(:'company_a','evt_unrelated_checkout')->>'token' as unrelated_lease \gset
+select public.business_billing_apply(:'company_a',:'unrelated_lease','evt_unrelated_checkout','cus_test_company_a','sub_test','vehicle','active',2,now()+interval '1 month','cs_old_unrelated');
+select qa.check((select checkout_id='cs_pending_new' from public.business_billing_accounts where company_id=:'company_a'),'a stale checkout ID cannot clear a newer mapping');
+select public.business_billing_acquire(:'company_a','evt_matching_checkout')->>'token' as matching_lease \gset
+select public.business_billing_apply(:'company_a',:'matching_lease','evt_matching_checkout','cus_test_company_a','sub_test','vehicle','active',2,now()+interval '1 month','cs_pending_new');
+select qa.check((select checkout_id is null and checkout_url is null and checkout_plan is null and checkout_expires_at is null from public.business_billing_accounts where company_id=:'company_a'),'a matching confirmed checkout clears its mapping atomically with the entitlement');
 insert into public.business_entitlements(company_id,plan,status,vehicle_quantity,period_end) values(:'company_b','company','active',1,now()+interval '1 month');
 select public.business_assert_vehicle_entitlement(:'company_a',2);
 select qa.reject(format('select public.business_assert_vehicle_entitlement(%L,3)',:'company_a'),array['P0001'],'a confirmed per-vehicle plan enforces its purchased quota');

@@ -14,6 +14,88 @@ exception when invalid_text_representation or numeric_value_out_of_range then re
 end;
 $$;
 
+-- Matches the persisted GPS shape read by RodagemGeo.validate(). The optional
+-- lastSeenAt field keeps routes from earlier app versions readable.
+create or replace function public.rodagem_track_valid(track jsonb)
+returns boolean language plpgsql immutable parallel safe security invoker set search_path = '' as $$
+declare
+  route_id text;
+  id_units integer;
+  i integer;
+  point_count integer;
+  candidates jsonb;
+  candidate jsonb;
+  last_point jsonb;
+  last_seen jsonb;
+  previous_time numeric := null;
+  sample_time numeric;
+  whitespace text := E' \t\n\f\r' || chr(11) || chr(160) || chr(5760) || chr(8192) || chr(8193) || chr(8194)
+    || chr(8195) || chr(8196) || chr(8197) || chr(8198) || chr(8199) || chr(8200) || chr(8201)
+    || chr(8202) || chr(8232) || chr(8233) || chr(8239) || chr(8287) || chr(12288) || chr(65279);
+begin
+  if track is null or jsonb_typeof(track) is distinct from 'object'
+      or track->'version' is distinct from '1'::jsonb
+      or jsonb_typeof(track->'id') is distinct from 'string'
+      or coalesce(track->>'mode','') not in ('eco','precise')
+      or jsonb_typeof(track->'enabled') is distinct from 'boolean'
+      or jsonb_typeof(track->'totalMeters') is distinct from 'number'
+      or (track->>'totalMeters')::numeric < 0 or (track->>'totalMeters')::numeric > 100000000
+      or jsonb_typeof(track->'points') is distinct from 'array'
+      or not public.rodagem_json_uint(track->'gaps',1000000)
+      or not public.rodagem_json_uint(track->'createdAt',8640000000000000)
+      or not public.rodagem_json_uint(track->'updatedAt',8640000000000000)
+      or not public.rodagem_json_uint(track->'lastSampleAt',8640000000000000)
+      or (track->>'updatedAt')::numeric < (track->>'createdAt')::numeric
+      or (track->>'lastSampleAt')::numeric > (track->>'updatedAt')::numeric
+      or not (track ? 'lastFix') then return false; end if;
+  route_id := track->>'id';
+  id_units := length(route_id);
+  if id_units not between 1 and 100 or btrim(route_id,whitespace)='' then return false; end if;
+  -- JavaScript bounds this identifier by UTF-16 units, not Unicode code points.
+  for i in 1..length(route_id) loop
+    if ascii(substr(route_id,i,1)) > 65535 then id_units := id_units + 1; end if;
+  end loop;
+  if id_units > 100 then return false; end if;
+  last_seen := case when track ? 'lastSeenAt' then track->'lastSeenAt' else track->'lastSampleAt' end;
+  if not public.rodagem_json_uint(last_seen,8640000000000000)
+      or (last_seen#>>'{}')::numeric < (track->>'lastSampleAt')::numeric
+      or (last_seen#>>'{}')::numeric > (track->>'updatedAt')::numeric then return false; end if;
+  point_count := jsonb_array_length(track->'points');
+  if point_count > 4000 then return false; end if;
+  candidates := track->'points';
+  if track->'lastFix' <> 'null'::jsonb then
+    if jsonb_typeof(track->'lastFix') is distinct from 'object' or point_count=0 then return false; end if;
+    candidates := candidates || jsonb_build_array(track->'lastFix');
+  end if;
+  last_point := case when point_count>0 then track->'points'->(point_count-1) else null end;
+  for i in 0..jsonb_array_length(candidates)-1 loop
+    candidate := candidates->i;
+    if jsonb_typeof(candidate) is distinct from 'object'
+        or jsonb_typeof(candidate->'lat') is distinct from 'number'
+        or (candidate->>'lat')::numeric < -90 or (candidate->>'lat')::numeric > 90
+        or jsonb_typeof(candidate->'lng') is distinct from 'number'
+        or (candidate->>'lng')::numeric < -180 or (candidate->>'lng')::numeric > 180
+        or not public.rodagem_json_uint(candidate->'t',8640000000000000)
+        or jsonb_typeof(candidate->'accuracy') is distinct from 'number'
+        or (candidate->>'accuracy')::numeric < 0 or (candidate->>'accuracy')::numeric > 10000000
+        or jsonb_typeof(candidate->'break') is distinct from 'boolean' then return false; end if;
+    sample_time := (candidate->>'t')::numeric;
+    if i < point_count then
+      if sample_time < (track->>'createdAt')::numeric or sample_time > (track->>'updatedAt')::numeric
+          or (previous_time is not null and sample_time <= previous_time) then return false; end if;
+      previous_time := sample_time;
+    else
+      if candidate->'t' is distinct from track->'lastSampleAt'
+          or candidate->'t' is distinct from last_point->'t'
+          or candidate->'lat' is distinct from last_point->'lat'
+          or candidate->'lng' is distinct from last_point->'lng' then return false; end if;
+    end if;
+  end loop;
+  return true;
+exception when invalid_text_representation or numeric_value_out_of_range then return false;
+end;
+$$;
+
 create or replace function public.rodagem_snapshot_valid(snapshot jsonb)
 returns boolean language plpgsql stable parallel safe set search_path = '' as $$
 declare
@@ -103,12 +185,10 @@ begin
     if jsonb_typeof(entry) is distinct from 'object'
         or jsonb_typeof(entry->'id') is distinct from 'string'
         or length(entry->>'id') not between 1 and 100
-        or jsonb_typeof(entry->'track') is distinct from 'object'
+        or not public.rodagem_track_valid(entry->'track')
         or entry->'track'->'id' is distinct from entry->'id'
-        or entry->'track'->'version' is distinct from '1'::jsonb
-        or jsonb_typeof(entry->'track'->'points') is distinct from 'array'
-        or jsonb_array_length(entry->'track'->'points') > 4000
         or not public.rodagem_json_uint(entry->'updatedAt',8640000000000000)
+        or entry->'track'->'updatedAt' is distinct from entry->'updatedAt'
         or jsonb_typeof(entry->'finished') is distinct from 'boolean'
         then return false; end if;
   end loop;
@@ -233,11 +313,13 @@ end;
 $$;
 
 revoke all on function public.rodagem_json_uint(jsonb,numeric) from public, anon;
+revoke all on function public.rodagem_track_valid(jsonb) from public, anon;
 revoke all on function public.rodagem_snapshot_valid(jsonb) from public, anon;
 revoke all on function public.rodagem_sync_stamp() from public, anon;
 revoke all on function public.rodagem_load_snapshot(uuid) from public, anon;
 revoke all on function public.rodagem_save_snapshot(uuid,bigint,jsonb) from public, anon;
 grant execute on function public.rodagem_json_uint(jsonb,numeric) to authenticated;
+grant execute on function public.rodagem_track_valid(jsonb) to authenticated;
 grant execute on function public.rodagem_snapshot_valid(jsonb) to authenticated;
 grant execute on function public.rodagem_load_snapshot(uuid) to authenticated;
 grant execute on function public.rodagem_save_snapshot(uuid,bigint,jsonb) to authenticated;
