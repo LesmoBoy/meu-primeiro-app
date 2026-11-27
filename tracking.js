@@ -19,7 +19,8 @@
     if (saved && typeof saved.enabled === 'boolean' && ['eco','precise'].includes(saved.mode)) prefs = {enabled:saved.enabled,mode:saved.mode};
   } catch { /* Preferências inválidas não impedem a jornada. */ }
   let journey = null, active = null, raw = null, viewedId = null;
-  let timer = null, token = 0, pending = false, releaseLock = null, lockToken = null, capturing = false;
+  let timer = null, token = 0, pending = false, pendingSince = 0, releaseLock = null, lockToken = null, capturing = false;
+  let permissionStatus = null, permissionState;
   let status = 'O GPS começa com a jornada, se você permitir.';
   let lastState = '', lastDraw = '', map = null, line = null, marker = null, roads = null;
   let follow = true, roadsFailed = false, acquiring = false;
@@ -83,9 +84,37 @@
   }
   function stop() {
     token++;
-    clearTimeout(timer); timer = null; pending = false; capturing = false;
+    clearTimeout(timer); timer = null; pending = false; pendingSince = 0; capturing = false;
     releaseLock?.(); releaseLock = null; lockToken = null;
     try { if (JSON.parse(localStorage.getItem(LEASE) || 'null')?.owner === owner) localStorage.removeItem(LEASE); } catch {}
+  }
+  function permissionRevoked() {
+    if (!capturing && !acquiring && !pending) return;
+    stop();
+    try { if (active) save(geo().breakSegment(active,Date.now(),false)); }
+    catch { /* O percurso anterior permanece guardado; nenhuma distância é estimada. */ }
+    status = 'Permissão de localização removida. O cronômetro continua; ative o GPS após liberar a permissão.';
+    render();
+  }
+  async function observePermission() {
+    if (!navigator.permissions?.query) return null;
+    try {
+      const next = await navigator.permissions.query({name:'geolocation'});
+      if (permissionStatus !== next) {
+        if (permissionStatus?.removeEventListener) permissionStatus.removeEventListener('change',permissionChanged);
+        else if (permissionStatus) permissionStatus.onchange = null;
+        permissionStatus = next;
+        if (next.addEventListener) next.addEventListener('change',permissionChanged);
+        else next.onchange = permissionChanged;
+      }
+      permissionChanged();
+      return next;
+    } catch { return null; }
+  }
+  function permissionChanged() {
+    const previous = permissionState;
+    permissionState = permissionStatus?.state;
+    if (permissionState === 'denied' || previous === 'granted' && permissionState !== 'granted') permissionRevoked();
   }
   async function acquire(id, attempt) {
     if (navigator.locks?.request) {
@@ -114,12 +143,12 @@
     try {
       if (!renewLease()) { stop(); status = 'GPS em outra aba. Continue nela ou toque em Ativar GPS.'; render(); return; }
     } catch { stop(); status = 'Sem espaço para guardar o trajeto. Os lançamentos existentes foram preservados.'; render(); warn(status); return; }
-    pending = true;
+    pending = true; pendingSince = Date.now();
     status = active.points.length ? 'Atualizando sua posição…' : 'Aguardando a primeira posição do GPS…';
     render();
-    navigator.geolocation.getCurrentPosition(position => {
+    try { navigator.geolocation.getCurrentPosition(position => {
       if (attempt !== token) return;
-      pending = false;
+      pending = false; pendingSince = 0;
       try {
         if (journey?.estado !== 'running' || !consented()) { stop(); render(); return; }
         if (!renewLease()) { stop(); status = 'GPS em outra aba. Continue nela ou toque em Ativar GPS.'; render(); return; }
@@ -135,12 +164,18 @@
       render(); schedule(attempt);
     },error => {
       if (attempt !== token) return;
-      pending = false;
+      pending = false; pendingSince = 0;
       status = error.code === 1 ? 'Localização não autorizada. Libere o GPS no navegador ou informe os km manualmente.' : error.code === 3 ? 'O GPS demorou para responder. Tentaremos novamente.' : 'Posição indisponível. Confira a localização do aparelho.';
-      if (error.code === 1) stop();
+      if (error.code === 1) {
+        stop();
+        try { if (active) save(geo().breakSegment(active,Date.now(),false)); } catch {}
+      }
       render();
       if (error.code !== 1) schedule(attempt);
-    },{enableHighAccuracy:prefs.mode === 'precise',maximumAge:active?.lastFix ? (prefs.mode === 'precise' ? 5000 : 10000) : 0,timeout:20000});
+    },{enableHighAccuracy:prefs.mode === 'precise',maximumAge:active?.lastFix ? (prefs.mode === 'precise' ? 5000 : 10000) : 0,timeout:20000}); }
+    catch {
+      stop(); status = 'O navegador interrompeu a localização. Seus dados foram mantidos; toque em Ativar GPS para tentar novamente.'; render();
+    }
   }
   async function start(j, options = {}) {
     if (!j?.id || j.estado !== 'running' || !geo()) return;
@@ -151,9 +186,10 @@
     if (!navigator.geolocation) { status = 'Este navegador não oferece GPS. Informe os km no fechamento.'; render(); return; }
     if (!options.requestPermission) {
       try {
-        if (!navigator.permissions?.query || (await navigator.permissions.query({name:'geolocation'})).state !== 'granted') { status = 'Toque em Ativar GPS para retomar o percurso.'; render(); return; }
+        if ((await observePermission())?.state !== 'granted') { status = 'Toque em Ativar GPS para retomar o percurso.'; render(); return; }
       } catch { status = 'Toque em Ativar GPS para retomar o percurso.'; render(); return; }
     }
+    else observePermission();
     if (capturing || acquiring || journey?.id !== j.id || journey.estado !== 'running' || !consented()) return;
     stop();
     const attempt = token;
@@ -340,7 +376,17 @@
     } catch { warn('Não consegui apagar o percurso. Tente novamente.'); }
   });
   document.addEventListener('rodagem:route',event => { if (event.detail?.panel === 'percurso') { if (!viewedId) viewedId = journey?.id || active?.id || null; render(); if (map) setTimeout(() => map.invalidateSize({pan:false}),0); } });
-  document.addEventListener('visibilitychange',() => { if (!document.hidden) { render(); if (capturing && !pending) { clearTimeout(timer); poll(token); } } });
+  document.addEventListener('visibilitychange',() => {
+    if (document.hidden) return;
+    render();
+    observePermission();
+    // Alguns Androids suspendem a aba sem concluir nem expirar a solicitação.
+    // Invalide a resposta antiga e retome em um novo segmento, sem estimar o trecho perdido.
+    if (capturing && pending && Date.now()-pendingSince > 25000) {
+      stop();
+      if (journey?.estado === 'running') start(journey,{requestPermission:false}).catch(() => {});
+    } else if (capturing && !pending) { clearTimeout(timer); poll(token); }
+  });
   window.addEventListener('storage',event => {
     if (event.key === PREFIX+active?.id && event.newValue !== raw) {
       stop(); active = read(active.id); raw = event.newValue; status = 'Percurso atualizado em outra aba. Ative o GPS para continuar aqui.'; render();

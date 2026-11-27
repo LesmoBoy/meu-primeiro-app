@@ -1,0 +1,71 @@
+NOTICE:  trigger "rodagem_sync_stamp" for relation "public.rodagem_sync" does not exist, skipping
+NOTICE:  policy "rodagem_sync_select" for relation "public.rodagem_sync" does not exist, skipping
+NOTICE:  policy "rodagem_sync_insert" for relation "public.rodagem_sync" does not exist, skipping
+NOTICE:  policy "rodagem_sync_update" for relation "public.rodagem_sync" does not exist, skipping
+NOTICE:  policy "rodagem_sync_delete" for relation "public.rodagem_sync" does not exist, skipping
+NOTICE:  function public.rodagem_load_snapshot() does not exist, skipping
+NOTICE:  function public.rodagem_save_snapshot(pg_catalog.int8,jsonb) does not exist, skipping
+NOTICE:  relation "rodagem_sync" already exists, skipping
+NOTICE:  function public.rodagem_load_snapshot() does not exist, skipping
+NOTICE:  function public.rodagem_save_snapshot(pg_catalog.int8,jsonb) does not exist, skipping
+                                                                   set_config                                                                   
+------------------------------------------------------------------------------------------------------------------------------------------------
+ {"version":1,"settings":null,"records":{"versao":1,"registros":[]},"routes":[],"gpsPreferences":{"enabled":false,"mode":"eco"},"journey":null}
+(1 row)
+
+              set_config              
+--------------------------------------
+ 11111111-1111-4111-8111-111111111111
+(1 row)
+
+NOTICE:  PASS first authenticated load is empty
+NOTICE:  PASS authenticated creation returns revision and server timestamp
+NOTICE:  PASS matching revision advances atomically
+NOTICE:  PASS stale CAS cannot overwrite a newer revision
+NOTICE:  PASS duplicate first save cannot replace an existing snapshot
+NOTICE:  PASS column grants prevent client-chosen revisions
+NOTICE:  PASS clients cannot transfer ownership
+NOTICE:  PASS malformed, duplicate, fractional, impossible-date, running and oversized data retain existing records (12 cases)
+NOTICE:  PASS valid financial records and paused journeys are accepted
+NOTICE:  PASS normal and paused GPS routes save; legacy lastSeenAt remains compatible
+NOTICE:  PASS GPS shape, numeric bounds, timestamps and lastFix reject unreadable snapshots (27 track cases plus entry correlations)
+NOTICE:  PASS vehicle category, activity, fuel, year and bicycle-energy validation (9 invalid cases)
+              set_config              
+--------------------------------------
+ 22222222-2222-4222-8222-222222222222
+(1 row)
+
+NOTICE:  PASS a second UID cannot read the first UID through RPC or table API
+NOTICE:  PASS a second UID cannot insert, update or delete another UID
+NOTICE:  PASS the second account saves independently
+NOTICE:  PASS expected UID rejects a token switch before either read or write
+NOTICE:  PASS authenticated role without JWT UID cannot read or save
+ set_config 
+------------
+ 
+(1 row)
+
+NOTICE:  PASS anonymous role has neither table nor RPC access
+NOTICE:  PASS deleting an Auth user removes only that account snapshot
+NOTICE:  PASS insecure legacy RPC overloads are absent
+              set_config              
+--------------------------------------
+ 11111111-1111-4111-8111-111111111111
+(1 row)
+
+NOTICE:  PASS HML linked UID A uploads and restores exact fictional profile, record and paused journey
+NOTICE:  PASS HML UID switch blocks A upload into B and B restores only its own fictional snapshot
+NOTICE:  PASS HML returning to UID A restores the original exact server envelope
+              set_config              
+--------------------------------------
+ 22222222-2222-4222-8222-222222222222
+(1 row)
+
+              set_config              
+--------------------------------------
+ 11111111-1111-4111-8111-111111111111
+(1 row)
+
+NOTICE:  PASS HML personal upload/load remain SECURITY INVOKER with empty search_path and RLS/FORCE
+PASS two concurrent PostgreSQL sessions cannot both commit the same revision
+PASS PostgreSQL 17 schema, RLS, grants, CAS, UID binding, validation and account-deletion tests

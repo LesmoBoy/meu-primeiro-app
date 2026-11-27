@@ -306,7 +306,7 @@ begin
     where user_id = owner_id and revision = expected_revision returning * into saved;
   end if;
   if saved.user_id is null then
-    raise exception using errcode = '40001', message = 'Os dados mudaram na nuvem. Confira a versão mais recente antes de enviar novamente.';
+    raise exception using errcode = 'PT409', message = 'Os dados mudaram na nuvem. Confira a versão mais recente antes de enviar novamente.';
   end if;
   return jsonb_build_object('revision',saved.revision,'payload',saved.payload,'updated_at',saved.updated_at);
 end;

@@ -1,0 +1,57 @@
+{
+  "classification": "automated-local-simulated-Auth-boundary-and-DOM-with-pinned-SDK-retry-probe",
+  "timestamp": "2026-11-27T02:40:11.197Z",
+  "production": false,
+  "realGoogleOIDC": false,
+  "realFinancialData": false,
+  "physicalDevice": false,
+  "results": [
+    {
+      "suite": "qa/cloud-client-test.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "passMarkers": 23,
+      "summary": "PASS 22 cloud client suites (SDK boundary mocked; real login requires provider configuration)",
+      "stdoutSha256": "9ef40fc2f28c24f1a7e0666216ff39f60595a407952b1811e322677618b381e6"
+    },
+    {
+      "suite": "qa/deep-audit-integrations-auth.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "passMarkers": 6,
+      "summary": "PASS 5 focused cloud boundary audit tests",
+      "stdoutSha256": "bc91a4ae980fd76bdea78bb02943c8d3176f9c32418df7931e5d6ebe989b4ed4"
+    },
+    {
+      "suite": "qa/v323/session-client-test.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "passMarkers": 26,
+      "summary": "PASS 25 v3.2.3 session client suites (simulated SDK boundary and pinned-SDK retry probe; synthetic data only)",
+      "stdoutSha256": "9189050edac4fcbd90abef98020e1211034c470dc8d47d5957b900f7785838f8"
+    },
+    {
+      "suite": "qa/v323/session-diagnostics-test.mjs",
+      "passed": true,
+      "exitCode": 0,
+      "passMarkers": 12,
+      "summary": "PASS 11 v3.2.3 session diagnostics DOM suites (simulation; no real OAuth/browser rendering)",
+      "stdoutSha256": "1bb483a1b2d6b7fc22bb25987e4e5d7b6c23581cb8bcab29af411fb53909d63c"
+    },
+    {
+      "suite": "qa/google-identity-dom.cjs",
+      "passed": true,
+      "exitCode": 0,
+      "passMarkers": 10,
+      "summary": "PASS 9 Google Identity lifecycle suites (simulated DOM, no browser/network/auth).",
+      "stdoutSha256": "f07ca923678c8c81946748b08bf87708d052ea92cff09dd6b0d56ae5ac4c8d25"
+    }
+  ],
+  "hashes": {
+    "cloud-client.js": "c4eeafd9cfb28d81f2e753318a579a05e937d5436e2e4eb64a3432af7a2e7d30",
+    "session-diagnostics.js": "46bcf56880ffcab0d62844c45de91e002b75a66f89ed85321287db1bcd7d2f80",
+    "qa/v323/session-client-test.cjs": "73c6379b70634d47154532d3cca42a889f0fd7c1dd21f2a425f7cfdd5cb89856",
+    "qa/v323/session-diagnostics-test.mjs": "c2e3a6825429294a2f029a8f0bfada135e5a3e46bc950c918f10cc824cb03c97"
+  },
+  "note": "PASS markers include suite summaries; do not add them as unique scenario counts. Auth mocks/DOM and a real SDK synthetic-fetch test do not independently prove real Auth HTTP or Google login."
+}

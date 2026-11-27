@@ -19,13 +19,13 @@ begin
   begin
     perform public.rodagem_save_snapshot(auth.uid(),1,s);
     raise exception 'Stale write should conflict';
-  exception when serialization_failure then null; end;
+  exception when sqlstate 'PT409' then null; end;
   if public.rodagem_load_snapshot(auth.uid())->>'revision' <> '2' then raise exception 'Stale write mutated stored row'; end if;
   raise notice 'PASS stale CAS cannot overwrite a newer revision';
   begin
     perform public.rodagem_save_snapshot(auth.uid(),0,s);
     raise exception 'Duplicate creation should conflict';
-  exception when serialization_failure then null; end;
+  exception when sqlstate 'PT409' then null; end;
   raise notice 'PASS duplicate first save cannot replace an existing snapshot';
   begin
     update public.rodagem_sync set revision = 99;
@@ -245,3 +245,51 @@ begin
   raise notice 'PASS insecure legacy RPC overloads are absent';
 end;
 $$;
+
+-- v3.2.3 round trip with a fictional local profile, daily record and paused journey.
+-- Roll back so the two-session CAS runner still begins with A at revision 2.
+begin;
+insert into auth.users values('22222222-2222-4222-8222-222222222222');
+set role authenticated;
+select set_config('request.jwt.claim.sub','11111111-1111-4111-8111-111111111111',false);
+do $$
+declare
+ s jsonb:=current_setting('rodagem.qa_snapshot')::jsonb;
+ sent jsonb; loaded jsonb;
+begin
+ s:=jsonb_set(s,'{settings}','{"versao":2,"nome":"Perfil sintético HML","modelo":"Veículo fictício","trabalho":"taxi","jornada":8,"meta":20000,"categoria":"carro","ano":2020,"combustivel":"Gasolina","configurado":true}');
+ s:=jsonb_set(s,'{records,registros}','[{"tipo":"dia","id":"hml-fictional-day","data":"2026-11-25","ganhos":20000,"combustivel":3000,"outros":500,"entregas":10,"horas":480,"km":12500,"jornadaId":"hml-paused"}]');
+ s:=jsonb_set(s,'{journey}','{"versao":1,"id":"hml-paused","estado":"paused","data":"2026-11-25","iniciadaEm":1000,"acumulado":120000,"rodandoDesde":null}');
+ sent:=public.rodagem_save_snapshot(auth.uid(),2,s);
+ loaded:=public.rodagem_load_snapshot(auth.uid());
+ if sent<>loaded or loaded->'payload'<>s or loaded->>'revision'<>'3' then raise exception 'HML synthetic upload/restore did not preserve exact payload'; end if;
+ perform set_config('rodagem.qa_hml_saved',loaded::text,false);
+ raise notice 'PASS HML linked UID A uploads and restores exact fictional profile, record and paused journey';
+end; $$;
+select set_config('request.jwt.claim.sub','22222222-2222-4222-8222-222222222222',false);
+do $$
+declare s jsonb:=current_setting('rodagem.qa_snapshot')::jsonb;
+begin
+ if public.rodagem_load_snapshot(auth.uid()) is not null then raise exception 'HML clean B restored A payload'; end if;
+ begin
+  perform public.rodagem_save_snapshot('11111111-1111-4111-8111-111111111111',3,s);
+  raise exception 'HML token-switch upload should fail';
+ exception when invalid_authorization_specification then null; end;
+ if public.rodagem_load_snapshot(auth.uid()) is not null then raise exception 'HML token switch populated B'; end if;
+ if public.rodagem_save_snapshot(auth.uid(),0,s)->'payload'<>s then raise exception 'HML B upload failed'; end if;
+ raise notice 'PASS HML UID switch blocks A upload into B and B restores only its own fictional snapshot';
+end; $$;
+select set_config('request.jwt.claim.sub','11111111-1111-4111-8111-111111111111',false);
+do $$ begin
+ if public.rodagem_load_snapshot(auth.uid())<>current_setting('rodagem.qa_hml_saved')::jsonb then raise exception 'HML B activity changed restored A payload'; end if;
+ raise notice 'PASS HML returning to UID A restores the original exact server envelope';
+end; $$;
+reset role;
+do $$ begin
+ if (select count(*)<>2 or bool_or(prosecdef) or not bool_and(proconfig @> array['search_path=""'])
+  from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='public' and proname in ('rodagem_load_snapshot','rodagem_save_snapshot'))
+ then raise exception 'HML personal RPC privilege model changed'; end if;
+ if not (select relrowsecurity and relforcerowsecurity from pg_class where oid='public.rodagem_sync'::regclass) then raise exception 'HML personal RLS/FORCE changed'; end if;
+ raise notice 'PASS HML personal upload/load remain SECURITY INVOKER with empty search_path and RLS/FORCE';
+end; $$;
+rollback;

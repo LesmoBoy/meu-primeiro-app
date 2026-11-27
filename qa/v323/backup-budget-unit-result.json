@@ -1,0 +1,25 @@
+{
+  "classification": "automated_local_pure_js",
+  "syntheticOnly": true,
+  "passed": [
+    "compact bytes match the JSON transport for plain canonical values",
+    "server separators and expanded numeric notation are accounted for",
+    "the audit-sized ledger fits compact JSON but is refused before a server write",
+    "exact byte boundary is allowed and one extra byte is refused",
+    "NUL and unpaired surrogates fail without silent string substitution",
+    "non-JSON values fail instead of becoming null or being omitted",
+    "cycles fail while shared child objects retain normal JSON duplication",
+    "getters and serialization hooks are never invoked",
+    "depth and work guards are iterative and do not modify the supplied structure",
+    "frozen records are measured without mutation or access to browser state"
+  ],
+  "errors": [],
+  "largeFixtureBudget": {
+    "wireBytes": 4633030,
+    "serverBytesUpperBound": 5281046,
+    "limitBytes": 5242880,
+    "fits": false,
+    "reason": "server-limit",
+    "complete": true
+  }
+}

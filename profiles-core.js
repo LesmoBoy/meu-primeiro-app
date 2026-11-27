@@ -71,6 +71,7 @@
     if (snapshot.data.activeId !== bootId) { markStale(); throw Error(STALE_MESSAGE); }
   }
   function assertCurrent() {
+    root.RodagemDeviceData?.assertWritable();
     if (stale || error) throw Error(error || STALE_MESSAGE);
     try { assertSnapshot(read()); }
     catch (failure) {

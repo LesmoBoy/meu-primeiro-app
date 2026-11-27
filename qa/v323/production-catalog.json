@@ -1,0 +1,385 @@
+{
+  "classification": "production-read-only-catalog-and-advisors",
+  "observedAt": "2026-11-27T02:29:31Z",
+  "financialRowsRead": false,
+  "productionWrites": false,
+  "baseCommit": "8f4cae36367f667ca871bd2539891ad6d1a74599",
+  "tables": [
+    {
+      "rls": true,
+      "name": "business_companies",
+      "forceRls": true
+    },
+    {
+      "rls": true,
+      "name": "business_entities",
+      "forceRls": true
+    },
+    {
+      "rls": true,
+      "name": "business_invites",
+      "forceRls": true
+    },
+    {
+      "rls": true,
+      "name": "business_members",
+      "forceRls": true
+    },
+    {
+      "rls": true,
+      "name": "rodagem_sync",
+      "forceRls": true
+    }
+  ],
+  "functions": [
+    {
+      "name": "business_accept_invite",
+      "owner": "postgres",
+      "definer": true,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "arguments": "expected_user_id uuid, invite_token text",
+      "anonExecute": false,
+      "definitionMd5": "16f8352da4999eacbacaa722def84e33",
+      "authenticatedExecute": true
+    },
+    {
+      "name": "business_archive_deleted_user",
+      "owner": "postgres",
+      "definer": true,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "arguments": "",
+      "anonExecute": false,
+      "definitionMd5": "0561cf4c24e9079b676862c07afd8d6a",
+      "authenticatedExecute": false
+    },
+    {
+      "name": "business_archive_entity",
+      "owner": "postgres",
+      "definer": true,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "arguments": "expected_user_id uuid, company_id uuid, entity_kind text, entity_id uuid, expected_revision bigint",
+      "anonExecute": false,
+      "definitionMd5": "18346fa259ec98a04452957234956c05",
+      "authenticatedExecute": true
+    },
+    {
+      "name": "business_create_company",
+      "owner": "postgres",
+      "definer": true,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "arguments": "expected_user_id uuid, company_name text",
+      "anonExecute": false,
+      "definitionMd5": "377100551be93d1482eab75f3e2cb1c4",
+      "authenticatedExecute": true
+    },
+    {
+      "name": "business_entity_json",
+      "owner": "postgres",
+      "definer": false,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "arguments": "entity business_entities",
+      "anonExecute": false,
+      "definitionMd5": "028d89a76fa8a643370e7988a5dad6a5",
+      "authenticatedExecute": false
+    },
+    {
+      "name": "business_guard",
+      "owner": "postgres",
+      "definer": true,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "arguments": "expected_user_id uuid",
+      "anonExecute": false,
+      "definitionMd5": "4a7425868c611c2a0f985757e65924c1",
+      "authenticatedExecute": false
+    },
+    {
+      "name": "business_invite_member",
+      "owner": "postgres",
+      "definer": true,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "arguments": "expected_user_id uuid, company_id uuid, invite_email text, invite_name text, invite_role text",
+      "anonExecute": false,
+      "definitionMd5": "acfdac9b333a3064b430044e4d969e06",
+      "authenticatedExecute": true
+    },
+    {
+      "name": "business_list_companies",
+      "owner": "postgres",
+      "definer": true,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "arguments": "expected_user_id uuid",
+      "anonExecute": false,
+      "definitionMd5": "71cd1b4da87fe98abe739d7a65bf349d",
+      "authenticatedExecute": true
+    },
+    {
+      "name": "business_load_workspace",
+      "owner": "postgres",
+      "definer": true,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "arguments": "expected_user_id uuid, company_id uuid",
+      "anonExecute": false,
+      "definitionMd5": "6c6bcf5529fd80485f649da52f938f93",
+      "authenticatedExecute": true
+    },
+    {
+      "name": "business_member_json",
+      "owner": "postgres",
+      "definer": false,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "arguments": "member business_members",
+      "anonExecute": false,
+      "definitionMd5": "c1ef7d1de802f37acc9a0baf526d9bae",
+      "authenticatedExecute": false
+    },
+    {
+      "name": "business_membership_id",
+      "owner": "postgres",
+      "definer": true,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "arguments": "company_id uuid",
+      "anonExecute": false,
+      "definitionMd5": "238223b0b78e88eab297dcff2f303d1a",
+      "authenticatedExecute": true
+    },
+    {
+      "name": "business_membership_role",
+      "owner": "postgres",
+      "definer": true,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "arguments": "company_id uuid",
+      "anonExecute": false,
+      "definitionMd5": "22a52a2a0048319e41cf8effe3a6e514",
+      "authenticatedExecute": true
+    },
+    {
+      "name": "business_revoke_invite",
+      "owner": "postgres",
+      "definer": true,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "arguments": "expected_user_id uuid, company_id uuid, invite_id uuid",
+      "anonExecute": false,
+      "definitionMd5": "2a325cf74cbc774c7287bbeeb5da43bd",
+      "authenticatedExecute": true
+    },
+    {
+      "name": "business_save_entity",
+      "owner": "postgres",
+      "definer": true,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "arguments": "expected_user_id uuid, company_id uuid, entity_kind text, entity_id uuid, expected_revision bigint, entity_data jsonb",
+      "anonExecute": false,
+      "definitionMd5": "5a38321d34b6632a9bed7c8ee0e1e565",
+      "authenticatedExecute": true
+    },
+    {
+      "name": "business_save_member",
+      "owner": "postgres",
+      "definer": true,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "arguments": "expected_user_id uuid, company_id uuid, member_id uuid, expected_revision bigint, member_data jsonb",
+      "anonExecute": false,
+      "definitionMd5": "7ecb649df4dd3999f0cac506574896ef",
+      "authenticatedExecute": true
+    },
+    {
+      "name": "business_valid_date",
+      "owner": "postgres",
+      "definer": false,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "arguments": "value jsonb",
+      "anonExecute": false,
+      "definitionMd5": "e93a830a6f9aa5b17c933746c10db10f",
+      "authenticatedExecute": false
+    },
+    {
+      "name": "business_valid_text",
+      "owner": "postgres",
+      "definer": false,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "arguments": "value jsonb, maximum integer, optional boolean",
+      "anonExecute": false,
+      "definitionMd5": "96f718a5a739da1127b1e9aff3c0f698",
+      "authenticatedExecute": false
+    },
+    {
+      "name": "business_valid_timestamp",
+      "owner": "postgres",
+      "definer": false,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "arguments": "value jsonb",
+      "anonExecute": false,
+      "definitionMd5": "80d6e77194d1ed6a581fa3784bcb01df",
+      "authenticatedExecute": false
+    },
+    {
+      "name": "business_validate_entity",
+      "owner": "postgres",
+      "definer": false,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "arguments": "entity_kind text, entity_data jsonb",
+      "anonExecute": false,
+      "definitionMd5": "af74ace189a067c3ede3c013c6354bb7",
+      "authenticatedExecute": false
+    },
+    {
+      "name": "rodagem_json_uint",
+      "owner": "postgres",
+      "definer": false,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "arguments": "value jsonb, maximum numeric",
+      "anonExecute": false,
+      "definitionMd5": "2d82ee437db5e770c451eefa8872501d",
+      "authenticatedExecute": true
+    },
+    {
+      "name": "rodagem_load_snapshot",
+      "owner": "postgres",
+      "definer": false,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "arguments": "expected_user_id uuid",
+      "anonExecute": false,
+      "definitionMd5": "7664d08eb4634e8dbc2f9cf177dc1137",
+      "authenticatedExecute": true
+    },
+    {
+      "name": "rodagem_save_snapshot",
+      "owner": "postgres",
+      "definer": false,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "arguments": "expected_user_id uuid, expected_revision bigint, snapshot jsonb",
+      "anonExecute": false,
+      "definitionMd5": "40e49a3d93a7afc62d24420d452339d9",
+      "authenticatedExecute": true
+    },
+    {
+      "name": "rodagem_snapshot_valid",
+      "owner": "postgres",
+      "definer": false,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "arguments": "snapshot jsonb",
+      "anonExecute": false,
+      "definitionMd5": "6998fccf5943e77713cabfeac3e442d0",
+      "authenticatedExecute": true
+    },
+    {
+      "name": "rodagem_sync_stamp",
+      "owner": "postgres",
+      "definer": false,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "arguments": "",
+      "anonExecute": false,
+      "definitionMd5": "a52a7b9eb793f76d6f5290cab9f31da7",
+      "authenticatedExecute": true
+    },
+    {
+      "name": "rodagem_track_valid",
+      "owner": "postgres",
+      "definer": false,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "arguments": "track jsonb",
+      "anonExecute": false,
+      "definitionMd5": "3e7c97944dd0d71cc343421d65569988",
+      "authenticatedExecute": true
+    }
+  ],
+  "migrations": [
+    {
+      "version": "20261124105205",
+      "name": "rodagem_personal_sync"
+    },
+    {
+      "version": "20261124105206",
+      "name": "rodagem_enterprise"
+    },
+    {
+      "version": "20261124105447",
+      "name": "rodagem_foreign_key_indexes"
+    },
+    {
+      "version": "20261126211001",
+      "name": "rodagem_track_snapshot_validation"
+    }
+  ],
+  "advisories": {
+    "security": [
+      {
+        "name": "rls_enabled_no_policy",
+        "level": "INFO",
+        "count": 1,
+        "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy"
+      },
+      {
+        "name": "authenticated_security_definer_function_executable",
+        "level": "WARN",
+        "count": 11,
+        "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable"
+      },
+      {
+        "name": "auth_leaked_password_protection",
+        "level": "WARN",
+        "count": 1,
+        "remediation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection"
+      }
+    ],
+    "performance": [
+      {
+        "name": "unused_index",
+        "level": "INFO",
+        "count": 4,
+        "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index"
+      }
+    ],
+    "health": []
+  }
+}

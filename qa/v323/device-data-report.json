@@ -1,0 +1,42 @@
+{
+  "mode": "local DOM/API simulation with synthetic fixtures",
+  "passed": [
+    "initialization is read-only and logout data remains present",
+    "technical export preserves exact raw strings including unreadable legacy data and excludes all Auth/other profiles/binding",
+    "export is available without Web Locks but removal is refused",
+    "removal requires an export, saved-copy acknowledgement and exact current name",
+    "signed-in account and failed Auth lookup cannot remove local data",
+    "configured but unavailable Auth module fails closed",
+    "an account appearing during lock acquisition cancels removal",
+    "an exclusively local installation can remove only after explicit confirmation",
+    "CAS detects record edits and newly created routes after export",
+    "renaming or switching the profile after export cancels removal",
+    "all pending journeys, including unreadable state, prevent removal",
+    "drafts and busy cloud or business UI prevent removal",
+    "pending cloud recovery prevents removal without deleting its journal",
+    "contended storage locks cancel without waiting or removing data",
+    "confirmed removal preserves registry, Auth state, account binding and every other profile",
+    "secondary profile export and removal never touches principal or another namespace",
+    "generation blocks queued stale writers even when both tabs initially had no records",
+    "journal preparation quota failure leaves original bytes writable and GPS untouched",
+    "failure after partial deletion rolls back exact bytes and freezes old writers",
+    "failed rollback preserves journal and a fresh load can recover the exact original data",
+    "interrupted deletion recovers before any subsequent save and forces reload",
+    "recovery never overwrites data created after an interrupted deletion",
+    "malformed journals cannot target Auth keys or another profile",
+    "invalid generation fails closed without rewriting historical bytes",
+    "simultaneous explicit removals do not interleave or recreate deleted records",
+    "canceling the removal UI clears acknowledgement without changing storage",
+    "download failure cannot count as a saved export or permit removal",
+    "bounded export rejects excessively large local data without deleting it"
+  ],
+  "pending": [
+    "Android físico",
+    "OAuth/contas reais",
+    "produção"
+  ],
+  "productionOperations": 0,
+  "suites": 28,
+  "errors": [],
+  "technicalImportImplemented": false
+}

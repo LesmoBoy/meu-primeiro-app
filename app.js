@@ -65,6 +65,22 @@ function validarBackup(dados) {
   }
   return validados;
 }
+// Diagnóstico separado da validação: backups antigos continuam legíveis, com
+// todos os seus valores originais. Nenhuma correção é feita ao abrir os dados.
+function duracaoDiariaLegada(registro) {
+  return registro?.tipo === 'dia' && inteiro(registro.horas) && registro.horas > 2400;
+}
+function diagnosticarDuracoesLegadas(dados) {
+  const itens = Array.isArray(dados) ? dados : dados?.registros;
+  const recordIds = Object.freeze((Array.isArray(itens) ? itens : []).filter(duracaoDiariaLegada).map(r => r.id));
+  return Object.freeze({count:recordIds.length,recordIds});
+}
+function mensagemDuracoesLegadas(diagnostico) {
+  const quantidade = diagnostico?.count || 0;
+  if (!quantidade) return '';
+  return quantidade + (quantidade === 1 ? ' fechamento tem' : ' fechamentos têm') + ' duração acima de 24 horas. As horas originais e os valores financeiros foram preservados. Confira no Histórico antes de corrigir. O saldo por hora desses registros fica indisponível até a revisão.';
+}
+window.RodagemLegacyHours = Object.freeze({inspect:diagnosticarDuracoesLegadas,message:mensagemDuracoesLegadas});
 function aviso(texto, erro = false) {
   $('mensagem').textContent = texto;
   $('mensagem').hidden = !texto;
@@ -205,7 +221,7 @@ function calcular(r, novos) {
   if (r.tipo === 'dia') {
     const liquido = saldo(r)/100;
     const linhas = [['Saldo do dia',moeda.format(liquido)], ['Saldo por ' + unidadesDeTrabalho().singular,r.entregas ? moeda.format(liquido/r.entregas) : '—']];
-    if (r.horas) linhas.push(['Saldo por hora',moeda.format(liquido/(r.horas/100))]);
+    if (r.horas) linhas.push(['Saldo por hora',duracaoDiariaLegada(r) ? 'Indisponível: duração acima de 24 h; revise no Histórico.' : moeda.format(liquido/(r.horas/100))]);
     if (r.km) linhas.push(['Saldo por km',moeda.format(liquido/(r.km/100))]);
     apresentar(destino,linhas);
     return;
@@ -287,6 +303,8 @@ for (const tipo of Object.keys(tipos)) {
       const novos = [...registros.filter(r => r.id !== registro.id),registro];
       if (evento.submitter?.value === 'salvar') {
         const editando = Boolean(form.dataset.id);
+        const anterior = registros.find(r => r.id === registro.id);
+        if (duracaoDiariaLegada(anterior) && !await confirmar('Este fechamento tem ' + numero.format(anterior.horas/100) + ' horas originais, acima do limite diário. Você informou ' + numero.format(registro.horas/100) + ' horas. Confirmar a correção explícita deste registro? Os campos de ganhos e gastos serão salvos como aparecem no formulário. Baixe um backup antes se quiser guardar o valor anterior.')) return;
         if (!editando && tipo === 'dia' && registros.some(r => r.tipo === 'dia' && r.data === registro.data)) {
           if (!await confirmar('Já existe um fechamento nesta data. Adicionar outro lançamento ao mesmo dia? Você também pode voltar e editar o anterior no Histórico.')) return;
         }
@@ -388,7 +406,7 @@ function editar(r) {
   if (r.tipo === 'posto') form.elements.tanque.value = r.tanque;
   form.querySelector('[data-cancelar]').hidden = false;
   abrir(secoes[r.tipo]);
-  aviso('Editando lançamento de ' + formatarData(r.data) + '.');
+  aviso('Editando lançamento de ' + formatarData(r.data) + '.' + (duracaoDiariaLegada(r) ? ' As ' + numero.format(r.horas/100) + ' horas originais estão preservadas. Para salvar uma correção, informe até 24 horas e confirme a alteração; cancelar mantém o registro original.' : ''));
   form.elements.data.focus();
   if (r.tipo === 'dia' && typeof atualizarPrevia === 'function') atualizarPrevia();
 }
@@ -400,6 +418,22 @@ function botao(texto, acao) {
   elemento.textContent = texto;
   elemento.onclick = acao;
   return elemento;
+}
+function atualizarAvisoDuracoesLegadas() {
+  let elemento = $('legados-aviso');
+  const texto = mensagemDuracoesLegadas(diagnosticarDuracoesLegadas(registros));
+  if (!elemento && texto) {
+    elemento = document.createElement('div');
+    elemento.id = 'legados-aviso';
+    elemento.className = 'notice';
+    elemento.setAttribute('role','status');
+    elemento.setAttribute('aria-live','polite');
+    $('mensagem').after(elemento);
+  }
+  if (elemento) {
+    elemento.textContent = texto;
+    elemento.hidden = !texto;
+  }
 }
 function renderizarHistorico() {
   const dados = filtrados();
@@ -470,6 +504,13 @@ function renderizarHistorico() {
       acoes.append(botao('Ver percurso',() => window.RodagemGPS.openRoute(r.jornadaId)));
     }
     conteudo.append(titulo,detalhe);
+    if (duracaoDiariaLegada(r)) {
+      const alerta = document.createElement('p');
+      alerta.className = 'hint';
+      alerta.dataset.legacyHours = 'true';
+      alerta.textContent = 'Duração original: ' + numero.format(r.horas/100) + ' h, acima de 24 h. Registro preservado; saldo por hora indisponível. Use Editar somente para confirmar uma correção.';
+      conteudo.append(alerta);
+    }
     item.append(icone,conteudo,acoes);
     lista.append(item);
   }
@@ -524,19 +565,22 @@ $('arquivo').onchange = async evento => {
     const usuario = window.RodagemProfiles?.current();
     const origem = typeof dados.perfil?.nome === 'string' ? dados.perfil.nome.slice(0,32) : '';
     const destino = usuario ? ' do perfil ' + usuario.name : ' deste navegador';
-    if (!await confirmar('Substituir os registros' + destino + ' pelos ' + novos.length + ' lançamentos do backup' + (origem ? ' de ' + origem : '') + '? Os outros perfis não serão alterados. Baixe uma cópia dos atuais antes, se quiser guardá-los.')) return;
+    const avisoLegado = mensagemDuracoesLegadas(diagnosticarDuracoesLegadas(novos));
+    if (!await confirmar('Substituir os registros' + destino + ' pelos ' + novos.length + ' lançamentos do backup' + (origem ? ' de ' + origem : '') + '? Os outros perfis não serão alterados. Baixe uma cópia dos atuais antes, se quiser guardá-los.' + (avisoLegado ? ' Atenção: ' + avisoLegado : ''))) return;
     if (importacao !== importacaoAtual) return;
     await persistir(novos,true,versaoBase);
     limpar($('dia'));
     limpar($('posto'));
     renderizarHistorico();
-    aviso('Backup restaurado.');
+    aviso('Backup restaurado.' + (avisoLegado ? ' ' + avisoLegado : ''));
   } catch (erro) { if (importacao === importacaoAtual) aviso(erro.message,true); }
 };
 window.addEventListener('storage', evento => {
   if (evento.key !== chave && evento.key !== null) return;
   aviso('Os lançamentos mudaram em outra aba. Recarregue antes de salvar para manter seus dados atualizados.',true);
 });
+document.addEventListener('rodagem:changed', atualizarAvisoDuracoesLegadas);
+atualizarAvisoDuracoesLegadas();
 abrir(location.hash.slice(1),false);
 if ('serviceWorker' in navigator && ['https:', 'http:'].includes(location.protocol)) {
   navigator.serviceWorker.register('./sw.js').catch(erro => console.warn('Modo offline indisponível.',erro));

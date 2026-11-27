@@ -6,6 +6,7 @@ import vm from 'node:vm';
 import assert from 'node:assert/strict';
 const source = await fs.readFile(new URL('../cloud-sync.js',import.meta.url),'utf8');
 const gps = await fs.readFile(new URL('../gps-core.js',import.meta.url),'utf8');
+const budget = await fs.readFile(new URL('../backup-budget.js',import.meta.url),'utf8');
 const userA = {user:{id:'b697b572-f3d3-4b7c-a0e8-4de95799c837',email:'ana@example.test'}};
 const userB = {user:{id:'7e1d2fca-e66f-4cac-bd17-345836de8a14',email:'bruno@example.test'}};
 const recordKey='minha-rodagem-v1',bindingKey='minha-rodagem-cloud-v1',journalKey='minha-rodagem-sync-journal-v1';
@@ -26,6 +27,7 @@ async function setup({store = new Map(),configured = true,remote = null,provider
   a.context.location.reload=()=>{reloads++;};
   vm.runInContext(gps,a.context,{filename:'gps-core.js'});
   a.window.RodagemGeo = a.context.RodagemGeo;
+  vm.runInContext(budget,a.context,{filename:'backup-budget.js'});
   vm.runInContext(source,a.context,{filename:'cloud-sync.js'});
   await flush();
   return {...a,api:a.window.RodagemSync,driver,stats:()=>({loads,saves,reloads,confirms,signins}),

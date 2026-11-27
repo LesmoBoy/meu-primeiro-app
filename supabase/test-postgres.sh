@@ -53,7 +53,7 @@ first_status=0; wait "$first_pid" || first_status=$?
 second_status=0; wait "$second_pid" || second_status=$?
 if { [ "$first_status" -eq 0 ] && [ "$second_status" -ne 0 ]; } ||
    { [ "$first_status" -ne 0 ] && [ "$second_status" -eq 0 ]; }; then
-  grep -q '40001' "$qa_tmpdir/first.log" "$qa_tmpdir/second.log" || { cat "$qa_tmpdir/first.log" "$qa_tmpdir/second.log"; exit 1; }
+  grep -q 'PT409' "$qa_tmpdir/first.log" "$qa_tmpdir/second.log" || { cat "$qa_tmpdir/first.log" "$qa_tmpdir/second.log"; exit 1; }
 else
   cat "$qa_tmpdir/first.log" "$qa_tmpdir/second.log"
   echo 'Concurrent CAS did not produce exactly one successful save.' >&2

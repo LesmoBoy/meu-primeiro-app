@@ -1,7 +1,7 @@
 // Simulated Cache Storage, network and timers; no real-browser offline claim.
 const vm=require('node:vm'),fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const root=path.resolve(__dirname,'..'),scope='https://example.test/meu-primeiro-app/';
-const prefix='rodagem-cache:'+scope+':',current=prefix+'3.2.2';
+const prefix='rodagem-cache:'+scope+':',current=prefix+'3.2.3';
 const source=fs.readFileSync(path.join(root,'sw.js'),'utf8');
 function boot({missingInstallFile=null}={}){
  const events={},stores=new Map(),timers=new Map();let nextTimer=0,skipped=false,claimed=false,mode='offline',requests=0;
@@ -23,8 +23,8 @@ function boot({missingInstallFile=null}={}){
 let passed=0;async function check(name,test){await test();passed++;console.log('PASS',name)}
 (async()=>{
  const app=boot();
- await check('complete thirty-nine-file install before skipWaiting',async()=>{
-  await app.lifecycle('install');assert.ok(app.skipped());assert.equal(app.stores.get(current).size,39);
+ await check('complete forty-two-file install before skipWaiting',async()=>{
+  await app.lifecycle('install');assert.ok(app.skipped());assert.equal(app.stores.get(current).size,42);
   for(const[url,response]of app.stores.get(current)){const name=new URL(url).pathname.slice('/meu-primeiro-app/'.length);assert.equal((await response.clone().arrayBuffer()).byteLength,fs.statSync(path.join(root,name)).size,name)}
  });
  await check('scope-safe upgrade preserves sibling scoped and legacy files',async()=>{
@@ -38,10 +38,10 @@ let passed=0;async function check(name,test){await test();passed++;console.log('
   for(const status of [404,503]){app.network(status);const page=await app.request(scope,{mode:'navigate'});assert.equal(page.status,200);assert.ok((await page.text()).includes('experience.js'));const script=await app.request(scope+'app.js');assert.equal(script.status,200);assert.equal((await script.arrayBuffer()).byteLength,fs.statSync(path.join(root,'app.js')).size);assert.equal(app.timers.size,0)}
  });
  await check('offline root, index and query routes load cached shell',async()=>{
-  app.network('offline');for(const url of [scope,scope+'index.html',scope+'?v=3.2.2',scope+'index.html?from=home']){const response=await app.request(url,{mode:'navigate'});assert.equal(response.status,200,url);assert.ok((await response.text()).includes('experience.js'))}
+  app.network('offline');for(const url of [scope,scope+'index.html',scope+'?v=3.2.3',scope+'index.html?from=home']){const response=await app.request(url,{mode:'navigate'});assert.equal(response.status,200,url);assert.ok((await response.text()).includes('experience.js'))}
  });
  await check('offline dependency bytes remain complete with query parameters',async()=>{
-  for(const name of ['privacidade.html','exclusao-dados.html','transport-art.css','assets/transportes.webp','business-core.js','business-client.js','business-ui.js','business.css','billing-config.js','billing.js','fleet.css','cloud.css','cloud-config.js','google-identity.js','cloud-client.js','cloud-sync.js','vendor/supabase/supabase.js','vehicle-catalog.js','styles.css','enhancements.css','profiles.css','profiles-core.js','profiles-ui.js','app.js','gps-core.js','tracking.js','experience.js','interactions.js','vendor/leaflet/leaflet.js','vendor/leaflet/leaflet.css','assets/inicio.svg','assets/fechamento.svg','assets/consumo.svg','assets/historico.svg','assets/ajustes.svg','manifest.webmanifest','icon-192.png','icon-512.png']){const response=await app.request(scope+name+'?v=refined');assert.equal(response.status,200,name);assert.equal((await response.arrayBuffer()).byteLength,fs.statSync(path.join(root,name)).size,name)}
+  for(const name of ['privacidade.html','exclusao-dados.html','transport-art.css','assets/transportes.webp','business-core.js','business-client.js','business-ui.js','business.css','billing-config.js','billing.js','fleet.css','cloud.css','cloud-config.js','google-identity.js','cloud-client.js','cloud-sync.js','backup-budget.js','session-diagnostics.js','device-data.js','vendor/supabase/supabase.js','vehicle-catalog.js','styles.css','enhancements.css','profiles.css','profiles-core.js','profiles-ui.js','app.js','gps-core.js','tracking.js','experience.js','interactions.js','vendor/leaflet/leaflet.js','vendor/leaflet/leaflet.css','assets/inicio.svg','assets/fechamento.svg','assets/consumo.svg','assets/historico.svg','assets/ajustes.svg','manifest.webmanifest','icon-192.png','icon-512.png']){const response=await app.request(scope+name+'?v=refined');assert.equal(response.status,200,name);assert.equal((await response.arrayBuffer()).byteLength,fs.statSync(path.join(root,name)).size,name)}
  });
  await check('hanging network aborts and falls back after deadline',async()=>{
   app.network('hang');const pending=app.request(scope,{mode:'navigate'});assert.equal(app.timers.size,1);app.expire();const response=await pending;assert.equal(response.status,200);assert.ok((await response.text()).includes('experience.js'));assert.equal(app.timers.size,0)

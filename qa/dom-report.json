@@ -1,0 +1,21 @@
+{
+  "mode": "Simulated DOM integration; no visual/browser/offline claim",
+  "passed": [
+    "empty app boots and all five routes are exclusive",
+    "version 1 records preserved and actual dashboard arithmetic",
+    "profile presets stay editable, save, persist and update goal",
+    "live daily balance, saving and editing preserve earlier records",
+    "invalid numbers and canceled duplicate day preserve records",
+    "full-partial-full consumption, duplicate odometer and no double charge",
+    "backup download, invalid import and confirmed compatible import",
+    "a duplicate-day confirmation cannot erase a pending fuel save in the same tab",
+    "backup reading and confirmation cannot erase a pending save in the same tab",
+    "a valid backup still recovers corrupt storage and canceling never changes it",
+    "journey pauses, reload, pending recovery and associated save",
+    "stale tab cannot overwrite records saved in another tab",
+    "offline status updates through connectivity events",
+    "ending a shift protects existing drafts when confirmation is canceled",
+    "storage quota failure never discards existing records"
+  ],
+  "failures": []
+}

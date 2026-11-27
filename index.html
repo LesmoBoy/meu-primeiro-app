@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="business.css">
   <link rel="stylesheet" href="transport-art.css">
   <script src="profiles-core.js" defer></script>
+  <script src="device-data.js" defer></script>
   <script src="app.js" defer></script>
   <script src="vendor/leaflet/leaflet.js" defer></script>
   <script src="gps-core.js" defer></script>
@@ -29,7 +30,9 @@
   <script src="vendor/supabase/supabase.js" defer></script>
   <script src="google-identity.js" defer></script>
   <script src="cloud-client.js" defer></script>
+  <script src="backup-budget.js" defer></script>
   <script src="cloud-sync.js" defer></script>
+  <script src="session-diagnostics.js" defer></script>
   <script src="business-core.js" defer></script>
   <script src="business-client.js" defer></script>
   <script src="billing-config.js" defer></script>
@@ -72,7 +75,7 @@
 <main id="conteudo" tabindex="-1">
   <div id="mensagem" class="notice" role="status" aria-live="polite" hidden></div>
   <section id="inicio" class="view" aria-labelledby="titulo-inicio">
-    <div class="page-heading"><div><p class="eyebrow" id="data-hoje">SEU PAINEL</p><h1 id="titulo-inicio">Bora fazer um bom dia<span class="accent">.</span></h1><p class="page-description">Cada serviço conta. Acompanhe seus ganhos e sua jornada.</p></div><img class="page-illustration" src="assets/inicio.svg" width="180" height="110" alt="" decoding="async"><span class="version-pill">RODAGEM · 3.2.2</span></div>
+    <div class="page-heading"><div><p class="eyebrow" id="data-hoje">SEU PAINEL</p><h1 id="titulo-inicio">Bora fazer um bom dia<span class="accent">.</span></h1><p class="page-description">Cada serviço conta. Acompanhe seus ganhos e sua jornada.</p></div><img class="page-illustration" src="assets/inicio.svg" width="180" height="110" alt="" decoding="async"><span class="version-pill">RODAGEM · 3.2.3</span></div>
     <div class="dashboard-top">
       <div class="hero-card transport-hero"><div class="hero-content"><span class="eyebrow">SALDO DE HOJE</span><p class="hero-value" id="saldo-hoje">R$ 0,00</p><p class="hero-caption">Seus ganhos menos os gastos do fechamento.</p><div class="hero-mini"><span>Ganhos <strong id="ganhos-hoje">R$ 0,00</strong></span><span>Gastos <strong id="gastos-hoje">R$ 0,00</strong></span><span><span data-work-units>Serviços</span> <strong id="entregas-hoje">0</strong></span></div><button class="button hero-button" type="button" data-go="fechamento"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-plus"/></svg>Registrar fechamento<svg class="icon" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></button></div><div class="city-art" aria-hidden="true"></div></div>
       <div class="card goal-card"><div class="card-top"><span class="icon-tile mint"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-spark"/></svg></span><button type="button" class="text-button" data-go="ajustes">Ajustar meta <span aria-hidden="true">↗</span></button></div><h2>Sua meta do dia</h2><p class="goal-amount" id="meta-valor">Defina sua meta</p><div class="progress-track" role="progressbar" aria-label="Meta de saldo do dia" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="meta-progresso"><span></span></div><p class="hint" id="meta-texto">Escolha quanto você quer ter de saldo ao fim do dia.</p><span class="small-label">Você define o ritmo. A gente organiza.</span></div>

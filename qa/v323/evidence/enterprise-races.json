@@ -1,0 +1,119 @@
+{
+  "recordedAt": "2026-11-27T02:41:34.364089+00:00",
+  "postgres": "PostgreSQL 17.12 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+  "image": "postgres:17-alpine",
+  "network": "none",
+  "publishedPorts": false,
+  "syntheticOnly": true,
+  "scenarios": [
+    {
+      "scenario": "save versus archive",
+      "holder": "COMMIT",
+      "waiter": "PT409",
+      "lockObserved": true,
+      "finalRevision": 2,
+      "archived": false
+    },
+    {
+      "scenario": "archive versus save",
+      "holder": "COMMIT",
+      "waiter": "PT409",
+      "lockObserved": true,
+      "finalRevision": 2,
+      "archived": true
+    },
+    {
+      "scenario": "two member edits with one expected revision",
+      "holder": "COMMIT",
+      "waiter": "PT409",
+      "lockObserved": true,
+      "finalRevision": 2
+    },
+    {
+      "scenario": "two acceptances of one token",
+      "holder": "COMMIT",
+      "waiter": "42501",
+      "lockObserved": true,
+      "membershipsCreated": 1
+    },
+    {
+      "scenario": "revocation wins against in-flight acceptance",
+      "holder": "COMMIT",
+      "waiter": "42501",
+      "lockObserved": true,
+      "membershipsCreated": 0
+    },
+    {
+      "scenario": "acceptance wins against in-flight revocation",
+      "holder": "COMMIT",
+      "waiter": "42501",
+      "lockObserved": true,
+      "membershipsCreated": 1
+    },
+    {
+      "scenario": "two invitations replace the same email serially",
+      "holder": "COMMIT",
+      "waiter": "COMMIT",
+      "lockObserved": true,
+      "activeTokens": 1
+    },
+    {
+      "scenario": "revoked manager waits then save_entity is denied",
+      "holder": "COMMIT",
+      "waiter": "42501",
+      "lockObserved": true,
+      "actorMutation": false
+    },
+    {
+      "scenario": "revoked manager waits then archive_entity is denied",
+      "holder": "COMMIT",
+      "waiter": "42501",
+      "lockObserved": true,
+      "actorMutation": false
+    },
+    {
+      "scenario": "revoked manager waits then save_member is denied",
+      "holder": "COMMIT",
+      "waiter": "42501",
+      "lockObserved": true,
+      "actorMutation": false
+    },
+    {
+      "scenario": "revoked manager waits then invite_member is denied",
+      "holder": "COMMIT",
+      "waiter": "42501",
+      "lockObserved": true,
+      "actorMutation": false
+    },
+    {
+      "scenario": "revoked manager waits then revoke_invite is denied",
+      "holder": "COMMIT",
+      "waiter": "42501",
+      "lockObserved": true,
+      "actorMutation": false
+    },
+    {
+      "scenario": "manager demoted to finance waits then fleet write is denied",
+      "holder": "COMMIT",
+      "waiter": "42501",
+      "lockObserved": true,
+      "actorMutation": false
+    },
+    {
+      "scenario": "concurrent owners cannot both demote the last owners",
+      "holder": "COMMIT",
+      "waiter": "42501",
+      "lockObserved": true,
+      "activeOwners": 1
+    },
+    {
+      "scenario": "same new entity ID across companies cannot be overwritten",
+      "holder": "COMMIT",
+      "waiter": "PT409",
+      "lockObserved": true,
+      "finalRevision": 1,
+      "originalCompanyPreserved": true
+    }
+  ],
+  "passed": 15
+}

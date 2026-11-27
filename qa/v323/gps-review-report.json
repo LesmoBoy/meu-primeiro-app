@@ -1,0 +1,12 @@
+{
+  "classification": "automated-local-simulated-permission-review",
+  "physicalDevice": false,
+  "batteryMeasured": false,
+  "passed": [
+    "removing a granted permission back to prompt invalidates a queued callback",
+    "initial prompt still allows an explicitly requested location permission",
+    "revocation while acquiring a Web Lock cancels without a position request",
+    "permission granted again does not silently resume a revoked capture"
+  ],
+  "failures": []
+}

@@ -1,0 +1,15 @@
+{
+  "classification": "local-simulated-browser-lifecycle",
+  "passed": [
+    "stalled request after Android-like suspension resumes and ignores its late callback",
+    "recent pending request is not duplicated by repeated foreground events",
+    "browser permission revocation cancels the lease and all pending callbacks",
+    "denied callback does not retry or silently restart when foregrounded",
+    "inaccurate fixes do not add distance and long signal loss breaks the route",
+    "synchronous browser failure preserves route and releases capture",
+    "economic mode keeps coarse sampling and bounded geolocation timeout"
+  ],
+  "errors": [],
+  "physicalDevice": false,
+  "batteryMeasured": false
+}
