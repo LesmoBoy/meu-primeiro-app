@@ -99,6 +99,8 @@ async function technicalDownload(){
  await page.waitForFunction(()=>Boolean(window.RodagemDeviceData&&window.RodagemSessionDiagnostics&&window.__v323CloudFixture));
 
  await check('legacy hours are visibly marked without rewriting stored historical values',async()=>{
+  assert.match(await page.locator('.version-pill').innerText(),/3\.2\.3/);
+  assert.match(await page.locator('.app-footer').innerText(),/v3\.2\.3/);
   await page.locator('#legados-aviso').waitFor({state:'visible'});assert.match(await page.locator('#legados-aviso').innerText(),/24 horas/);
   await navigate('historico');assert.match(await page.locator('[data-legacy-hours]').innerText(),/25,01 h/);
   assert.equal(await stored(recordKey),seed[recordKey]);
