@@ -1,0 +1,23 @@
+{
+  "version": "3.2.3",
+  "classification": "real-Chromium-with-synthetic-data-and-mocked-cloud-adapter",
+  "liveAuthentication": false,
+  "physicalGPS": false,
+  "productionOperations": 0,
+  "passed": [
+    "legacy hours are visibly marked without rewriting stored historical values",
+    "legacy correction requires a valid daily duration and explicit confirmation",
+    "device removal stays unavailable without a technical export and cancel preserves data",
+    "technical download includes only the active profile allowlist and changes no records",
+    "manual session diagnostics render a busy state and never call a financial RPC",
+    "logout discards a late diagnostic result and preserves the local history",
+    "device deletion requires name, saved-copy acknowledgement and signed-out account",
+    "the real service worker caches all three new runtime modules",
+    "new cards remain readable on mobile and desktop without runtime errors or external requests"
+  ],
+  "errors": [],
+  "browserErrors": [],
+  "externalRequests": 0,
+  "appURL": "http://127.0.0.1:43741/meu-primeiro-app/",
+  "browserVersion": "151.0.7922.34"
+}

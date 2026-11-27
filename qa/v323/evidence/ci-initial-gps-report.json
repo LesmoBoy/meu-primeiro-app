@@ -1,0 +1,33 @@
+{
+  "mode": "Real Chromium, synthetic GPS coordinates",
+  "passed": [
+    "native browser permission and geolocation API produce the first synthetic fix",
+    "opting out starts the timer without requesting or sampling location",
+    "economic GPS starts with the journey and map tiles are loaded only when the map is needed",
+    "accepted movement accumulates plausible GPS distance and ignores stationary jitter",
+    "pausing stops sampling and resuming does not add the movement made during the pause",
+    "the map engine and route vector work when map tiles are unavailable",
+    "ending the journey prefills distance and saved history can reopen its route",
+    "GPX exports contain the recorded segments and routes survive a page reload",
+    "discarding a stored route preserves the saved financial kilometres",
+    "denied location keeps the timer and manual closing usable",
+    "weak and stale fixes never manufacture travelled kilometres",
+    "coarse economic fixes with unknown speed do not turn stationary drift into distance",
+    "map screenshots are captured with no JavaScript runtime errors"
+  ],
+  "errors": [],
+  "browserErrors": [],
+  "nativeGeolocationChecked": true,
+  "physicalDevice": false,
+  "batteryMeasured": false,
+  "appURL": "http://127.0.0.1:44623/meu-primeiro-app/",
+  "browserVersion": "151.0.7922.34",
+  "mapPaintedBounds": [
+    {
+      "kind": "canvas",
+      "width": 21,
+      "height": 290,
+      "paintedPixels": 346
+    }
+  ]
+}

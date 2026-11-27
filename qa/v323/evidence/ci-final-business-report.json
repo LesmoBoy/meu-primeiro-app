@@ -1,0 +1,29 @@
+{
+  "mode": "Real Chromium, synthetic local business data, Google available without login and billing unconfigured",
+  "passed": [
+    "business opens as an empty local workspace without rewriting personal history",
+    "two companies are created through the interface with independent empty ledgers",
+    "local team roles are saved as organization metadata without claiming authenticated access",
+    "multiple vehicles retain a free model, year, energy and individual odometers",
+    "invalid vehicle years preserve the saved fleet and the editable draft",
+    "all seven trip costs are counted once and only completed services enter profit",
+    "losses remain negative and reports filter by vehicle, driver and calendar dates",
+    "date and odometer reminders can be completed and reactivated",
+    "driver documents use a person and due date without requiring a vehicle",
+    "archiving a vehicle preserves its completed trip and removes new-assignment choices",
+    "company selection isolates fleet, team, trips and alerts without erasing the first company",
+    "unsaved company form fields require confirmation before changing companies",
+    "a storage quota failure cannot replace existing companies or personal records",
+    "business backup contains fleet history and malformed imports preserve all stored bytes",
+    "an edit in another tab while restore confirmation waits cancels a stale import",
+    "subscription setup stays honest and cannot start an unconfigured checkout",
+    "the business area and every main route fit phone and desktop widths",
+    "business data survive reload and personal financial records remain unchanged",
+    "switching local profiles never copies companies or financial history to another person",
+    "business workflows emit no JavaScript runtime errors"
+  ],
+  "errors": [],
+  "browserErrors": [],
+  "appURL": "http://127.0.0.1:44517/meu-primeiro-app/",
+  "browserVersion": "151.0.7922.34"
+}

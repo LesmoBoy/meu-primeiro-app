@@ -1,6 +1,6 @@
 {
   "baseCommit": "8f4cae36367f667ca871bd2539891ad6d1a74599",
-  "generatedAt": "2026-11-27T02:45:46.420059+00:00",
+  "generatedAt": "2026-11-27T07:54:23.959274+00:00",
   "runtimeFiles": 43,
   "runtime": [
     {
@@ -194,7 +194,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "8a0137ff6167e31df32457aa6e23405b741953234058ce4fc78a51891ef4c341",
+      "sha256": "6a9551da88f0ee5e31b000da8dcc1471fef44ec8b85b5c3352fdb3473b35fc50",
       "bytes": 33734,
       "baselineSha256": "fd8eb062d4e6b0c826af45e143fbaeed267b956952ed76eea656487286f54dd5",
       "unchangedFrom322": false
@@ -306,6 +306,11 @@
     }
   ],
   "changedFiles": [
+    {
+      "path": ".gitattributes",
+      "status": "novo",
+      "reason": "Preserva bytes de logs capturados sem tratá-los como formatação de código."
+    },
     {
       "path": ".github/workflows/browser-tests.yml",
       "status": "modificado",
@@ -502,6 +507,11 @@
       "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
     },
     {
+      "path": "qa/v323/audit-pdf-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
       "path": "qa/v323/auth-http-cas-proof.json",
       "status": "novo",
       "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
@@ -542,6 +552,26 @@
       "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
     },
     {
+      "path": "qa/v323/browser-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/build-audit-pdf.py",
+      "status": "novo",
+      "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
+    },
+    {
+      "path": "qa/v323/ci-final-summary.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/ci-initial-summary.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
       "path": "qa/v323/device-data-report.json",
       "status": "novo",
       "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
@@ -563,6 +593,86 @@
     },
     {
       "path": "qa/v323/evidence/catalog-comparison.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-final-auth-http-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-final-business-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-final-fleet-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-final-google-identity-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-final-gps-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-final-migrations-chain-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-final-postgres-enterprise-ci.log",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-final-postgres-personal-ci.log",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-final-profiles-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-final-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-initial-business-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-initial-fleet-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-initial-google-identity-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-initial-gps-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-initial-profiles-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-initial-report.json",
       "status": "novo",
       "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
     },
@@ -682,6 +792,16 @@
       "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
     },
     {
+      "path": "qa/v323/production-readonly-runtime.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/production-readonly-runtime.py",
+      "status": "novo",
+      "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
+    },
+    {
       "path": "qa/v323/production-readonly-session.json",
       "status": "novo",
       "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
@@ -713,6 +833,11 @@
     },
     {
       "path": "qa/v323/safeauth-local-result.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/secret-pattern-review.json",
       "status": "novo",
       "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
     },

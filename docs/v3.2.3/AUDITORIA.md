@@ -2,7 +2,7 @@
 
 Referência: auditoria completa v3.2.2 de **26/11/2026**, commit [`8f4cae36367f667ca871bd2539891ad6d1a74599`](https://github.com/LesmoBoy/meu-primeiro-app/commit/8f4cae36367f667ca871bd2539891ad6d1a74599). Desenvolvimento e revalidação: 26–27/11/2026. Branch: `codex/desenvolvimento-v3.2.3`.
 
-**Estado: candidata em validação; publicação não autorizada e homologação comercial incompleta.** Este documento separa implementação, testes executados e cenários pendentes. Não certifica ausência de vulnerabilidades. O registro consolidado final está em [RESULTADOS.md](RESULTADOS.md), acompanhado de evidências reproduzíveis.
+**Estado: candidata com validação automatizada concluída; publicação não autorizada e homologação comercial incompleta.** Este documento separa implementação, testes executados e cenários pendentes. Não certifica ausência de vulnerabilidades. O [CI final](https://github.com/LesmoBoy/meu-primeiro-app/actions/runs/45930835327) aprovou os três jobs no commit `bd8f927eede3f03df396d8d23f541fb8cd309692`: 96 cenários Chromium, 30 suítes locais, PostgreSQL e 16 grupos HTTP autenticados. O registro consolidado está em [RESULTADOS.md](RESULTADOS.md), com evidências reproduzíveis.
 
 ## Resumo executivo
 

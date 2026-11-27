@@ -1,0 +1,21 @@
+{
+  "mode": "Real Chromium, isolated local multi-profile fixtures",
+  "passed": [
+    "the principal profile reads legacy data without copying or rewriting it",
+    "profile creation switches to an empty, separately named local profile",
+    "new financial records and preferences remain inside the selected profile",
+    "backup and CSV export only the active profile",
+    "switching restores each profile without leaking fuel, route or motorcycle data",
+    "GPS preferences are scoped independently for each profile",
+    "switching profiles pauses a running journey and preserves resumable time",
+    "a profile changed in another tab makes the old tab read-only and rejects stale writes",
+    "empty and duplicate profile names cannot add unintended profiles",
+    "profile picker is usable at phone and desktop widths without horizontal overflow",
+    "failed registry writes preserve the principal profile and its legacy records",
+    "no JavaScript runtime errors are emitted by profile flows"
+  ],
+  "errors": [],
+  "browserErrors": [],
+  "appURL": "http://127.0.0.1:41723/meu-primeiro-app/",
+  "browserVersion": "151.0.7922.34"
+}

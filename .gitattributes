@@ -1,0 +1,2 @@
+# Keep captured psql/CI output byte-for-byte; whitespace checks still cover code.
+qa/v323/evidence/*.log -whitespace

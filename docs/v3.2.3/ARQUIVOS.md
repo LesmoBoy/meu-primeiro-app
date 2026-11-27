@@ -4,6 +4,7 @@ Comparação com `8f4cae36367f667ca871bd2539891ad6d1a74599`. O manifesto `qa/v32
 
 | Arquivo | Estado | Justificativa |
 |---|---|---|
+| `.gitattributes` | novo | Preserva bytes de logs capturados sem tratá-los como formatação de código. |
 | `.github/workflows/browser-tests.yml` | modificado | Todas as suítes, novos fluxos Chromium, HTTP local real e artefatos sanitizados. |
 | `.gitignore` | novo | Evita dependências e capturas/logs volumosos no versionamento. |
 | `CHANGELOG.md` | novo | Comportamento final e restrições da versão. |
@@ -43,6 +44,7 @@ Comparação com `8f4cae36367f667ca871bd2539891ad6d1a74599`. O manifesto `qa/v32
 | `qa/migrations-chain-test.py` | modificado | Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível. |
 | `qa/sw-test.cjs` | modificado | Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível. |
 | `qa/v323/POSTGRES-HML.md` | novo | Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível. |
+| `qa/v323/audit-pdf-report.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
 | `qa/v323/auth-http-cas-proof.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
 | `qa/v323/auth-http-hml.cjs` | novo | Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível. |
 | `qa/v323/auth-http-report.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
@@ -51,11 +53,31 @@ Comparação com `8f4cae36367f667ca871bd2539891ad6d1a74599`. O manifesto `qa/v32
 | `qa/v323/backup-budget-test.cjs` | novo | Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível. |
 | `qa/v323/backup-budget-unit-result.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
 | `qa/v323/browser-regressions.cjs` | novo | Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível. |
+| `qa/v323/browser-report.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
+| `qa/v323/build-audit-pdf.py` | novo | Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível. |
+| `qa/v323/ci-final-summary.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
+| `qa/v323/ci-initial-summary.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
 | `qa/v323/device-data-report.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
 | `qa/v323/device-data-test.mjs` | novo | Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível. |
 | `qa/v323/evidence/budget-final.log` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
 | `qa/v323/evidence/cas-sqlstate-manifest.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
 | `qa/v323/evidence/catalog-comparison.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
+| `qa/v323/evidence/ci-final-auth-http-report.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
+| `qa/v323/evidence/ci-final-business-report.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
+| `qa/v323/evidence/ci-final-fleet-report.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
+| `qa/v323/evidence/ci-final-google-identity-report.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
+| `qa/v323/evidence/ci-final-gps-report.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
+| `qa/v323/evidence/ci-final-migrations-chain-report.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
+| `qa/v323/evidence/ci-final-postgres-enterprise-ci.log` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
+| `qa/v323/evidence/ci-final-postgres-personal-ci.log` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
+| `qa/v323/evidence/ci-final-profiles-report.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
+| `qa/v323/evidence/ci-final-report.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
+| `qa/v323/evidence/ci-initial-business-report.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
+| `qa/v323/evidence/ci-initial-fleet-report.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
+| `qa/v323/evidence/ci-initial-google-identity-report.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
+| `qa/v323/evidence/ci-initial-gps-report.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
+| `qa/v323/evidence/ci-initial-profiles-report.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
+| `qa/v323/evidence/ci-initial-report.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
 | `qa/v323/evidence/enterprise-baseline.log` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
 | `qa/v323/evidence/enterprise-final.log` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
 | `qa/v323/evidence/enterprise-hml.log` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
@@ -79,6 +101,8 @@ Comparação com `8f4cae36367f667ca871bd2539891ad6d1a74599`. O manifesto `qa/v32
 | `qa/v323/npm-audit.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
 | `qa/v323/postgres-hml-races.py` | novo | Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível. |
 | `qa/v323/production-catalog.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
+| `qa/v323/production-readonly-runtime.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
+| `qa/v323/production-readonly-runtime.py` | novo | Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível. |
 | `qa/v323/production-readonly-session.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
 | `qa/v323/release-inventory.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
 | `qa/v323/release-inventory.py` | novo | Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível. |
@@ -86,6 +110,7 @@ Comparação com `8f4cae36367f667ca871bd2539891ad6d1a74599`. O manifesto `qa/v32
 | `qa/v323/rollback-dry-run.py` | novo | Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível. |
 | `qa/v323/run-local-tests.mjs` | novo | Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível. |
 | `qa/v323/safeauth-local-result.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
+| `qa/v323/secret-pattern-review.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |
 | `qa/v323/session-client-test.cjs` | novo | Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível. |
 | `qa/v323/session-diagnostics-test.mjs` | novo | Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível. |
 | `qa/v323/sync-integration-report.json` | novo | Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita. |

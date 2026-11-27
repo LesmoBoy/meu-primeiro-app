@@ -12,7 +12,7 @@ Referência v3.2.2: `8f4cae36367f667ca871bd2539891ad6d1a74599`, auditoria de 26/
 - [x] Implementar orçamento conservador de envio JSONB sem restringir a leitura/restauração compatível.
 - [x] Acrescentar regressões de sessão, logout, troca de contas, vínculo, upload, restauração, dados locais e GPS.
 - [x] Preparar plano de rollback antes da publicação; ensaio local do cache executado separadamente.
-- [ ] Confirmar aprovação do CI da árvore candidata final, com todas as suítes existentes e novas.
+- [x] Confirmar aprovação do CI da árvore candidata final, com todas as suítes existentes e novas: execução 45930835327, commit `bd8f927eede3f03df396d8d23f541fb8cd309692`.
 - [ ] Aprovar a migração mínima do conflito HTTP e seu procedimento de retorno antes de aplicá-la no projeto de produção.
 
 ## Homologação externa de autenticação e sincronização

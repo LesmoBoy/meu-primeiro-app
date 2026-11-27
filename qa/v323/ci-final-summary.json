@@ -1,0 +1,113 @@
+{
+  "classification": "completed-GitHub-Actions-verified-artifacts",
+  "runId": 45930835327,
+  "testedCommit": "bd8f927eede3f03df396d8d23f541fb8cd309692",
+  "url": "https://github.com/LesmoBoy/meu-primeiro-app/actions/runs/45930835327",
+  "conclusion": "success",
+  "jobs": [
+    {
+      "id": 140282817256,
+      "name": "Auth e PostgREST reais",
+      "conclusion": "success"
+    },
+    {
+      "id": 140282817421,
+      "name": "Chromium",
+      "conclusion": "success"
+    },
+    {
+      "id": 140282817566,
+      "name": "PostgreSQL",
+      "conclusion": "success"
+    }
+  ],
+  "nodeSuites": 30,
+  "nodeSourcesMatched": 31,
+  "existingBrowserScenarios": 87,
+  "newBrowserScenarios": 9,
+  "totalBrowserScenarios": 96,
+  "browserSuites": [
+    {
+      "suite": "report.json",
+      "passed": 13,
+      "errors": 0,
+      "browserVersion": "151.0.7922.34",
+      "sha256": "e875f31a95f51910f202c4e726a24c6f6faa527d29a1e3da584c17a0acaaf04c",
+      "evidence": "qa/v323/evidence/ci-final-report.json"
+    },
+    {
+      "suite": "gps-report.json",
+      "passed": 13,
+      "errors": 0,
+      "browserVersion": "151.0.7922.34",
+      "sha256": "5c6ca575629a7fe68458e1aee8a8970a0bdfe606ad8d09e5b2dd56576e9b290a",
+      "evidence": "qa/v323/evidence/ci-final-gps-report.json"
+    },
+    {
+      "suite": "profiles-report.json",
+      "passed": 12,
+      "errors": 0,
+      "browserVersion": "151.0.7922.34",
+      "sha256": "d5fddfb34d00f564a54d266258cc5c0d7a512eb03b4323276d856108b0eac177",
+      "evidence": "qa/v323/evidence/ci-final-profiles-report.json"
+    },
+    {
+      "suite": "fleet-report.json",
+      "passed": 14,
+      "errors": 0,
+      "browserVersion": "151.0.7922.34",
+      "sha256": "be48da5d08242a2f27e24f39c97d8306f1691404f5216cbb516e0b0d0d4c74e9",
+      "evidence": "qa/v323/evidence/ci-final-fleet-report.json"
+    },
+    {
+      "suite": "google-identity-report.json",
+      "passed": 15,
+      "errors": 0,
+      "browserVersion": "151.0.7922.34",
+      "sha256": "f697e46fbad1a2a4727700aab677cbe723b6ce01e21d2689ddc6d9429913258e",
+      "evidence": "qa/v323/evidence/ci-final-google-identity-report.json"
+    },
+    {
+      "suite": "business-report.json",
+      "passed": 20,
+      "errors": 0,
+      "browserVersion": "151.0.7922.34",
+      "sha256": "5f4d67e2ef034a1721f574628c6c87291d13eed7b9f38c143771e972b11f90e4",
+      "evidence": "qa/v323/evidence/ci-final-business-report.json"
+    },
+    {
+      "suite": "v323/browser-report.json",
+      "passed": 9,
+      "errors": 0,
+      "browserVersion": "151.0.7922.34",
+      "evidence": "qa/v323/browser-report.json"
+    }
+  ],
+  "authenticatedLocalHTTPGroups": 16,
+  "authenticatedHTTPEvents": 82,
+  "authSourceHashesMatched": 9,
+  "localPostgresMigrations": 5,
+  "functionsMatched": 25,
+  "tablesRlsAndForce": 5,
+  "physicalGPS": false,
+  "externalGoogleOIDC": false,
+  "productionChanged": false,
+  "artifacts": [
+    {
+      "name": "postgres",
+      "digest": "sha256:acd164fa642f6173b5a9202c46d37a961988c72fb675c061be9df1e5f6f1d2a0",
+      "verified": true
+    },
+    {
+      "name": "auth-http",
+      "digest": "sha256:f98e3de14a5e2445748d14206a9c2cac842d9d59237d62f3a784e4d82c9fae04",
+      "verified": true
+    },
+    {
+      "name": "chromium",
+      "digest": "sha256:1487e0eb029a268633be66ccc45d4deed776b70b4915a19b9b35d362a6563b8a",
+      "verified": true
+    }
+  ],
+  "note": "Real Chromium and real local HTTP services; synthetic financial/account/GPS fixtures. Hosted Google OIDC, Android physical testing and production rollout remain pending."
+}

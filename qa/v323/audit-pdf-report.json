@@ -1,0 +1,44 @@
+{
+  "classification": "standalone-audit-document-build-and-pdf-layout-check",
+  "generatedAt": "2026-11-27T07:53:16.487279+00:00",
+  "pdf": "/workspace/Auditoria-Tecnica-Minha-Rodagem-v3.2.3.pdf",
+  "pdfSha256": "159c85e1234b4e8420089b24601d2436dfcd2b39891830047073a384c7a3910f",
+  "pages": 27,
+  "sourceSha256": {
+    "docs/v3.2.3/AUDITORIA.md": "90597c93fe0db4f5cba176085b84d32d644c471a0e8a2a3ef89976e89a809211",
+    "docs/v3.2.3/RESULTADOS.md": "bb6f849846e8166d789c13337e7c70ff36da5184d7bb37b63884939ce6c08b76",
+    "docs/v3.2.3/SECURITY-DEFINER.md": "ed5b0d6e66adc2c37559a7316715b791296cfb9d42a8eb6edcb131b5ebb48416",
+    "docs/v3.2.3/CAS-HTTP.md": "1abbc2f020d796b416e989ff1cb1ff34a2a981b1d588fe830cf6a92ea1164a2c",
+    "docs/v3.2.3/HOMOLOGACAO-AUTENTICADA.md": "8890bf66f8078e25681b4ac217cefabc48884b7af2d44a3e7d77d47ed3a88c12",
+    "docs/v3.2.3/HOMOLOGACAO.md": "2844e5b8c898b528fa78f1e5071c0d479a04e56d32d905715c6dc28a8655fdb0",
+    "docs/v3.2.3/ROLLBACK.md": "0c337d112eeb168f14f4cad7dd6363439a89cd1608f60fe179cd3281ee6be0f3",
+    "docs/v3.2.3/GPS-ANDROID.md": "2145d99c4bb432bcce1aa15bc739191a18335a536dc5af26c7c90ed92f0af8f8"
+  },
+  "unicodeFonts": {
+    "AuditSans": "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    "AuditSansBold": "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+    "AuditSansItalic": "/usr/share/fonts/truetype/dejavu/DejaVuSans-Oblique.ttf",
+    "AuditMono": "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
+  },
+  "checks": {
+    "physicalTestsExplicitlyNotExecuted": true,
+    "googleOidcExplicitlyNotExecuted": true,
+    "productionNotAuthorized": true,
+    "noCommercialCertification": true,
+    "securityDefinerMatrixPresent": true,
+    "rollbackPresent": true,
+    "outlineTargetsValid": true
+  },
+  "outOfPageTextSpans": [],
+  "previewPngs": [
+    "/workspace/minha-rodagem-v323-pdf-preview/pagina-01.png",
+    "/workspace/minha-rodagem-v323-pdf-preview/pagina-03.png",
+    "/workspace/minha-rodagem-v323-pdf-preview/pagina-14.png",
+    "/workspace/minha-rodagem-v323-pdf-preview/pagina-25.png",
+    "/workspace/minha-rodagem-v323-pdf-preview/pagina-27.png"
+  ],
+  "productionMutation": false,
+  "physicalDeviceTests": false,
+  "externalGoogleOidcTests": false,
+  "note": "PDF verification proves artifact content/layout, not application correctness. CI status is copied from the current Markdown sources."
+}

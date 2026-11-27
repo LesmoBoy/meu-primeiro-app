@@ -1,0 +1,23 @@
+{
+  "mode": "Real Chromium, synthetic vehicle categories and passive Google-only configuration",
+  "passed": [
+    "legacy motorcycle preferences and financial bytes remain unchanged until an explicit save",
+    "vehicle categories are independent of activities and the model remains a free text field",
+    "taxi settings save a free model and year, then show trips as rides",
+    "the chosen category, free name, energy and year survive a reload",
+    "diesel trucks retain liquid consumption and freight uses the journey label",
+    "school vans allow an omitted year and keep all old financial records intact",
+    "invalid four-digit years never replace the saved vehicle or financial history",
+    "human-powered bicycles cannot acquire a fuel-in-litres calculation",
+    "electric bicycles use energy and preserve fuel history without inventing km/L",
+    "GNV is kept separate from litre calculations while ordinary vehicle fields stay editable",
+    "a second local profile keeps its category and year separate from the first vehicle",
+    "Google is available while Facebook stays disabled and no login or account transfer is started",
+    "vehicle settings and cloud setup remain readable at 320, 390 and 1280 pixels",
+    "fleet profile flows emit no JavaScript runtime errors"
+  ],
+  "errors": [],
+  "browserErrors": [],
+  "appURL": "http://127.0.0.1:44319/meu-primeiro-app/",
+  "browserVersion": "151.0.7922.34"
+}

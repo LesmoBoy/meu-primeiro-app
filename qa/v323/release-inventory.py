@@ -31,6 +31,7 @@ def reason(name):
         'exclusao-dados.html':'Distingue remoção do perfil, limpeza do navegador e exclusão da conta.',
         '.github/workflows/browser-tests.yml':'Todas as suítes, novos fluxos Chromium, HTTP local real e artefatos sanitizados.',
         '.gitignore':'Evita dependências e capturas/logs volumosos no versionamento.',
+        '.gitattributes':'Preserva bytes de logs capturados sem tratá-los como formatação de código.',
         'package.json':'Versão e comandos de validação reproduzíveis, sem mudança de dependências.',
         'package-lock.json':'Metadados da versão; versões e integridades de dependências preservadas.',
         'README.md':'Entrada para documentação, execução e limites da candidata.',

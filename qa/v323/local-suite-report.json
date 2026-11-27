@@ -1,6 +1,6 @@
 {
   "classification": "automated-local-node-and-simulated-DOM",
-  "timestamp": "2026-11-27T02:43:55.882Z",
+  "timestamp": "2026-11-27T02:52:34.406Z",
   "productionMutated": false,
   "realFinancialData": false,
   "physicalGPS": false,
@@ -13,7 +13,7 @@
       "suite": "qa/gps-core-test.cjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 521,
+      "durationMs": 219,
       "passLines": 14,
       "evidence": "qa/v323/evidence/local-01.log"
     },
@@ -21,7 +21,7 @@
       "suite": "qa/profiles-core-test.cjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 78,
+      "durationMs": 40,
       "passLines": 13,
       "evidence": "qa/v323/evidence/local-02.log"
     },
@@ -29,7 +29,7 @@
       "suite": "qa/vehicle-catalog-test.cjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 48,
+      "durationMs": 25,
       "passLines": 9,
       "evidence": "qa/v323/evidence/local-03.log"
     },
@@ -37,7 +37,7 @@
       "suite": "qa/vehicle-integration.mjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 533,
+      "durationMs": 255,
       "passLines": 7,
       "evidence": "qa/v323/evidence/local-04.log"
     },
@@ -45,7 +45,7 @@
       "suite": "qa/cloud-client-test.cjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 192,
+      "durationMs": 99,
       "passLines": 23,
       "evidence": "qa/v323/evidence/local-05.log"
     },
@@ -53,7 +53,7 @@
       "suite": "qa/cloud-sync-test.mjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 722,
+      "durationMs": 391,
       "passLines": 19,
       "evidence": "qa/v323/evidence/local-06.log"
     },
@@ -61,7 +61,7 @@
       "suite": "qa/google-identity-dom.cjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 232,
+      "durationMs": 119,
       "passLines": 10,
       "evidence": "qa/v323/evidence/local-07.log"
     },
@@ -69,7 +69,7 @@
       "suite": "qa/dom-smoke.mjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 782,
+      "durationMs": 372,
       "passLines": 15,
       "evidence": "qa/v323/evidence/local-08.log"
     },
@@ -77,7 +77,7 @@
       "suite": "qa/connection-test.mjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 255,
+      "durationMs": 137,
       "passLines": 7,
       "evidence": "qa/v323/evidence/local-09.log"
     },
@@ -85,7 +85,7 @@
       "suite": "qa/sw-test.cjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 115,
+      "durationMs": 60,
       "passLines": 11,
       "evidence": "qa/v323/evidence/local-10.log"
     },
@@ -93,7 +93,7 @@
       "suite": "qa/business-core-test.cjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 109,
+      "durationMs": 66,
       "passLines": 16,
       "evidence": "qa/v323/evidence/local-11.log"
     },
@@ -101,7 +101,7 @@
       "suite": "qa/business-client-test.cjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 96,
+      "durationMs": 55,
       "passLines": 16,
       "evidence": "qa/v323/evidence/local-12.log"
     },
@@ -109,7 +109,7 @@
       "suite": "qa/billing-test.mjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 171,
+      "durationMs": 101,
       "passLines": 24,
       "evidence": "qa/v323/evidence/local-13.log"
     },
@@ -117,7 +117,7 @@
       "suite": "qa/tracking-test.mjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 287,
+      "durationMs": 191,
       "passLines": 9,
       "evidence": "qa/v323/evidence/local-14.log"
     },
@@ -125,7 +125,7 @@
       "suite": "qa/math-audit.cjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 327,
+      "durationMs": 197,
       "passLines": 7,
       "evidence": "qa/v323/evidence/local-15.log"
     },
@@ -133,7 +133,7 @@
       "suite": "qa/deep-audit-data-gps-consent-test.mjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 255,
+      "durationMs": 146,
       "passLines": 4,
       "evidence": "qa/v323/evidence/local-16.log"
     },
@@ -141,7 +141,7 @@
       "suite": "qa/deep-audit-ui-probes.mjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 550,
+      "durationMs": 266,
       "passLines": 13,
       "evidence": "qa/v323/evidence/local-17.log"
     },
@@ -149,7 +149,7 @@
       "suite": "qa/deep-audit-integrations-auth.cjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 90,
+      "durationMs": 32,
       "passLines": 6,
       "evidence": "qa/v323/evidence/local-18.log"
     },
@@ -157,7 +157,7 @@
       "suite": "qa/deep-audit-integrations-ui.mjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 472,
+      "durationMs": 232,
       "passLines": 7,
       "evidence": "qa/v323/evidence/local-19.log"
     },
@@ -165,7 +165,7 @@
       "suite": "qa/deep-audit-integrations-invite-context.mjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 289,
+      "durationMs": 153,
       "passLines": 3,
       "evidence": "qa/v323/evidence/local-20.log"
     },
@@ -173,7 +173,7 @@
       "suite": "qa/deep-audit-payments-boundaries.mjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 94,
+      "durationMs": 49,
       "passLines": 5,
       "evidence": "qa/v323/evidence/local-21.log"
     },
@@ -181,7 +181,7 @@
       "suite": "qa/deep-audit-payments-checkout-race.mjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 93,
+      "durationMs": 47,
       "passLines": 0,
       "evidence": "qa/v323/evidence/local-22.log"
     },
@@ -189,7 +189,7 @@
       "suite": "qa/v323/legacy-hours-test.mjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 746,
+      "durationMs": 350,
       "passLines": 12,
       "evidence": "qa/v323/evidence/local-23.log"
     },
@@ -197,7 +197,7 @@
       "suite": "qa/v323/backup-budget-test.cjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 1587,
+      "durationMs": 815,
       "passLines": 10,
       "evidence": "qa/v323/evidence/local-24.log"
     },
@@ -205,7 +205,7 @@
       "suite": "qa/v323/session-client-test.cjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 156,
+      "durationMs": 79,
       "passLines": 26,
       "evidence": "qa/v323/evidence/local-25.log"
     },
@@ -213,7 +213,7 @@
       "suite": "qa/v323/session-diagnostics-test.mjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 299,
+      "durationMs": 116,
       "passLines": 12,
       "evidence": "qa/v323/evidence/local-26.log"
     },
@@ -221,7 +221,7 @@
       "suite": "qa/v323/gps-lifecycle-test.mjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 360,
+      "durationMs": 165,
       "passLines": 7,
       "evidence": "qa/v323/evidence/local-27.log"
     },
@@ -229,7 +229,7 @@
       "suite": "qa/v323/gps-review-test.mjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 248,
+      "durationMs": 148,
       "passLines": 4,
       "evidence": "qa/v323/evidence/local-28.log"
     },
@@ -237,7 +237,7 @@
       "suite": "qa/v323/sync-integration-test.mjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 3276,
+      "durationMs": 1734,
       "passLines": 23,
       "evidence": "qa/v323/evidence/local-29.log"
     },
@@ -245,7 +245,7 @@
       "suite": "qa/v323/device-data-test.mjs",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 1324,
+      "durationMs": 644,
       "passLines": 28,
       "evidence": "qa/v323/evidence/local-30.log"
     }
@@ -270,7 +270,7 @@
     "fleet.css": "b9dca2183b0bd45f71be67c17ea2adee91e547a2b4ce8c47fc538d651c23e743",
     "google-identity.js": "3509c36284b184bc06fd792685ee5877b52c19030816fbf04c2f88f85b6979e7",
     "gps-core.js": "e2651907be91a409f438e46a893345ad228bf68bf523b5d5d8b847c8a13015a6",
-    "index.html": "8a0137ff6167e31df32457aa6e23405b741953234058ce4fc78a51891ef4c341",
+    "index.html": "6a9551da88f0ee5e31b000da8dcc1471fef44ec8b85b5c3352fdb3473b35fc50",
     "interactions.js": "fedb140f66615f2f13ac8a45170ac1317443477acc4f270ccaa2be79fed02710",
     "privacidade.html": "397c1fa69528f72bf5b15c18f06a86bc61338750eeb57afae67bdf0debcddc72",
     "profiles-core.js": "886514169889df2bf090aa0f07cb747ea02768d68d3bd364168701d07bbc5e66",

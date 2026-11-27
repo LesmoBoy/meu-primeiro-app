@@ -1,0 +1,69 @@
+{
+  "runId": 45930316503,
+  "testedCommit": "e01f59cc48feaa64466895a5a637145c9e0df0db",
+  "url": "https://github.com/LesmoBoy/meu-primeiro-app/actions/runs/45930316503",
+  "status": "success",
+  "existingBrowserScenarios": 87,
+  "newBrowserScenarios": 9,
+  "totalBrowserScenarios": 96,
+  "rows": [
+    {
+      "suite": "report.json",
+      "passed": 13,
+      "errors": 0,
+      "browserVersion": "151.0.7922.34",
+      "sha256": "083e18cb23aa8993a6ed5e33ea73b83266f3fd10aa8bef32bd89ffa3576893e0",
+      "evidence": "qa/v323/evidence/ci-initial-report.json"
+    },
+    {
+      "suite": "gps-report.json",
+      "passed": 13,
+      "errors": 0,
+      "browserVersion": "151.0.7922.34",
+      "sha256": "d83f5d26d05410bab0d6f0352c8e0a7d0b5e986200c4e8a1ee1da59755cfa39f",
+      "evidence": "qa/v323/evidence/ci-initial-gps-report.json"
+    },
+    {
+      "suite": "profiles-report.json",
+      "passed": 12,
+      "errors": 0,
+      "browserVersion": "151.0.7922.34",
+      "sha256": "bad5e6a1646cee0f71782ee7654bddf21f77431a5837e6a4174d2315866f8091",
+      "evidence": "qa/v323/evidence/ci-initial-profiles-report.json"
+    },
+    {
+      "suite": "fleet-report.json",
+      "passed": 14,
+      "errors": 0,
+      "browserVersion": "151.0.7922.34",
+      "sha256": "1b6f4c6b9a9a318c67bbb2e882bc92d9fb996672c2102ca8865cc88170016597",
+      "evidence": "qa/v323/evidence/ci-initial-fleet-report.json"
+    },
+    {
+      "suite": "google-identity-report.json",
+      "passed": 15,
+      "errors": 0,
+      "browserVersion": "151.0.7922.34",
+      "sha256": "ba81aecd95c6e99e6d066f38dafe17776a4a8e51024e1266269b17c4d8013666",
+      "evidence": "qa/v323/evidence/ci-initial-google-identity-report.json"
+    },
+    {
+      "suite": "business-report.json",
+      "passed": 20,
+      "errors": 0,
+      "browserVersion": "151.0.7922.34",
+      "sha256": "154a6a4574b62ded1d5287fd528095d2cf66e0090dceb15001515406d0aa01b3",
+      "evidence": "qa/v323/evidence/ci-initial-business-report.json"
+    },
+    {
+      "suite": "v323/browser-report.json",
+      "passed": 9,
+      "errors": 0,
+      "evidence": "qa/v323/browser-report.json"
+    }
+  ],
+  "physicalDevice": false,
+  "googleOIDC": false,
+  "productionChanges": false,
+  "note": "Initial complete CI. A subsequent commit only aligns the footer version and asserts version labels; final CI is recorded separately."
+}

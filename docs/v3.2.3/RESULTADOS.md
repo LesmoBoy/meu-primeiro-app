@@ -2,6 +2,8 @@
 
 Dados de teste: exclusivamente sintéticos. Escritas remotas de produção: **zero**. Execução em 26–27/11/2026, sobre a referência auditada v3.2.2. Esta tabela não soma linhas de log a cenários de navegador.
 
+**CI final aprovado:** [execução 45930835327](https://github.com/LesmoBoy/meu-primeiro-app/actions/runs/45930835327), commit `bd8f927eede3f03df396d8d23f541fb8cd309692`. Os três jobs — Chromium, PostgreSQL e HTTP autenticado — concluíram com sucesso. Artefatos foram baixados e seus SHA-256 conferidos. `qa/v323/ci-final-summary.json` registra fontes, contagens e limites. Alterações posteriores de entrega são documentação, evidências e ferramentas de empacotamento, sem mudança do runtime ou SQL validados.
+
 | Categoria | Resultado executado | Evidência | Limite |
 |---|---|---|---|
 | Automatizados locais Node/DOM | 30/30 suítes aprovadas, incluindo todas as existentes e oito novas | `qa/v323/local-suite-report.json`, logs individuais no artefato do CI | APIs/DOM parcialmente simulados; não prova renderização nem provedores externos |
@@ -17,8 +19,9 @@ Dados de teste: exclusivamente sintéticos. Escritas remotas de produção: **ze
 | Prova controlada CAS HTTP | 40001 sem resposta até 2.500 ms; PT409/HTTP409 em 157 ms; revisão e hash preservados | `auth-http-cas-proof.json` | Stack local PostgREST14.18; não requisição conflitante de produção |
 | Rollback local | Reconstrução da referência, 40 arquivos runtime e 10 suítes de cache simuladas aprovadas | `rollback-dry-run-report.json` | Não é rollback publicado; backend tem plano próprio |
 | Dependências | `npm audit`: zero avisos conhecidos na árvore de ferramentas da consulta | `npm-audit.json` | Não certifica todo fornecedor/serviço externo |
-| Chromium real | Execução final no CI em consolidação | Relatório CI será anexado antes da entrega final | Fixtures de Google/GPS/Auth continuam sintéticas |
+| Chromium real | **96/96 cenários aprovados**: 87 existentes e 9 novos; larguras 320/390/1280 e offline, sem erros de execução | `ci-final-summary.json`, `browser-report.json` e `evidence/ci-final-*-report.json` | Fixtures de Google/GPS/Auth continuam sintéticas; Chrome151 no CI não é Android físico |
 | Produção — somente leitura | Main preservada na referência; catálogo de cinco tabelas/25 funções/quatro migrações e Advisor consultados | `production-catalog.json` | Nenhuma linha financeira lida nem escrita |
+| Produção — runtime público | 40/40 hashes iguais à v3.2.2; Auth saudável, Google ativo e Facebook/Email desativados | `production-readonly-runtime.json` | GET de arquivos/configuração pública, sem token de usuário ou publicação |
 | Google existente em produção v3.2.2 | Conta conectada correspondeu; modo “Na minha conta” ativou fluxo protegido e retornou a “Neste aparelho” | `production-readonly-session.json` | Confirmação pela interface; sem captura independente HTTP/getUser e sem executar a candidata |
 | Físicos Android/GPS/bateria | **NÃO EXECUTADOS** | [Roteiro pendente](GPS-ANDROID.md) | Não aprovados por simulação |
 | Google OIDC externo da v3.2.3 / duas contas e aparelhos | **NÃO EXECUTADO** | [Checklist pendente](HOMOLOGACAO.md) | HTTP local não substitui assinatura/nonce/consentimento reais do provedor |

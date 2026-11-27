@@ -1,0 +1,26 @@
+{
+  "mode": "Real Chromium, isolated local fixture and intercepted fake Google Identity SDK; no live authentication",
+  "passed": [
+    "bootstrap creates no auth DOM, network request or storage",
+    "invalid public client and nonce fail before SDK or DOM",
+    "explicit official button resolves once with PKCE-independent GIS configuration",
+    "one pending request rejects a concurrent request without replacing the dialog",
+    "cancel and late callbacks cannot resolve a later attempt",
+    "Escape cancels accessibly, cleans the dialog and restores initiating focus",
+    "external dialog close cancels and a parent app dialog is preserved",
+    "invalid credential and mismatched response client are rejected without retaining auth DOM",
+    "SDK network failure is bounded and the next explicit request can retry",
+    "SDK initialization/render failure releases busy state for retry",
+    "cancel while SDK is loading prevents a late script load from opening auth UI",
+    "offline before a request and connectivity loss cancel without live Google requests",
+    "320/390/1280 layouts fit the viewport, remain modal and return focus",
+    "load and request timeouts clean old timers and allow a fresh attempt",
+    "no tokens are stored and no unexpected external request or runtime error occurs"
+  ],
+  "errors": [],
+  "browserErrors": [],
+  "unexpectedExternalRequests": 0,
+  "fixtureURL": "http://127.0.0.1:37773/fixture.html",
+  "browserVersion": "151.0.7922.34",
+  "interceptedFakeSDKRequests": 6
+}
