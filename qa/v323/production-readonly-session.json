@@ -1,0 +1,16 @@
+{
+  "classification": "production-read-only-existing-v3.2.2",
+  "runId": "bf4a2582-7ed5-4a54-9ddc-59b1a7e42993",
+  "version": "3.2.2",
+  "errorSeguro": "O acesso à empresa segue a função da conta conectada. Os dados são verificados pelo servidor.",
+  "accountMatched": true,
+  "authHTTPStatus": null,
+  "noCompanyOpened": true,
+  "cloudModeSelected": "Na minha conta",
+  "returnedToLocalMode": true,
+  "networkStatusObserved": false,
+  "noRecordsReadOrWritten": true,
+  "sessionInitiallyActive": true,
+  "authenticatedFlowSucceeded": true,
+  "limitation": "UI guard verified indirectly. No independent HTTP capture, no v3.2.3 deployment, no company or financial record access."
+}

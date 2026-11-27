@@ -1,5 +1,13 @@
 # Ativar Google, Facebook e sincronização
 
+## Candidata 3.2.3 — estabilidade e homologação — 27/11/2026
+
+O desenvolvimento está isolado em `codex/desenvolvimento-v3.2.3`; a produção permanece na referência 3.2.2 até autorização de publicação. Consulte a [auditoria e os critérios de homologação](v3.2.3/AUDITORIA.md), a [revisão individual dos definers](v3.2.3/SECURITY-DEFINER.md), o [tratamento de backups](v3.2.3/TAMANHO-BACKUP.md) e o [rollback](v3.2.3/ROLLBACK.md).
+
+Novos envios verificam o orçamento da representação JSONB antes da RPC. Registros históricos acima de 24 horas continuam legíveis/exportáveis, com aviso; o envio é interrompido antes de substituir a cópia da conta, até revisão explícita. A restauração preserva os validadores de compatibilidade anteriores. Uma quinta migração foi preparada para conflitos HTTP seguros em quatro funções, sem mudar permissões ou regras financeiras; sua aplicação em produção depende de aprovação explícita. Nenhum provedor ou cobrança foi ativado.
+
+O gerenciamento de dados do dispositivo permite cópia técnica por perfil e remoção explícita após logout, backup e confirmação. Logout continua preservando dados locais. Os testes autenticados locais e a observação da conta Google na versão publicada têm limites distintos, documentados na auditoria; não substituem homologação Google real da candidata nem testes físicos Android.
+
 ## Instalação 3.2.2 — Google Identity Services — 26/11/2026
 
 O projeto **MRB** (`ivoszoawhknwbiszjvfv`) recebeu `schema.sql` e `enterprise.sql`, com cinco tabelas protegidas por RLS. A configuração pública aponta para esse projeto e oferece somente Google; Facebook permanece desativado enquanto seu cadastro na Meta está pendente.

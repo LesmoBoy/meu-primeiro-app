@@ -378,6 +378,9 @@ function atualizarJornadaRodagem() {
         : estado === 'completed' ? 'Esta jornada já foi salva em um fechamento. Você pode iniciar outra sem registrar as mesmas horas novamente.'
           : estado === 'invalid' ? 'O marcador anterior não pôde ser lido. Revise suas horas no fechamento antes de iniciar outra jornada.'
             : 'Inicie para acompanhar suas horas. As pausas ficam fora da conta.';
+  if (j && duracaoJornadaRodagem(j) > 24 * 3600000 && estado !== 'completed' && estado !== 'invalid') {
+    $('jornada-dica').textContent += ' Este marcador ultrapassa 24 horas e foi preservado integralmente. Revise as horas efetivamente trabalhadas antes de salvar: cada fechamento diário aceita até 24 horas. Nenhum tempo será reduzido automaticamente.';
+  }
   window.RodagemGPS?.sync(j && estado !== 'completed' && estado !== 'invalid' ? j : null);
 }
 
@@ -434,7 +437,7 @@ async function levarJornadaAoFechamento() {
   form.dataset.jornada = j.id;
   form.elements.horas.dispatchEvent(new Event('input', {bubbles: true}));
   abrir('fechamento');
-  aviso('Horas da jornada preenchidas. Revise seus ganhos e gastos e salve o fechamento.');
+  aviso('Horas da jornada preenchidas. ' + (j.acumulado > 24 * 3600000 ? 'O tempo original acima de 24 horas foi mantido; revise as horas efetivamente trabalhadas antes de salvar um fechamento diário de até 24 horas. ' : '') + 'Revise seus ganhos e gastos e salve o fechamento.');
   form.elements.ganhos.focus();
 }
 

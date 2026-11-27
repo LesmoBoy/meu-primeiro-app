@@ -214,6 +214,13 @@
     const binding = requireBinding(user);
     const bindingRaw = raw(keys.binding);
     const snapshot = await withLocks(dataLocks(),capture);
+    const legacy = root.RodagemLegacyHours?.inspect(snapshot.records);
+    if (legacy?.count) {
+      const failure = Error('Há ' + legacy.count + ' lançamento(s) histórico(s) com duração acima de 24 horas. O envio foi interrompido sem alterar esses registros nem a última cópia válida da conta. Exporte um backup local e revise cada jornada antes de sincronizar.');
+      failure.code = 'BACKUP_LEGACY_HOURS'; throw failure;
+    }
+    if (!root.RodagemBackupBudget?.assertFits) throw Error('A verificação de tamanho não foi carregada. Reabra o app antes de enviar; a cópia anterior foi mantida.');
+    root.RodagemBackupBudget.assertFits(snapshot);
     const remote = remoteSnapshot(await cloud.load(user.userId));
     assertSession(user.userId,user.epoch);
     if ((remote?.revision || 0) !== binding.revision) throw Error('Há uma versão mais recente na conta. Recupere-a ou use outro perfil antes de salvar; nenhuma versão foi sobrescrita.');
@@ -304,6 +311,7 @@
   }
   function render() {
     if (!card) return;
+    card.setAttribute('aria-busy',String(busy));
     const configured = Boolean(cloud?.configured());
     let binding,problem = '';
     try { binding = readBinding(); } catch (failure) { problem = failure.message; }

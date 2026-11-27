@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'codex/testes-navegador-*'
+      - 'codex/desenvolvimento-v3.2.3'
   workflow_dispatch:
 
 permissions:
@@ -22,16 +23,20 @@ jobs:
     steps:
       - name: Obter os arquivos do teste
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Preparar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '24'
       - name: Instalar ferramenta de teste
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
       - name: Instalar Chromium e bibliotecas
         run: npx playwright install --with-deps chromium
-      - name: Testar o app publicado com dados fictícios
-        run: npm run test:gps-core && npm run test:profiles-core && node qa/vehicle-catalog-test.cjs && npm run test:cloud && npm run test:google-identity-dom && npm run test:dom && npm run test:connection && node qa/sw-test.cjs && npm run test:business-core && npm run test:business-client && npm run test:billing && node qa/tracking-test.mjs && node qa/math-audit.cjs && node qa/deep-audit-data-gps-consent-test.mjs && node qa/deep-audit-ui-probes.mjs && node qa/deep-audit-integrations-auth.cjs && node qa/deep-audit-integrations-ui.mjs && node qa/deep-audit-integrations-invite-context.mjs && node qa/deep-audit-payments-boundaries.mjs && node qa/deep-audit-payments-checkout-race.mjs
+      - name: Testar todas as suítes locais e regressões com dados fictícios
+        run: node qa/v323/run-local-tests.mjs
+      - name: Ensaiar rollback local e cache sem publicar
+        run: python qa/v323/rollback-dry-run.py
       - name: Testar os fluxos principais com dados fictícios
         if: env.BUSINESS_ONLY != 'true'
         run: npm run test:browser
@@ -50,17 +55,17 @@ jobs:
       - name: Testar empresa, equipe, frota, custos e alertas
         if: always() && env.VISUAL_ONLY != 'true'
         run: npm run test:business
-      - name: Exibir prévia para revisão visual
+      - name: Testar regressões da candidata 3.2.3 no Chromium
+        if: always() && env.BUSINESS_ONLY != 'true' && env.VISUAL_ONLY != 'true'
+        run: node qa/v323/browser-regressions.cjs
+      - name: Registrar capturas disponíveis
         if: always()
         run: |
           node <<'NODE'
           const fs = require('node:fs');
-          for (const name of ['failure-viewport.png','mobile-viewport.png','desktop-viewport.png','transport-mobile.png','transport-desktop.png','transport-company.png','transport-balance.png','gps-mobile.png','gps-desktop.png','gps-failure.png','profiles-mobile.png','profiles-desktop.png','profiles-failure.png','fleet-mobile.png','fleet-desktop.png','fleet-failure.png','google-identity-mobile.png','google-identity-desktop.png','business-mobile.png','business-desktop.png','business-failure.png']) {
-            const path = 'qa/' + name;
-            if (!fs.existsSync(path)) continue;
-            const encoded = fs.readFileSync(path).toString('base64');
-            for (let start = 0, part = 0; start < encoded.length; start += 4000, part++) {
-              console.log('BROWSER_IMAGE:' + name + ':' + part + ':' + encoded.slice(start,start+4000));
+          for (const directory of ['qa','qa/v323']) {
+            for (const name of fs.readdirSync(directory).filter(name => name.endsWith('.png'))) {
+              console.log(directory + '/' + name + ': ' + fs.statSync(directory + '/' + name).size + ' bytes; ver artefato');
             }
           }
           NODE
@@ -76,6 +81,10 @@ jobs:
             qa/fleet-report.json
             qa/business-report.json
             qa/google-identity-report.json
+            qa/v323/local-suite-report.json
+            qa/v323/*-report.json
+            qa/v323/evidence/local-*.log
+            qa/v323/browser-*.png
             qa/*.png
           if-no-files-found: warn
           retention-days: 3
@@ -93,6 +102,8 @@ jobs:
         run: bash supabase/test-enterprise.sh 2>&1 | tee qa/postgres-enterprise-ci.log
       - name: Conferir migrações e definições finais do banco
         run: python qa/migrations-chain-test.py
+      - name: Regressões de concorrência e tamanho JSONB
+        run: python qa/v323/postgres-hml-races.py && python qa/v323/backup-budget-postgres.py
       - name: Guardar evidências PostgreSQL
         if: always()
         uses: actions/upload-artifact@v4
@@ -101,4 +112,27 @@ jobs:
           path: |
             qa/postgres-*-ci.log
             qa/migrations-chain-report.json
+          retention-days: 3
+
+  authenticated-http:
+    name: Auth e PostgREST reais · contas sintéticas e rede isolada
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Obter arquivos
+        uses: actions/checkout@v4
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Instalar dependências fixas
+        run: npm ci --no-audit --no-fund
+      - name: Homologar HTTP autenticado local sem provedores externos
+        run: node qa/v323/auth-http-hml.cjs
+      - name: Guardar evidência sanitizada
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: minha-rodagem-auth-http
+          path: qa/v323/auth-http-report.json
           retention-days: 3

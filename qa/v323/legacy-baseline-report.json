@@ -1,0 +1,31 @@
+{
+  "version": "3.2.3",
+  "classification": "local-pure-and-simulated-DOM",
+  "syntheticDataOnly": true,
+  "productionOperations": 0,
+  "physicalTests": false,
+  "checks": [
+    {
+      "command": "node qa/dom-smoke.mjs",
+      "exitCode": 0,
+      "passed": 15,
+      "failures": [],
+      "sourceReport": "qa/dom-report.json"
+    },
+    {
+      "command": "node qa/math-audit.cjs",
+      "exitCode": 0,
+      "passed": 6,
+      "generatedExactDecimalCases": 50000
+    },
+    {
+      "command": "git diff --check -- app.js experience.js qa/v323/legacy-hours-test.mjs docs/v3.2.3/LEGADOS.md",
+      "exitCode": 0
+    }
+  ],
+  "sourceSha256": {
+    "app.js": "922b4511fc7835c1ce1f5acc37bffba44f84b99cdc07072a7871ede35d1f684b",
+    "experience.js": "f3b23ec1c1032cb9b24fd46a0203fed1d08d87de322ab1aaf6d4a0f4a4a52223",
+    "qa/v323/legacy-hours-test.mjs": "749eee84d34c3f5c7b7d493f38a8299aaaef9a1ce5596802d649ec08400eebdb"
+  }
+}

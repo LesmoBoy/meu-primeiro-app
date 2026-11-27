@@ -1,0 +1,16 @@
+PASS save versus archive: lock observed; holder COMMIT; waiter 40001
+PASS archive versus save: lock observed; holder COMMIT; waiter 40001
+PASS two member edits with one expected revision: lock observed; holder COMMIT; waiter 40001
+PASS two acceptances of one token: lock observed; holder COMMIT; waiter 42501
+PASS revocation wins against in-flight acceptance: lock observed; holder COMMIT; waiter 42501
+PASS acceptance wins against in-flight revocation: lock observed; holder COMMIT; waiter 42501
+PASS two invitations replace the same email serially: lock observed; holder COMMIT; waiter COMMIT
+PASS revoked manager waits then save_entity is denied: lock observed; holder COMMIT; waiter 42501
+PASS revoked manager waits then archive_entity is denied: lock observed; holder COMMIT; waiter 42501
+PASS revoked manager waits then save_member is denied: lock observed; holder COMMIT; waiter 42501
+PASS revoked manager waits then invite_member is denied: lock observed; holder COMMIT; waiter 42501
+PASS revoked manager waits then revoke_invite is denied: lock observed; holder COMMIT; waiter 42501
+PASS manager demoted to finance waits then fleet write is denied: lock observed; holder COMMIT; waiter 42501
+PASS concurrent owners cannot both demote the last owners: lock observed; holder COMMIT; waiter 42501
+PASS same new entity ID across companies cannot be overwritten: lock observed; holder COMMIT; waiter 40001
+PASS 15 coordinated PostgreSQL 17 races; synthetic data only; qa/v323/evidence/enterprise-races.json

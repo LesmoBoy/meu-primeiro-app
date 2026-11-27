@@ -1,0 +1,113 @@
+{
+  "mode": "Real Chromium through Playwright",
+  "passed": [
+    "five routes, hashes and browser back",
+    "320/390/1280 layouts have no horizontal overflow",
+    "v1 records load without migration or loss",
+    "routine presets, editable profile and goal persist",
+    "daily live balance, save and history edit preserve legacy records",
+    "invalid numbers and canceled duplicate day never create records",
+    "full/partial/full fuel cycle and dashboard data connect",
+    "fuel estimate rounds an exact half-cent up in real form interactions",
+    "backup downloads, invalid backup preserves records, valid import refreshes views",
+    "journey timer excludes pauses, survives reload, prefills and clears only after saving",
+    "a stale tab cannot overwrite records saved in another tab",
+    "PWA reloads and navigates offline under Pages subpath",
+    "screenshots captured and no JavaScript runtime errors"
+  ],
+  "errors": [],
+  "browserErrors": [],
+  "appURL": "http://127.0.0.1:36235/meu-primeiro-app/",
+  "browserVersion": "151.0.7922.34",
+  "appVersion": "minharodagem / feito para quem está no corre.\nPrivacidade\nExclusão de dados\nDados deste perfil neste navegador · v3.2.3",
+  "offlineEvidence": [
+    {
+      "stage": "immediately-after-setOffline",
+      "online": false,
+      "readyState": "complete",
+      "label": "Sem internet",
+      "updaterType": "function",
+      "activeElement": "BODY#",
+      "cacheKeys": [
+        "rodagem-cache:http://127.0.0.1:36235/meu-primeiro-app/:3.2.3"
+      ],
+      "controller": "http://127.0.0.1:36235/meu-primeiro-app/sw.js",
+      "panel": "fechamento",
+      "uncachedNetworkReachable": false
+    },
+    {
+      "stage": "after-offline-reload",
+      "online": true,
+      "readyState": "complete",
+      "label": "Sem internet",
+      "updaterType": "function",
+      "activeElement": "BODY#",
+      "cacheKeys": [
+        "rodagem-cache:http://127.0.0.1:36235/meu-primeiro-app/:3.2.3"
+      ],
+      "controller": "http://127.0.0.1:36235/meu-primeiro-app/sw.js",
+      "panel": "fechamento",
+      "uncachedNetworkReachable": false
+    },
+    {
+      "stage": "after-history-navigation",
+      "online": true,
+      "readyState": "complete",
+      "label": "Sem internet",
+      "updaterType": "function",
+      "activeElement": "H1#titulo-historico",
+      "cacheKeys": [
+        "rodagem-cache:http://127.0.0.1:36235/meu-primeiro-app/:3.2.3"
+      ],
+      "controller": "http://127.0.0.1:36235/meu-primeiro-app/sw.js",
+      "panel": "historico",
+      "uncachedNetworkReachable": false
+    },
+    {
+      "stage": "after-dashboard-navigation",
+      "online": true,
+      "readyState": "complete",
+      "label": "Sem internet",
+      "updaterType": "function",
+      "activeElement": "H1#titulo-inicio",
+      "cacheKeys": [
+        "rodagem-cache:http://127.0.0.1:36235/meu-primeiro-app/:3.2.3"
+      ],
+      "controller": "http://127.0.0.1:36235/meu-primeiro-app/sw.js",
+      "panel": "inicio",
+      "uncachedNetworkReachable": false
+    },
+    {
+      "stage": "after-label-event-wait",
+      "online": true,
+      "readyState": "complete",
+      "label": "Sem internet",
+      "updaterType": "function",
+      "activeElement": "H1#titulo-inicio",
+      "cacheKeys": [
+        "rodagem-cache:http://127.0.0.1:36235/meu-primeiro-app/:3.2.3"
+      ],
+      "controller": "http://127.0.0.1:36235/meu-primeiro-app/sw.js",
+      "panel": "inicio",
+      "uncachedNetworkReachable": false
+    },
+    {
+      "stage": "after-online-recovery",
+      "online": true,
+      "readyState": "complete",
+      "label": "Online",
+      "updaterType": "function",
+      "activeElement": "BODY#",
+      "cacheKeys": [
+        "rodagem-cache:http://127.0.0.1:36235/meu-primeiro-app/:3.2.3"
+      ],
+      "controller": "http://127.0.0.1:36235/meu-primeiro-app/sw.js",
+      "panel": "inicio",
+      "uncachedNetworkReachable": true
+    }
+  ],
+  "offlineArtwork": {
+    "width": 1439,
+    "height": 810
+  }
+}

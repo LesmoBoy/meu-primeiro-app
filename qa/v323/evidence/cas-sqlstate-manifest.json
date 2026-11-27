@@ -1,0 +1,31 @@
+{
+  "functions": {
+    "rodagem_save_snapshot": {
+      "signature": "public.rodagem_save_snapshot(uuid,bigint,jsonb)",
+      "replacements": 1,
+      "baselineBodyMd5": "a9597c8220b201d8228c0c8cb6e65ba7",
+      "candidateBodyMd5": "0bfd97a3c85f7d4e43518fbeead712bc"
+    },
+    "business_save_entity": {
+      "signature": "public.business_save_entity(uuid,uuid,text,uuid,bigint,jsonb)",
+      "replacements": 3,
+      "baselineBodyMd5": "ccbc7568a265637f4347fb30ef69068e",
+      "candidateBodyMd5": "5bbbc0e096cdd8172aca1bfdbaef6871"
+    },
+    "business_archive_entity": {
+      "signature": "public.business_archive_entity(uuid,uuid,text,uuid,bigint)",
+      "replacements": 1,
+      "baselineBodyMd5": "9e9de1d6a4b948bf98157b37cf936bad",
+      "candidateBodyMd5": "037e52b0f9a96bbf02b82cb789c41b58"
+    },
+    "business_save_member": {
+      "signature": "public.business_save_member(uuid,uuid,uuid,bigint,jsonb)",
+      "replacements": 2,
+      "baselineBodyMd5": "24930095c4370733a78c8ad17bf7988d",
+      "candidateBodyMd5": "ac84103ef0ed0e2fc043940a01e01e0e"
+    }
+  },
+  "logicalRaisesChanged": 7,
+  "financialRulesChanged": false,
+  "topLevelDataMutationStatements": false
+}

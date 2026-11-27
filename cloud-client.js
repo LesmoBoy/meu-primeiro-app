@@ -6,7 +6,8 @@
   const TIMEOUT = 15000;
   const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   const GOOGLE_CLIENT_ID = /^\d+-[A-Za-z0-9_-]+\.apps\.googleusercontent\.com$/;
-  let client = null, googleAttempt = null;
+  let client = null, googleAttempt = null, refreshAttempt = null, logoutAttempt = null;
+  let authVersion = 0, observedUserId;
 
   class CloudError extends Error {
     constructor(code, message) { super(message); this.name = 'RodagemCloudError'; this.code = code; }
@@ -62,14 +63,19 @@
     if (config.issue) throw new CloudError('CONFIGURATION',config.issue);
     if (!client) client = root.supabase.createClient(config.url,config.key,{
       auth:{flowType:'pkce',detectSessionInUrl:true,persistSession:true,autoRefreshToken:true,storageKey:'minha-rodagem-supabase-auth-v1'},
+      // A logical CAS conflict requires user review, never an automatic replay.
+      db:{retry:false},
       global:{fetch:timedFetch}
     });
     return client;
   }
   function failure(error, fallback = 'Não foi possível conectar sua conta. Tente novamente com internet.') {
     if (error instanceof CloudError) return error;
+    if (error?.name === 'AuthSessionMissingError' || ['session_not_found','refresh_token_not_found','refresh_token_already_used','bad_jwt','jwt_expired','user_not_found','user_banned'].includes(error?.code)) {
+      return new CloudError('AUTH_REQUIRED','A sessão expirou ou não está mais disponível. Entre novamente na sua conta.');
+    }
     if (error?.code === '28000') return new CloudError('SESSION_CHANGED','A conta foi alterada durante a sincronização. Confira a conta em uso antes de continuar.');
-    if (error?.code === '40001' || error?.status === 409) return new CloudError('CONFLICT','Os dados mudaram em outro aparelho. Confira a versão da nuvem antes de enviar novamente.');
+    if (['40001','PT409'].includes(error?.code) || error?.status === 409) return new CloudError('CONFLICT','Os dados mudaram em outro aparelho. Confira a versão da nuvem antes de enviar novamente.');
     if (error?.code === '42501' || [401,403].includes(error?.status)) return new CloudError('AUTH_REQUIRED','Entre novamente na sua conta para sincronizar.');
     if (error?.code === '22023') return new CloudError('INVALID_DATA','Não foi possível validar os dados para sincronização. Os dados locais foram mantidos.');
     return new CloudError('CONNECTION',fallback);
@@ -87,30 +93,77 @@
       expires_at:Number.isSafeInteger(session.expires_at) ? session.expires_at : null
     };
   }
+  function observeSession(session) {
+    const id = session?.user?.id || null;
+    if (observedUserId !== undefined && observedUserId !== id) authVersion++;
+    observedUserId = id;
+  }
   async function getSession() {
     try {
       const {data,error} = await connection().auth.getSession();
       if (error) throw error;
-      return publicSession(data?.session);
+      const session = publicSession(data?.session);
+      observeSession(session);
+      return session;
     } catch (error) { throw failure(error); }
   }
   async function verifySession(expectedUserId) {
-    const session = await getSession();
-    if (!session) throw new CloudError('AUTH_REQUIRED','Entre na sua conta para sincronizar.');
+    assertNoLogout();
+    const check = profileGuard(); check();
+    if (expectedUserId !== undefined && !UUID.test(expectedUserId || '')) throw new CloudError('SESSION_CHANGED','Confira a conta em uso antes de continuar.');
+    const version = authVersion;
     try {
+      // getSession can renew an expired token in the SDK, but its cached user
+      // never authorizes an operation. getUser is the server verification.
+      const session = await getSession(); check();
+      if (!session) throw new CloudError('AUTH_REQUIRED','Entre na sua conta para sincronizar.');
+      if (version !== authVersion) throw new CloudError('SESSION_CHANGED','A conta mudou durante a verificação. Confira a conta em uso antes de continuar.');
+      if (expectedUserId !== undefined && session.user.id !== expectedUserId) throw new CloudError('SESSION_CHANGED','A conta foi alterada. Confira a conta vinculada a este perfil antes de continuar.');
       const {data,error} = await connection().auth.getUser();
+      check();
       if (error) throw error;
+      if (!UUID.test(data?.user?.id || '')) throw new CloudError('AUTH_REQUIRED','O servidor não confirmou sua conta. Entre novamente para continuar.');
+      if (version !== authVersion) throw new CloudError('SESSION_CHANGED','A conta mudou durante a verificação. Confira a conta em uso antes de continuar.');
       if (data?.user?.id !== session.user.id) throw new CloudError('SESSION_CHANGED','A conta foi alterada. Confira a conta em uso antes de continuar.');
       if (expectedUserId !== undefined && data.user.id !== expectedUserId) throw new CloudError('SESSION_CHANGED','A conta foi alterada. Confira a conta vinculada a este perfil antes de continuar.');
-      return publicSession(session,data.user);
+      const current = await getSession(); check();
+      if (version !== authVersion || current?.user?.id !== session.user.id) throw new CloudError('SESSION_CHANGED','A conta mudou durante a verificação. Confira a conta em uso antes de continuar.');
+      if (current.expires_at !== null && current.expires_at * 1000 <= Date.now()) throw new CloudError('AUTH_REQUIRED','A sessão expirou. Entre novamente na sua conta antes de continuar.');
+      return publicSession(current,data.user);
     } catch (error) { throw failure(error); }
+  }
+  async function refreshSession(expectedUserId) {
+    assertNoLogout();
+    if (refreshAttempt) throw new CloudError('AUTH_PENDING','Uma renovação de sessão já está em andamento. Aguarde a conclusão.');
+    const attempt = {}; refreshAttempt = attempt;
+    const version = authVersion;
+    try {
+      const check = profileGuard();
+      check();
+      if (expectedUserId !== undefined && !UUID.test(expectedUserId || '')) throw new CloudError('SESSION_CHANGED','Confira a conta em uso antes de continuar.');
+      const session = await getSession(); check();
+      if (!session) throw new CloudError('AUTH_REQUIRED','Entre na sua conta antes de renovar a sessão.');
+      if (version !== authVersion) throw new CloudError('SESSION_CHANGED','A conta mudou durante a renovação. Confira a conta em uso.');
+      const userId = session.user.id;
+      if (expectedUserId !== undefined && userId !== expectedUserId) throw new CloudError('SESSION_CHANGED','A conta foi alterada. Confira a conta em uso antes de continuar.');
+      const {data,error} = await connection().auth.refreshSession(); check();
+      if (error) throw error;
+      if (version !== authVersion || data?.session?.user?.id !== userId) throw new CloudError('SESSION_CHANGED','A conta mudou durante a renovação. Entre novamente antes de continuar.');
+      const verified = await verifySession(userId); check();
+      if (version !== authVersion) throw new CloudError('SESSION_CHANGED','A conta mudou durante a renovação. Confira a conta em uso.');
+      return verified;
+    } catch (error) { throw failure(error,'Não foi possível renovar a sessão. Confira a internet e entre novamente se necessário.'); }
+    finally { if (refreshAttempt === attempt) refreshAttempt = null; }
   }
   function onAuth(callback) {
     if (typeof callback !== 'function') throw new TypeError('Informe a função que acompanha a conta.');
     let closed = false;
     const {data} = connection().auth.onAuthStateChange((event,session) => {
       // Não aguarde outras chamadas do SDK dentro da trava do listener de auth.
-      queueMicrotask(() => { if (!closed) callback(event,publicSession(session)); });
+      let value;
+      try { value = publicSession(session); } catch { value = null; }
+      observeSession(value);
+      queueMicrotask(() => { if (!closed) callback(event,value); });
     });
     return () => { if (!closed) { closed = true; data?.subscription?.unsubscribe(); } };
   }
@@ -123,11 +176,14 @@
     return url.href;
   }
   async function signIn(provider) {
+    assertNoLogout();
     const config = configuration();
     if (config.issue) throw new CloudError('CONFIGURATION',config.issue);
     if (!config.providers.includes(provider)) throw new CloudError('PROVIDER','Essa forma de entrada não está disponível nesta instalação.');
     if (provider === 'google' && config.googleAuthMode === 'id_token') return signInGoogleIdToken(config);
     try {
+      if (googleAttempt) googleAttempt.cancelled = true;
+      authVersion++;
       const {error} = await connection().auth.signInWithOAuth({provider,options:{redirectTo:redirectURL(),...(provider === 'facebook' ? {scopes:'email'} : {})}});
       if (error) throw error;
       return null;
@@ -135,10 +191,14 @@
   }
   async function signInGoogleIdToken(config) {
     if (googleAttempt) throw new CloudError('AUTH_PENDING','Já existe uma entrada com Google em andamento. Conclua ou cancele a janela aberta.');
+    authVersion++;
     const attempt = {}; googleAttempt = attempt;
     try {
       const guard = profileGuard();
-      const check = () => { try { guard(); } catch { throw new CloudError('SESSION_CHANGED','O perfil mudou durante a entrada. Reabra o perfil antes de tentar novamente.'); } };
+      const check = () => {
+        if (attempt.cancelled) throw new CloudError('SESSION_CHANGED','A entrada foi interrompida pela saída ou troca de conta. Confira a conta em uso antes de continuar.');
+        try { guard(); } catch { throw new CloudError('SESSION_CHANGED','O perfil mudou durante a entrada. Reabra o perfil antes de tentar novamente.'); }
+      };
       check();
       const encoder = root.TextEncoder || (typeof TextEncoder === 'function' ? TextEncoder : null);
       if (typeof root.crypto?.getRandomValues !== 'function' || typeof root.crypto.subtle?.digest !== 'function' || typeof encoder !== 'function') {
@@ -161,7 +221,11 @@
       if (!validIdTokenShape(credential)) {
         throw new CloudError('INVALID_CREDENTIAL','O Google não retornou uma identificação válida. Tente entrar novamente.');
       }
-      const {error} = await connection().auth.signInWithIdToken({provider:'google',token:credential,nonce:rawNonce});
+      // The SDK's ID-token exchange does not share signOut's auth lock. Keep
+      // this promise so an explicit logout can finish after it, without a
+      // delayed exchange silently signing the user back in.
+      attempt.exchange = connection().auth.signInWithIdToken({provider:'google',token:credential,nonce:rawNonce});
+      const {error} = await attempt.exchange;
       if (error) throw error;
       check();
       return null;
@@ -180,11 +244,41 @@
       return parts.every(part => part && typeof part === 'object' && !Array.isArray(part)) && typeof parts[0].alg === 'string';
     } catch { return false; }
   }
+  function assertNoLogout() {
+    if (logoutAttempt) throw new CloudError('AUTH_PENDING','A saída da conta está em andamento. Aguarde sua conclusão antes de continuar.');
+  }
   async function signOut() {
-    try {
-      const {error} = await connection().auth.signOut({scope:'local'});
-      if (error) throw error;
-    } catch (error) { throw failure(error,'Não foi possível sair da conta. Tente novamente com internet.'); }
+    if (logoutAttempt) return logoutAttempt;
+    // Invalidate a pending verification at the user's logout request, even if
+    // the SDK is waiting for an earlier refresh to release its auth lock.
+    authVersion++;
+    const attempt = googleAttempt;
+    if (attempt) attempt.cancelled = true;
+    const exchange = attempt?.exchange;
+    const operation = Promise.resolve().then(async () => {
+      try {
+        const auth = connection().auth;
+        if (exchange) {
+          let before;
+          try { before = await auth.getSession(); }
+          catch { /* A broken old session must not skip waiting for the exchange. */ }
+          // Only wait for HTTP already sent, never for the Google popup.
+          let result;
+          try { result = await exchange; } catch { /* Still complete logout. */ }
+          const current = await auth.getSession();
+          if (current.error) throw current.error;
+          const intendedId = result?.data?.user?.id || result?.data?.session?.user?.id || before?.data?.session?.user?.id || null;
+          if (current.data?.session && current.data.session.user?.id !== intendedId) {
+            throw new CloudError('SESSION_CHANGED','Outra conta entrou durante a saída. Confira a conta em uso antes de sair novamente.');
+          }
+        }
+        const {error} = await auth.signOut({scope:'local'});
+        if (error) throw error;
+      } catch (error) { throw failure(error,'Não foi possível sair da conta. Tente novamente com internet.'); }
+    });
+    logoutAttempt = operation;
+    try { return await operation; }
+    finally { if (logoutAttempt === operation) logoutAttempt = null; }
   }
   function envelope(value, allowNull = false) {
     if (value === null && allowNull) return null;
@@ -197,14 +291,17 @@
   }
   async function rpc(name, params, allowNull, expectedUserId) {
     if (!UUID.test(expectedUserId || '')) throw new CloudError('SESSION_CHANGED','Confira a conta vinculada a este perfil antes de sincronizar.');
-    const session = await verifySession(expectedUserId);
+    const check = profileGuard(); check();
+    const session = await verifySession(expectedUserId); check();
+    const version = authVersion;
     try {
       // O servidor compara este UID com auth.uid() antes de ler ou gravar.
       // Se o SDK trocar o token entre verifySession e o fetch, a operação falha.
       const {data,error} = await connection().rpc(name,{...params,expected_user_id:session.user.id});
       if (error) throw error;
-      const current = await getSession();
-      if (current?.user.id !== session.user.id) throw new CloudError('SESSION_CHANGED','A conta foi alterada durante a sincronização. Confira a conta em uso antes de continuar.');
+      check();
+      const current = await getSession(); check();
+      if (version !== authVersion || current?.user.id !== session.user.id) throw new CloudError('SESSION_CHANGED','A conta foi alterada durante a sincronização. Confira a conta em uso antes de continuar.');
       return envelope(data,allowNull);
     } catch (error) { throw failure(error); }
   }
@@ -221,7 +318,8 @@
     const id = profiles?.current().id;
     return () => {
       if (!profiles) return;
-      profiles.assertCurrent();
+      try { profiles.assertCurrent(); }
+      catch { throw new CloudError('SESSION_CHANGED','O perfil foi alterado. Reabra a área da conta antes de continuar.'); }
       if (profiles.current().id !== id) throw new CloudError('SESSION_CHANGED','O perfil foi alterado. Reabra a área da empresa antes de continuar.');
     };
   }
@@ -237,12 +335,13 @@
     if (!UUID.test(expectedUserId || '')) throw new CloudError('SESSION_CHANGED','Confira a conta em uso antes de abrir sua empresa.');
     const check = profileGuard(); check();
     const session = await verifySession(expectedUserId); check();
+    const version = authVersion;
     try {
       const {data,error} = await connection().rpc(name,{...params,expected_user_id:session.user.id});
       if (error) throw error;
       check();
       const current = await getSession(); check();
-      if (current?.user.id !== session.user.id) throw new CloudError('SESSION_CHANGED','A conta foi alterada durante a operação. Confira a conta em uso antes de continuar.');
+      if (version !== authVersion || current?.user.id !== session.user.id) throw new CloudError('SESSION_CHANGED','A conta foi alterada durante a operação. Confira a conta em uso antes de continuar.');
       return data;
     } catch (error) { throw businessFailure(error); }
   }
@@ -251,6 +350,7 @@
     if (!UUID.test(expectedUserId || '')) throw new CloudError('SESSION_CHANGED','Confira a conta em uso antes de continuar.');
     const check = profileGuard(); check();
     const session = await verifySession(expectedUserId); check();
+    const version = authVersion;
     try {
       const {data,error} = await connection().functions.invoke(name,{body:{...body,expected_user_id:session.user.id}});
       if (error) {
@@ -261,9 +361,9 @@
       }
       check();
       const current = await getSession(); check();
-      if (current?.user.id !== session.user.id) throw new CloudError('SESSION_CHANGED','A conta foi alterada durante a operação. Confira a conta em uso antes de continuar.');
+      if (version !== authVersion || current?.user.id !== session.user.id) throw new CloudError('SESSION_CHANGED','A conta foi alterada durante a operação. Confira a conta em uso antes de continuar.');
       return data;
     } catch (error) { throw businessFailure(error); }
   }
-  root.RodagemCloud = Object.freeze({configured,configurationIssue,ready:getSession,getSession,verifySession,onAuth,signIn,signOut,load,save,call,invoke});
+  root.RodagemCloud = Object.freeze({configured,configurationIssue,ready:getSession,getSession,verifySession,refreshSession,onAuth,signIn,signOut,load,save,call,invoke});
 })();

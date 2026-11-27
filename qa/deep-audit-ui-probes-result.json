@@ -1,0 +1,41 @@
+{
+  "mode": "Read-only source audit plus isolated DOM and Cache Storage simulation",
+  "passed": [
+    "HTML IDs and ARIA references are unique and resolve",
+    "invalid and HTML-like routes cannot create markup or alter the ledger",
+    "profile and free vehicle HTML payloads render as literal text",
+    "profile picker treats a hostile name as text and preserves accessible names",
+    "a non-BMP initial stays whole in avatar and the saved profile name",
+    "primary panel navigation updates one selected control and heading title",
+    "static new-tab links prevent opener access and asset scripts stay local",
+    "original SVG illustrations have no script, embedded HTML, event handlers or external href",
+    "public policy pages have no JavaScript or remote assets and include the declared contact",
+    "manifest relative start/scope/icon paths remain inside the application",
+    "navigation queries do not create cache entries containing fake authentication material",
+    "lookalike sibling, foreign origin, API and Google SDK requests remain outside the SW",
+    "successful network responses do not write personalized query variants into offline cache"
+  ],
+  "confirmedFindings": [
+    {
+      "id": "UI-001",
+      "severity": "low",
+      "status": "fixed_and_verified",
+      "file": "experience.js",
+      "line": 199,
+      "beforeAvatarCodePoints": [
+        "d83d",
+        "41"
+      ],
+      "afterAvatarCodePoints": [
+        "1f6f5",
+        "41"
+      ],
+      "expectedAvatar": "🛵A",
+      "impact": "Before the one-line fix, a valid name starting with a non-BMP character displayed a replacement character in dashboard avatar initials. Names, ARIA and data remained intact."
+    }
+  ],
+  "limitations": [
+    "No physical Android, screen reader, real rendering, battery or network test performed by this probe."
+  ],
+  "checked": 13
+}

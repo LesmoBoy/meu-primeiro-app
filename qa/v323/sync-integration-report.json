@@ -1,0 +1,55 @@
+{
+  "version": "3.2.3",
+  "classification": "local-simulated-integration",
+  "syntheticDataOnly": true,
+  "productionOperations": 0,
+  "networkRequests": 0,
+  "authenticatedCloudTests": false,
+  "physicalTests": false,
+  "passed": [
+    "authentication events alone never bind, load, upload or replace a profile",
+    "binding is explicit, cancelable and uses the verified account plus remote revision",
+    "an account already owned by another local profile cannot be linked again",
+    "binding, upload and restore fail before a data RPC when server verification rejects",
+    "a missing server-verification module never falls back to the cached Google session",
+    "an expired or different server identity cannot use a cached account binding",
+    "legacy duration blocks upload before load or save and preserves the last valid copies",
+    "JSONB budget rejects a real canonical ledger below the compact-JSON limit without RPCs",
+    "missing budget protection fails closed without replacing any copy or binding",
+    "a valid 24-hour daily record uploads only after confirmation and retains exact cents",
+    "canceling a valid upload preserves local bytes, binding and the remote revision",
+    "a newer remote revision cannot be overwritten by an older local binding",
+    "a server-side revision conflict during save preserves the winner and the old binding",
+    "server refusal of a validated save never advances the local binding or last valid copy",
+    "account changes during cloud reads prevent binding, upload and restoration",
+    "account changes during confirmation cancel all personal synchronization writes",
+    "server rejection after confirmation prevents upload and restoration mutations",
+    "a real local profile switch during cloud reads cannot write either namespace",
+    "binding changes during confirmation preserve the changed binding and prevent stale writes",
+    "legacy remote records restore exactly without applying the upload gate or changing other profiles",
+    "validation and restoration accept a compatible compact snapshot above the new JSONB upload bound",
+    "a restore canceled after inspection preserves every local byte and the last remote copy",
+    "rejection at the final authenticated restore check leaves no partial data or journal"
+  ],
+  "failures": [],
+  "rejectedBudget": {
+    "records": 36000,
+    "wireBytes": 5029030,
+    "serverBytesUpperBound": 5677046,
+    "limitBytes": 5242880,
+    "fits": false,
+    "reason": "server-limit",
+    "complete": true
+  },
+  "legacyRestore": {
+    "hours": 2501,
+    "gainCents": 18001,
+    "recordsSha256": "99cff9c578fe8dfe6cad0e208320544e0ea2499266e113bbe52da336c0519a45"
+  },
+  "finishedAt": "2026-11-27T02:43:54.512Z",
+  "executedSourceSha256": {
+    "cloudSync": "254864867ad9fb07ff763bc7b33f3822dab086d16925bf135896647085be15f3",
+    "backupBudget": "010f7617030478dc9946e750803761753ff6db147171af24b7032d1599bfae54",
+    "test": "7982ace5894693dfabffb7083bf681d58c981c9836371973d6214d138d8dac22"
+  }
+}

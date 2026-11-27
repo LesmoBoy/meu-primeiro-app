@@ -1,0 +1,44 @@
+{
+  "suite": "v323-cas-http-controlled-proof",
+  "timestamp": "2026-11-27T02:37:40.482Z",
+  "classification": "authenticated-local-real-http-synthetic",
+  "productionMutation": false,
+  "syntheticOnly": true,
+  "googleOidcTested": false,
+  "images": {
+    "postgres": "postgres:17-alpine@sha256:a77aa70e641402a21411b92b721c58d10f23b50ae5fdd2333efd22d166e1e5f7",
+    "auth": "supabase/gotrue:v2.199.0@sha256:85c8323c05854ba911a8b2968c513e7e1b4cf7ebf75a30124ae923e7127cf01f",
+    "rest": "postgrest/postgrest:v14.18@sha256:c7cd7e265a85b05248abf53f4473fcec7e327c282d0bd0cf60f1551996d09fcf",
+    "transport": "python:3.13-alpine@sha256:9ef1a599f863231c3d91e941389bfdc4a2d6070557243d54df1a4e57015b960e"
+  },
+  "baseline": {
+    "sqlstate": "40001",
+    "timeoutMs": 2500,
+    "durationMs": 2503,
+    "noHTTPConflictReturned": true
+  },
+  "patched": {
+    "sqlstate": "PT409",
+    "httpStatus": 409,
+    "responseCode": "PT409",
+    "durationMs": 157
+  },
+  "preserved": {
+    "beforeRevision": 1,
+    "afterRevision": 1,
+    "beforePayloadMd5": "30105bff631e12393063acd37a322fdc",
+    "afterPayloadMd5": "30105bff631e12393063acd37a322fdc",
+    "syntheticRecordCount": 1,
+    "originalFunctionRestored": true
+  },
+  "definitionSha256": {
+    "original": "ea2656d5708e47f441bac53f7749111e710d01c052b9c60d5f649eeca4b959a2",
+    "baseline": "ea2656d5708e47f441bac53f7749111e710d01c052b9c60d5f649eeca4b959a2",
+    "patched": "0162d1165a4d42585063fd435e6dd7a669c40124059c0d73ff0dc6c1bc2f74f4"
+  },
+  "references": [
+    "https://github.com/PostgREST/postgrest/blob/v14.18/src/PostgREST/MainTx.hs#L101",
+    "https://github.com/nikita-volkov/hasql-transaction/blob/1.1.0.1/library/Hasql/Transaction/Private/Sessions.hs"
+  ],
+  "credentialsOrTokensIncluded": false
+}

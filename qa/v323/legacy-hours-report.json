@@ -1,0 +1,30 @@
+{
+  "version": "3.2.3",
+  "mode": "local-pure-and-simulated-DOM",
+  "syntheticDataOnly": true,
+  "productionOperations": 0,
+  "physicalTests": false,
+  "passed": [
+    "pure diagnosis preserves frozen inputs and distinguishes the 24h boundary",
+    "opening legacy storage preserves exact stored bytes and financial totals",
+    "history exposes original hours without changing filters or money",
+    "hourly rate is withheld only for oversized legacy durations",
+    "new daily forms still reject above 24h and accept exactly 24h",
+    "canceling a legacy import preserves valid or damaged storage byte for byte",
+    "confirmed legacy import and JSON/CSV exports preserve original values",
+    "saving during legacy import reading or confirmation preserves the newer snapshot",
+    "an older file read cannot replace a newer confirmed import",
+    "editing legacy hours requires an explicit valid correction and confirmation",
+    "canceling the edit form preserves legacy data and unrelated saves survive correction confirmation",
+    "running, paused and pending journey markers above 24h survive loading without truncation"
+  ],
+  "failures": [],
+  "preservedStorageSha256": "9c9e646e3f6085f5f734a5f76a007ea4c9d8efa16aa556816be6387919b705ca",
+  "exportedValues": {
+    "legacyHours": 2501,
+    "legacyGainCents": 18001,
+    "jsonSha256": "085be368a263d315a565f74946173a6600956ed74bba14f416017c28cf965542",
+    "csvSha256": "3f8652edc65f9cc06427ca22ef0432e14e1e37d89548b15364ad538835791101"
+  },
+  "finishedAt": "2026-11-27T02:43:48.615Z"
+}

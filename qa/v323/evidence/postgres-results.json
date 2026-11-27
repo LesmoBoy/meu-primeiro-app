@@ -1,0 +1,170 @@
+{
+  "recordedAt": "2026-11-27T02:44:14.803589+00:00",
+  "base": "8f4cae36367f667ca871bd2539891ad6d1a74599",
+  "branch": "codex/desenvolvimento-v3.2.3",
+  "classification": "automated-local-disposable-postgresql",
+  "postgresVersion": "17.12",
+  "postgresImageRepoDigests": [
+    "postgres@sha256:a77aa70e641402a21411b92b721c58d10f23b50ae5fdd2333efd22d166e1e5f7"
+  ],
+  "syntheticOnly": true,
+  "candidateSqlChanged": true,
+  "productionDatabaseChanged": false,
+  "productionMigrationApplied": false,
+  "productionMigrationRequiresExplicitAuthorization": true,
+  "remoteAccessByTheseTests": false,
+  "executions": [
+    {
+      "command": "bash supabase/test-postgres.sh",
+      "exitCode": 0,
+      "log": "qa/v323/evidence/personal-final.log",
+      "logRecordedAt": "2026-11-27T02:41:08.859322+00:00",
+      "passMarkers": 26,
+      "hmlPassMarkers": 4,
+      "logSha256": "b5f161a92b5c264c4db97b5c039ed83f5fef927c2f017e4dc476d48d76e3cf85"
+    },
+    {
+      "command": "bash supabase/test-enterprise.sh",
+      "exitCode": 0,
+      "log": "qa/v323/evidence/enterprise-final.log",
+      "logRecordedAt": "2026-11-27T02:41:18.745548+00:00",
+      "passMarkers": 210,
+      "hmlPassMarkers": 112,
+      "logSha256": "50075e53f7bc4c1ce35581278242fb543741d84e7491cf14bdd81e7f1beaaaec"
+    },
+    {
+      "command": "python3 qa/migrations-chain-test.py",
+      "exitCode": 0,
+      "log": "qa/v323/evidence/migrations-final.log",
+      "logRecordedAt": "2026-11-27T02:43:24.212127+00:00",
+      "passMarkers": 0,
+      "hmlPassMarkers": 0,
+      "logSha256": "fcf07e5caf8774917c4cbe6369fe908651056e480b3d964cb9d8a6ce2244aff5"
+    },
+    {
+      "command": "python3 qa/v323/postgres-hml-races.py",
+      "exitCode": 0,
+      "log": "qa/v323/evidence/races-final.log",
+      "logRecordedAt": "2026-11-27T02:41:34.584513+00:00",
+      "passMarkers": 16,
+      "hmlPassMarkers": 0,
+      "logSha256": "77267160ad4956e63bfcd098f74916b77db57e0d9967b47b620419f0042803f2"
+    },
+    {
+      "command": "python3 qa/v323/backup-budget-postgres.py",
+      "exitCode": 0,
+      "log": "qa/v323/evidence/budget-final.log",
+      "logRecordedAt": "2026-11-27T02:29:53.885769+00:00",
+      "passMarkers": 0,
+      "hmlPassMarkers": 0,
+      "logSha256": "9b48683525d86d45d9df361746f023ac74363904ed877b1fc53ffde62f67a460"
+    }
+  ],
+  "scopeFileSha256": {
+    "supabase/enterprise-test.sql": "4265a7f3d64c07c7582a1915d2f4bab78aeb3be8635a0b1c964ae76f47e606b7",
+    "supabase/test.sql": "1b2a1ac6d60ab376333386068f7fd15e2c983d57dbb2ebff8c39133e737fa119",
+    "supabase/test-postgres.sh": "49811d868b9b4e3f133f8113bae81ec8369447994a3d60ba22a7ce5b05eb2fea",
+    "supabase/test-enterprise.sh": "74e21cb7d4c822d5a1482ddec3a353f3612b25438ef83382e7780e789ef93a2a",
+    "qa/migrations-chain-test.py": "93a44a6ed69d5a17325f5e29a431a97d20630683c1ceddf7ffb80312e7fb947f",
+    "qa/v323/postgres-hml-races.py": "ea8a52103424e804727024bd0d6344c3e39d7cb9625c7ba14a273f782aff47bd",
+    "qa/v323/backup-budget-postgres.py": "91416150ad224f64f696f1da20519506aab83bcc978bafdc0d1b4d9775f53e69",
+    "docs/v3.2.3/SECURITY-DEFINER.md": "ed5b0d6e66adc2c37559a7316715b791296cfb9d42a8eb6edcb131b5ebb48416",
+    "docs/v3.2.3/CAS-HTTP.md": "1abbc2f020d796b416e989ff1cb1ff34a2a981b1d588fe830cf6a92ea1164a2c",
+    "qa/v323/POSTGRES-HML.md": "eeb148463a1f04045235f326b4941e3bf4b315b33fdd87b4e375dd7c4a801fcc",
+    "supabase/schema.sql": "79d2beeab8e4d572182ece1a717127e9fe19de00d1ae0fc348ebc0b690303965",
+    "supabase/enterprise.sql": "7f6b5bf251386fe20eb57002e270f186c4b770797fb7dd0f035d43b19532f2e2",
+    "supabase/migrations/20261127023748_rodagem_cas_http_conflict.sql": "4108674410f07a6e713fe32efa88f3f7a37141cc3b3c162ca420dfc87e9b0fa7",
+    "docs/v3.2.3/sql/rollback-cas-http-conflict.sql": "bfc6d35cd00df764299560c0329f94bb92c044b581350cc6b69f3b7aae335432",
+    "qa/v323/evidence/cas-sqlstate-manifest.json": "76cba1b6ba4382428bf78f477104e75a89e64ec881159535cd7b454d02f86e81"
+  },
+  "coordinatedRaceScenarios": 15,
+  "backupBudgetComparisons": 8,
+  "migrations": {
+    "appliedLocally": 5,
+    "alreadyRecordedInProductionReference": 4,
+    "functionBodiesMatchedCandidateSchema": 25,
+    "tablesRlsAndForce": 5,
+    "incrementalReapplied": true,
+    "pendingProductionMigration": "20261127023748_rodagem_cas_http_conflict.sql"
+  },
+  "upgradeCompatibility": {
+    "seededTableCounts": {
+      "rodagem_sync": 1,
+      "business_companies": 1,
+      "business_members": 2,
+      "business_entities": 1,
+      "business_invites": 1
+    },
+    "completeRowsSha256": "fa133889b3b9a859b7902b4fb716a8b761e04d996aa8dbefcd2085cbb0b300df",
+    "payloadRevisionsTimestampsUnchanged": true,
+    "fourFunctionBodiesChangedOnlySqlstate": true,
+    "logicalRaisesChanged": 7,
+    "ownersAndAclPreserved": true,
+    "allPgProcMetadataExceptBodyPreserved": true,
+    "rollbackRestoredBaselineDefinitionsAndRows": true,
+    "reupgradeSucceeded": true,
+    "unexpectedBodyRejected55000": true
+  },
+  "productionReferenceComparison": {
+    "referenceObservedAt": "2026-11-27T02:29:31Z",
+    "referenceSha256": "fd6d2be28d290e861997283eedfa7dc4bed441f6c8283c9153ab61706caee198",
+    "baselineDefinitionsMatched": 25,
+    "candidateDefinitionsUnchanged": 21,
+    "candidateDefinitionsChangedOnlySqlstate": 4,
+    "definitionsMatchedAfterSqlstateNormalization": 25,
+    "ownersSignaturesAnonAclAndSettingsMatched": 25,
+    "authenticatedAclMatched": 24,
+    "reviewedAclDifferences": [
+      {
+        "name": "rodagem_sync_stamp",
+        "fields": {
+          "authenticatedExecute": {
+            "local": false,
+            "reference": true
+          }
+        }
+      }
+    ],
+    "grantedTriggerOrdinaryInvocationRejected": true,
+    "tablesRlsAndForceMatched": 5,
+    "baselineMigrationsMatched": 4,
+    "candidateMigrationPendingProductionAuthorization": "20261127023748_rodagem_cas_http_conflict.sql",
+    "newRemoteCalls": false,
+    "passed": true
+  },
+  "baselinePassMarkers": {
+    "personal": 22,
+    "enterprise": 98
+  },
+  "newHmlPassMarkers": {
+    "personal": 4,
+    "enterprise": 112
+  },
+  "findings": [
+    {
+      "code": "CAS_SQLSTATE_RETRY",
+      "status": "fixed-locally-pending-production-authorization",
+      "severity": "availability-and-error-handling",
+      "changedFunctions": 4,
+      "logicalRaisesChanged": 7,
+      "financialRulesChanged": false,
+      "httpEvidence": "qa/v323/auth-http-cas-proof.json"
+    },
+    {
+      "code": "TRIGGER_EXECUTE_ACL_DIFFERENCE",
+      "status": "reviewed-no-production-change",
+      "function": "rodagem_sync_stamp",
+      "localAuthenticatedExecute": false,
+      "referenceAuthenticatedExecute": true,
+      "securityDefiner": false,
+      "ordinaryCallRejected": "0A000"
+    }
+  ],
+  "limitations": [
+    "SQL auth.uid claims are synthetic, not JWT signature verification.",
+    "No production mutations, real financial records, hosted homologation, physical devices or external providers tested by these SQL runners.",
+    "PASS markers are not unique scenario totals.",
+    "Concurrency covers the 15 recorded coordinated READ COMMITTED interleavings, not all schedules or load.",
+    "Rollback was tested only locally and reintroduces the confirmed 40001 HTTP retry/timeout behavior."
+  ]
+}

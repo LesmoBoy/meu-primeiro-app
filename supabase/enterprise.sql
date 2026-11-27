@@ -234,7 +234,7 @@ begin
   perform public.business_validate_entity(entity_kind,entity_data);
   select * into previous from public.business_entities e where e.id=entity_id for update;
   if previous.id is not null and (previous.company_id<>company_id or previous.kind<>entity_kind) then raise exception using errcode='42501',message='Registro indisponível nesta empresa.'; end if;
-  if (previous.id is null and expected_revision<>0) or (previous.id is not null and previous.revision<>expected_revision) then raise exception using errcode='40001',message='O registro mudou. Atualize a empresa antes de salvar.'; end if;
+  if (previous.id is null and expected_revision<>0) or (previous.id is not null and previous.revision<>expected_revision) then raise exception using errcode='PT409',message='O registro mudou. Atualize a empresa antes de salvar.'; end if;
   if role='finance' and (entity_kind<>'trip' or previous.id is null or (entity_data-array['id','companyId','revision','archivedAt','createdAt','costs'])<>(previous.data-array['id','companyId','revision','archivedAt','createdAt','costs'])) then raise exception using errcode='42501',message='O financeiro pode atualizar somente os custos de viagens existentes.'; end if;
   if role='driver' and (entity_kind<>'trip' or entity_data->>'driverId' is distinct from member_id::text or (previous.id is not null and previous.data->>'driverId' is distinct from member_id::text)) then raise exception using errcode='42501',message='O motorista pode alterar somente as próprias viagens.'; end if;
   if entity_kind='vehicle' and role not in ('owner','manager') then raise exception using errcode='42501',message='Seu papel não permite alterar a frota.'; end if;
@@ -262,9 +262,9 @@ begin
       archived_at=case when role='finance' then e.archived_at when entity_data->'archivedAt'='null'::jsonb then null else e.archived_at end
       where e.id=entity_id and e.revision=expected_revision returning * into saved;
   end if;
-  if saved.id is null then raise exception using errcode='40001',message='O registro mudou antes do salvamento.'; end if;
+  if saved.id is null then raise exception using errcode='PT409',message='O registro mudou antes do salvamento.'; end if;
   return public.business_entity_json(saved);
-exception when unique_violation then raise exception using errcode='40001',message='O identificador já foi salvo. Atualize a empresa.';
+exception when unique_violation then raise exception using errcode='PT409',message='O identificador já foi salvo. Atualize a empresa.';
 end; $$;
 create or replace function public.business_archive_entity(expected_user_id uuid,company_id uuid,entity_kind text,entity_id uuid,expected_revision bigint)
 returns jsonb language plpgsql volatile security definer set search_path='' as $$
@@ -278,7 +278,7 @@ begin
   select * into previous from public.business_entities e where e.id=entity_id and e.company_id=business_archive_entity.company_id and e.kind=entity_kind for update;
   if previous.id is null then raise exception using errcode='42501',message='Registro indisponível nesta empresa.'; end if;
   if role not in ('owner','manager') and not (role='driver' and entity_kind='trip' and previous.data->>'driverId'=public.business_membership_id(company_id)::text) then raise exception using errcode='42501',message='Seu papel não permite arquivar este registro.'; end if;
-  if expected_revision is null or previous.revision<>expected_revision then raise exception using errcode='40001',message='O registro mudou. Atualize antes de arquivar.'; end if;
+  if expected_revision is null or previous.revision<>expected_revision then raise exception using errcode='PT409',message='O registro mudou. Atualize antes de arquivar.'; end if;
   update public.business_entities e set archived_at=clock_timestamp(),updated_at=clock_timestamp(),revision=e.revision+1,
     data=case when entity_kind='vehicle' then jsonb_set(e.data,'{active}','false') else e.data end
     where e.id=entity_id returning * into saved;
@@ -335,7 +335,7 @@ begin
   if actor_role is null or actor_role not in ('owner','manager') then raise exception using errcode='42501',message='O acesso à empresa mudou. Atualize antes de continuar.'; end if;
   select * into previous from public.business_members m where m.id=member_id and m.company_id=business_save_member.company_id for update;
   if previous.id is null then raise exception using errcode='42501',message='Pessoa indisponível nesta empresa.'; end if;
-  if expected_revision is null or previous.revision<>expected_revision then raise exception using errcode='40001',message='A pessoa mudou. Atualize a equipe antes de salvar.'; end if;
+  if expected_revision is null or previous.revision<>expected_revision then raise exception using errcode='PT409',message='A pessoa mudou. Atualize a equipe antes de salvar.'; end if;
   if jsonb_typeof(member_data) is distinct from 'object' or not public.business_valid_text(member_data->'name',80)
       or coalesce(member_data->>'role','') not in ('owner','manager','finance','driver')
       or jsonb_typeof(member_data->'active') is distinct from 'boolean'
@@ -352,7 +352,7 @@ begin
   update public.business_members m set display_name=btrim(member_data->>'name'),role=new_role,active=enabled,
     archived_at=case when enabled then null else coalesce(m.archived_at,clock_timestamp()) end,revision=m.revision+1
     where m.id=member_id and m.revision=expected_revision returning * into saved;
-  if saved.id is null then raise exception using errcode='40001',message='A pessoa mudou antes do salvamento.'; end if;
+  if saved.id is null then raise exception using errcode='PT409',message='A pessoa mudou antes do salvamento.'; end if;
   return public.business_member_json(saved);
 end; $$;
 

@@ -1,0 +1,918 @@
+{
+  "baseCommit": "8f4cae36367f667ca871bd2539891ad6d1a74599",
+  "generatedAt": "2026-11-27T07:54:23.959274+00:00",
+  "runtimeFiles": 43,
+  "runtime": [
+    {
+      "path": "app.js",
+      "sha256": "922b4511fc7835c1ce1f5acc37bffba44f84b99cdc07072a7871ede35d1f684b",
+      "bytes": 31094,
+      "baselineSha256": "42b71387ac1a7bd16f33fc954f9ad36347e99e5309ee4bc9141c9b96426d6ce5",
+      "unchangedFrom322": false
+    },
+    {
+      "path": "assets/ajustes.svg",
+      "sha256": "8f8abc3bfb2452fc145bdb74ef9e674424b4181d51b3ee630ebe143f9042725a",
+      "bytes": 2083,
+      "baselineSha256": "8f8abc3bfb2452fc145bdb74ef9e674424b4181d51b3ee630ebe143f9042725a",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "assets/consumo.svg",
+      "sha256": "368a4b55e839988161a68bb9e0f8e586d94ccc7fd2892383d8764006ffd57900",
+      "bytes": 2428,
+      "baselineSha256": "368a4b55e839988161a68bb9e0f8e586d94ccc7fd2892383d8764006ffd57900",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "assets/fechamento.svg",
+      "sha256": "434f3c0c8cd0306dd230ec2f445df4386c7672508da10ac71a8ae141fa9df980",
+      "bytes": 2349,
+      "baselineSha256": "434f3c0c8cd0306dd230ec2f445df4386c7672508da10ac71a8ae141fa9df980",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "assets/historico.svg",
+      "sha256": "a4218a1c21975b8ed2f768a321726a0cf3bfd531fe76ed212b8667ac4d231de3",
+      "bytes": 2273,
+      "baselineSha256": "a4218a1c21975b8ed2f768a321726a0cf3bfd531fe76ed212b8667ac4d231de3",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "assets/inicio.svg",
+      "sha256": "8106f7c1311d6a9e73ce16122eb7c783f02d7a2d6df546c85ab6e3e27a79b4b5",
+      "bytes": 2612,
+      "baselineSha256": "8106f7c1311d6a9e73ce16122eb7c783f02d7a2d6df546c85ab6e3e27a79b4b5",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "assets/transportes.webp",
+      "sha256": "e42e0fa94d885e23e37dd86d8b241897d60fd4f425b03f7599bce0b9e00d073f",
+      "bytes": 219736,
+      "baselineSha256": "e42e0fa94d885e23e37dd86d8b241897d60fd4f425b03f7599bce0b9e00d073f",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "backup-budget.js",
+      "sha256": "010f7617030478dc9946e750803761753ff6db147171af24b7032d1599bfae54",
+      "bytes": 7486,
+      "baselineSha256": null,
+      "unchangedFrom322": false
+    },
+    {
+      "path": "billing-config.js",
+      "sha256": "ca7746910103a4f43a7b044faab212e60a23feaca6871bb9812d2ec59aeade8c",
+      "bytes": 142,
+      "baselineSha256": "ca7746910103a4f43a7b044faab212e60a23feaca6871bb9812d2ec59aeade8c",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "billing.js",
+      "sha256": "84ad7b98e1534dcf233bf78cf9adbb6726b3b93d85d6665e68751d7167605492",
+      "bytes": 3722,
+      "baselineSha256": "84ad7b98e1534dcf233bf78cf9adbb6726b3b93d85d6665e68751d7167605492",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "business-client.js",
+      "sha256": "b213c965d4f55cbee2147de76a2350b901641ef0216840d939715e18eac785f7",
+      "bytes": 21830,
+      "baselineSha256": "b213c965d4f55cbee2147de76a2350b901641ef0216840d939715e18eac785f7",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "business-core.js",
+      "sha256": "459c295e72090dc157a3bcd3566875a6bc2a89eb01828cc1986653158c8c8b70",
+      "bytes": 19780,
+      "baselineSha256": "459c295e72090dc157a3bcd3566875a6bc2a89eb01828cc1986653158c8c8b70",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "business-ui.js",
+      "sha256": "96522bde47de2f6ab2b0ad08cdacb4fa37b585aa372b4f42a31c8225282ffaf9",
+      "bytes": 41883,
+      "baselineSha256": "96522bde47de2f6ab2b0ad08cdacb4fa37b585aa372b4f42a31c8225282ffaf9",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "business.css",
+      "sha256": "3551149f0a700f0c31c943b557109468899b25bd1b688e28f4df1d3e4caa49f8",
+      "bytes": 7414,
+      "baselineSha256": "3551149f0a700f0c31c943b557109468899b25bd1b688e28f4df1d3e4caa49f8",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "cloud-client.js",
+      "sha256": "c4eeafd9cfb28d81f2e753318a579a05e937d5436e2e4eb64a3432af7a2e7d30",
+      "bytes": 24656,
+      "baselineSha256": "216ae967706199028fee64f44a4c70ac46c464f776330bcb32739d441d26a968",
+      "unchangedFrom322": false
+    },
+    {
+      "path": "cloud-config.js",
+      "sha256": "7878a784cd5ff0122f706713ddc7c79e71d30e7dcdba6ba2179940efb6ef1314",
+      "bytes": 521,
+      "baselineSha256": "7878a784cd5ff0122f706713ddc7c79e71d30e7dcdba6ba2179940efb6ef1314",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "cloud-sync.js",
+      "sha256": "254864867ad9fb07ff763bc7b33f3822dab086d16925bf135896647085be15f3",
+      "bytes": 27122,
+      "baselineSha256": "d131e744c72739f9a5cae6d2c3d6b405d957a98af123910e3977b8124c18229c",
+      "unchangedFrom322": false
+    },
+    {
+      "path": "cloud.css",
+      "sha256": "53e6cbc84f867615ec73cc86866fd340be0ef88d3f246033b3796676f45af479",
+      "bytes": 2918,
+      "baselineSha256": "53e6cbc84f867615ec73cc86866fd340be0ef88d3f246033b3796676f45af479",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "device-data.js",
+      "sha256": "68dded06363b64c7a4b30be6efae80eebe5f7a59cb44554d903a53599022914c",
+      "bytes": 24148,
+      "baselineSha256": null,
+      "unchangedFrom322": false
+    },
+    {
+      "path": "enhancements.css",
+      "sha256": "2bc64d8cd92f42db46b28e80a45644f5094851276d546bd1e01546edb60b1f53",
+      "bytes": 7899,
+      "baselineSha256": "2bc64d8cd92f42db46b28e80a45644f5094851276d546bd1e01546edb60b1f53",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "exclusao-dados.html",
+      "sha256": "a7942911de93ce6b8e2e2943d915cba83b62fa2c85b0f1777cc51e95293a9e41",
+      "bytes": 12560,
+      "baselineSha256": "cd94369a1d88ee8f3cc0e38a52e40288d54b08379e3cd6df612767796fed272c",
+      "unchangedFrom322": false
+    },
+    {
+      "path": "experience.js",
+      "sha256": "f3b23ec1c1032cb9b24fd46a0203fed1d08d87de322ab1aaf6d4a0f4a4a52223",
+      "bytes": 32063,
+      "baselineSha256": "4227660648074cf6c9ca8bdb329ecdea4a87c7854808dd2707a2b4a0080abade",
+      "unchangedFrom322": false
+    },
+    {
+      "path": "fleet.css",
+      "sha256": "b9dca2183b0bd45f71be67c17ea2adee91e547a2b4ce8c47fc538d651c23e743",
+      "bytes": 1563,
+      "baselineSha256": "b9dca2183b0bd45f71be67c17ea2adee91e547a2b4ce8c47fc538d651c23e743",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "google-identity.js",
+      "sha256": "3509c36284b184bc06fd792685ee5877b52c19030816fbf04c2f88f85b6979e7",
+      "bytes": 10415,
+      "baselineSha256": "3509c36284b184bc06fd792685ee5877b52c19030816fbf04c2f88f85b6979e7",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "gps-core.js",
+      "sha256": "e2651907be91a409f438e46a893345ad228bf68bf523b5d5d8b847c8a13015a6",
+      "bytes": 9182,
+      "baselineSha256": "e2651907be91a409f438e46a893345ad228bf68bf523b5d5d8b847c8a13015a6",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "icon-192.png",
+      "sha256": "995722525a7fc8ea3e11161e9e4565c6851b92fd4474df8e8df4895d2c4466fc",
+      "bytes": 7471,
+      "baselineSha256": "995722525a7fc8ea3e11161e9e4565c6851b92fd4474df8e8df4895d2c4466fc",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "icon-512.png",
+      "sha256": "0d51aae07e12e9fb6ab15dbaa649527d7441928cd6eeed3a361b93e1303ad168",
+      "bytes": 18629,
+      "baselineSha256": "0d51aae07e12e9fb6ab15dbaa649527d7441928cd6eeed3a361b93e1303ad168",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "index.html",
+      "sha256": "6a9551da88f0ee5e31b000da8dcc1471fef44ec8b85b5c3352fdb3473b35fc50",
+      "bytes": 33734,
+      "baselineSha256": "fd8eb062d4e6b0c826af45e143fbaeed267b956952ed76eea656487286f54dd5",
+      "unchangedFrom322": false
+    },
+    {
+      "path": "interactions.js",
+      "sha256": "fedb140f66615f2f13ac8a45170ac1317443477acc4f270ccaa2be79fed02710",
+      "bytes": 1213,
+      "baselineSha256": "fedb140f66615f2f13ac8a45170ac1317443477acc4f270ccaa2be79fed02710",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "manifest.webmanifest",
+      "sha256": "d87ef7ff7d581cbcd46595bf226207a52ba5c3a457bd07a3452e9c4a3e3a8faf",
+      "bytes": 511,
+      "baselineSha256": "d87ef7ff7d581cbcd46595bf226207a52ba5c3a457bd07a3452e9c4a3e3a8faf",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "privacidade.html",
+      "sha256": "397c1fa69528f72bf5b15c18f06a86bc61338750eeb57afae67bdf0debcddc72",
+      "bytes": 15445,
+      "baselineSha256": "3d5ffbcd19f370a5027e20e8d3980afbd63b54298693d7c2e171fde6e40cd3f4",
+      "unchangedFrom322": false
+    },
+    {
+      "path": "profiles-core.js",
+      "sha256": "886514169889df2bf090aa0f07cb747ea02768d68d3bd364168701d07bbc5e66",
+      "bytes": 10924,
+      "baselineSha256": "4a23cd935c2c46d3d3021b08e436b50b43cc421a1077009f799e103433b6c14a",
+      "unchangedFrom322": false
+    },
+    {
+      "path": "profiles-ui.js",
+      "sha256": "5b0285d77cbc891e0423889b832cbfc560fb92bac1b0699ec47c79119efc5e86",
+      "bytes": 9202,
+      "baselineSha256": "5b0285d77cbc891e0423889b832cbfc560fb92bac1b0699ec47c79119efc5e86",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "profiles.css",
+      "sha256": "3a94861ff1fae80271db3885c7908dabf1e2b8a61577fd0eccc4af32eb1e1bfb",
+      "bytes": 4682,
+      "baselineSha256": "3a94861ff1fae80271db3885c7908dabf1e2b8a61577fd0eccc4af32eb1e1bfb",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "session-diagnostics.js",
+      "sha256": "46bcf56880ffcab0d62844c45de91e002b75a66f89ed85321287db1bcd7d2f80",
+      "bytes": 5611,
+      "baselineSha256": null,
+      "unchangedFrom322": false
+    },
+    {
+      "path": "styles.css",
+      "sha256": "a1cf98f3464ba3e3cea1f6c669ef3a78243cfa40c1a5ae1c0559130777df02de",
+      "bytes": 36487,
+      "baselineSha256": "a1cf98f3464ba3e3cea1f6c669ef3a78243cfa40c1a5ae1c0559130777df02de",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "sw.js",
+      "sha256": "1ef4528526de0ce720156b654a4244971bdb20d8e730addeef1ca0665ecec4c1",
+      "bytes": 3250,
+      "baselineSha256": "ffae1d3b92980d1b1e31d8bb76161ad8d4dea2d61e7e742f185276d17e1b47af",
+      "unchangedFrom322": false
+    },
+    {
+      "path": "tracking.js",
+      "sha256": "a1ba75091376f52f5015f1c8cacc361dc25238a1defc249c58bd9de60af3a9fa",
+      "bytes": 24395,
+      "baselineSha256": "291122e2b996fc1020a923112c0554014f44db955410dcab103c60275a9d8815",
+      "unchangedFrom322": false
+    },
+    {
+      "path": "transport-art.css",
+      "sha256": "728b136a7fef8ee0fcf997e96f6ac560ba744cb13c093467f97a4b4e3e69c5db",
+      "bytes": 2164,
+      "baselineSha256": "728b136a7fef8ee0fcf997e96f6ac560ba744cb13c093467f97a4b4e3e69c5db",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "vehicle-catalog.js",
+      "sha256": "0a06b04524c9c60226fcefd83b54608cdb38ed7bf8e080d895bde2f255803ce6",
+      "bytes": 6802,
+      "baselineSha256": "0a06b04524c9c60226fcefd83b54608cdb38ed7bf8e080d895bde2f255803ce6",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "vendor/leaflet/leaflet.css",
+      "sha256": "a7837102824184820dfa198d1ebcd109ff6d0ff9a2672a074b9a1b4d147d04c6",
+      "bytes": 14806,
+      "baselineSha256": "a7837102824184820dfa198d1ebcd109ff6d0ff9a2672a074b9a1b4d147d04c6",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "vendor/leaflet/leaflet.js",
+      "sha256": "db49d009c841f5ca34a888c96511ae936fd9f5533e90d8b2c4d57596f4e5641a",
+      "bytes": 147552,
+      "baselineSha256": "db49d009c841f5ca34a888c96511ae936fd9f5533e90d8b2c4d57596f4e5641a",
+      "unchangedFrom322": true
+    },
+    {
+      "path": "vendor/supabase/supabase.js",
+      "sha256": "a867edbcfb029370aeec7223dd6180b560b621fbe3bc64c6584fb0369d1b7bce",
+      "bytes": 219856,
+      "baselineSha256": "a867edbcfb029370aeec7223dd6180b560b621fbe3bc64c6584fb0369d1b7bce",
+      "unchangedFrom322": true
+    }
+  ],
+  "changedFiles": [
+    {
+      "path": ".gitattributes",
+      "status": "novo",
+      "reason": "Preserva bytes de logs capturados sem tratá-los como formatação de código."
+    },
+    {
+      "path": ".github/workflows/browser-tests.yml",
+      "status": "modificado",
+      "reason": "Todas as suítes, novos fluxos Chromium, HTTP local real e artefatos sanitizados."
+    },
+    {
+      "path": ".gitignore",
+      "status": "novo",
+      "reason": "Evita dependências e capturas/logs volumosos no versionamento."
+    },
+    {
+      "path": "CHANGELOG.md",
+      "status": "novo",
+      "reason": "Comportamento final e restrições da versão."
+    },
+    {
+      "path": "README.md",
+      "status": "modificado",
+      "reason": "Entrada para documentação, execução e limites da candidata."
+    },
+    {
+      "path": "app.js",
+      "status": "modificado",
+      "reason": "Diagnóstico legado, avisos, taxa por hora e edição explícita, sem normalização histórica."
+    },
+    {
+      "path": "backup-budget.js",
+      "status": "novo",
+      "reason": "Orçamento conservador UTF-8/JSONB, sem mutação ou acesso a armazenamento."
+    },
+    {
+      "path": "cloud-client.js",
+      "status": "modificado",
+      "reason": "Sessão autoritativa, renovação, logout concorrente, PT409 e repetição automática desativada."
+    },
+    {
+      "path": "cloud-sync.js",
+      "status": "modificado",
+      "reason": "Preflight JSONB/legados antes do upload e estado ocupado acessível."
+    },
+    {
+      "path": "device-data.js",
+      "status": "novo",
+      "reason": "Exportação técnica e remoção explícita protegida dos dados do perfil ativo."
+    },
+    {
+      "path": "docs/SUPABASE.md",
+      "status": "modificado",
+      "reason": "Documentação de comportamento, evidências, riscos, homologação ou rollback."
+    },
+    {
+      "path": "docs/v3.2.3/ARQUIVOS.md",
+      "status": "novo",
+      "reason": "Documentação de comportamento, evidências, riscos, homologação ou rollback."
+    },
+    {
+      "path": "docs/v3.2.3/AUDITORIA.md",
+      "status": "novo",
+      "reason": "Documentação de comportamento, evidências, riscos, homologação ou rollback."
+    },
+    {
+      "path": "docs/v3.2.3/CAS-HTTP.md",
+      "status": "novo",
+      "reason": "Documentação de comportamento, evidências, riscos, homologação ou rollback."
+    },
+    {
+      "path": "docs/v3.2.3/DADOS-DISPOSITIVO.md",
+      "status": "novo",
+      "reason": "Documentação de comportamento, evidências, riscos, homologação ou rollback."
+    },
+    {
+      "path": "docs/v3.2.3/GPS-ANDROID.md",
+      "status": "novo",
+      "reason": "Documentação de comportamento, evidências, riscos, homologação ou rollback."
+    },
+    {
+      "path": "docs/v3.2.3/HOMOLOGACAO-AUTENTICADA.md",
+      "status": "novo",
+      "reason": "Documentação de comportamento, evidências, riscos, homologação ou rollback."
+    },
+    {
+      "path": "docs/v3.2.3/HOMOLOGACAO.md",
+      "status": "novo",
+      "reason": "Documentação de comportamento, evidências, riscos, homologação ou rollback."
+    },
+    {
+      "path": "docs/v3.2.3/LEGADOS.md",
+      "status": "novo",
+      "reason": "Documentação de comportamento, evidências, riscos, homologação ou rollback."
+    },
+    {
+      "path": "docs/v3.2.3/RESULTADOS.md",
+      "status": "novo",
+      "reason": "Documentação de comportamento, evidências, riscos, homologação ou rollback."
+    },
+    {
+      "path": "docs/v3.2.3/ROLLBACK.md",
+      "status": "novo",
+      "reason": "Documentação de comportamento, evidências, riscos, homologação ou rollback."
+    },
+    {
+      "path": "docs/v3.2.3/SECURITY-DEFINER.md",
+      "status": "novo",
+      "reason": "Documentação de comportamento, evidências, riscos, homologação ou rollback."
+    },
+    {
+      "path": "docs/v3.2.3/SESSAO.md",
+      "status": "novo",
+      "reason": "Documentação de comportamento, evidências, riscos, homologação ou rollback."
+    },
+    {
+      "path": "docs/v3.2.3/TAMANHO-BACKUP.md",
+      "status": "novo",
+      "reason": "Documentação de comportamento, evidências, riscos, homologação ou rollback."
+    },
+    {
+      "path": "docs/v3.2.3/VINCULO-BACKUP.md",
+      "status": "novo",
+      "reason": "Documentação de comportamento, evidências, riscos, homologação ou rollback."
+    },
+    {
+      "path": "docs/v3.2.3/sql/rollback-cas-http-conflict.sql",
+      "status": "novo",
+      "reason": "Rollback SQL revisável com guard; nenhum uso em produção."
+    },
+    {
+      "path": "exclusao-dados.html",
+      "status": "modificado",
+      "reason": "Distingue remoção do perfil, limpeza do navegador e exclusão da conta."
+    },
+    {
+      "path": "experience.js",
+      "status": "modificado",
+      "reason": "Aviso e preservação de cronômetros legados acima de 24 horas."
+    },
+    {
+      "path": "index.html",
+      "status": "modificado",
+      "reason": "Carga dos três módulos novos e identificação da candidata 3.2.3."
+    },
+    {
+      "path": "package-lock.json",
+      "status": "modificado",
+      "reason": "Metadados da versão; versões e integridades de dependências preservadas."
+    },
+    {
+      "path": "package.json",
+      "status": "modificado",
+      "reason": "Versão e comandos de validação reproduzíveis, sem mudança de dependências."
+    },
+    {
+      "path": "privacidade.html",
+      "status": "modificado",
+      "reason": "Explica gerenciamento e cópia técnica dos dados locais."
+    },
+    {
+      "path": "profiles-core.js",
+      "status": "modificado",
+      "reason": "Guard de geração/journal para impedir gravação antiga após remoção local."
+    },
+    {
+      "path": "qa/cloud-sync-test.mjs",
+      "status": "modificado",
+      "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
+    },
+    {
+      "path": "qa/deep-audit-ui-probes-result.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/dom-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/migrations-chain-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/migrations-chain-test.py",
+      "status": "modificado",
+      "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
+    },
+    {
+      "path": "qa/sw-test.cjs",
+      "status": "modificado",
+      "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
+    },
+    {
+      "path": "qa/v323/POSTGRES-HML.md",
+      "status": "novo",
+      "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
+    },
+    {
+      "path": "qa/v323/audit-pdf-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/auth-http-cas-proof.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/auth-http-hml.cjs",
+      "status": "novo",
+      "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
+    },
+    {
+      "path": "qa/v323/auth-http-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/backup-budget-postgres-result.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/backup-budget-postgres.py",
+      "status": "novo",
+      "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
+    },
+    {
+      "path": "qa/v323/backup-budget-test.cjs",
+      "status": "novo",
+      "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
+    },
+    {
+      "path": "qa/v323/backup-budget-unit-result.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/browser-regressions.cjs",
+      "status": "novo",
+      "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
+    },
+    {
+      "path": "qa/v323/browser-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/build-audit-pdf.py",
+      "status": "novo",
+      "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
+    },
+    {
+      "path": "qa/v323/ci-final-summary.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/ci-initial-summary.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/device-data-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/device-data-test.mjs",
+      "status": "novo",
+      "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
+    },
+    {
+      "path": "qa/v323/evidence/budget-final.log",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/cas-sqlstate-manifest.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/catalog-comparison.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-final-auth-http-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-final-business-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-final-fleet-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-final-google-identity-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-final-gps-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-final-migrations-chain-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-final-postgres-enterprise-ci.log",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-final-postgres-personal-ci.log",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-final-profiles-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-final-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-initial-business-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-initial-fleet-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-initial-google-identity-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-initial-gps-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-initial-profiles-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/ci-initial-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/enterprise-baseline.log",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/enterprise-final.log",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/enterprise-hml.log",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/enterprise-races.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/enterprise-races.log",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/migrations-final.log",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/personal-final.log",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/postgres-baseline.log",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/postgres-hml.log",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/postgres-results.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/evidence/races-final.log",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/gps-lifecycle-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/gps-lifecycle-test.mjs",
+      "status": "novo",
+      "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
+    },
+    {
+      "path": "qa/v323/gps-review-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/gps-review-test.mjs",
+      "status": "novo",
+      "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
+    },
+    {
+      "path": "qa/v323/legacy-baseline-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/legacy-hours-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/legacy-hours-test.mjs",
+      "status": "novo",
+      "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
+    },
+    {
+      "path": "qa/v323/local-suite-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/migration-review.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/npm-audit.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/postgres-hml-races.py",
+      "status": "novo",
+      "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
+    },
+    {
+      "path": "qa/v323/production-catalog.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/production-readonly-runtime.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/production-readonly-runtime.py",
+      "status": "novo",
+      "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
+    },
+    {
+      "path": "qa/v323/production-readonly-session.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/release-inventory.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/release-inventory.py",
+      "status": "novo",
+      "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
+    },
+    {
+      "path": "qa/v323/rollback-dry-run-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/rollback-dry-run.py",
+      "status": "novo",
+      "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
+    },
+    {
+      "path": "qa/v323/run-local-tests.mjs",
+      "status": "novo",
+      "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
+    },
+    {
+      "path": "qa/v323/safeauth-local-result.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/secret-pattern-review.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/session-client-test.cjs",
+      "status": "novo",
+      "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
+    },
+    {
+      "path": "qa/v323/session-diagnostics-test.mjs",
+      "status": "novo",
+      "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
+    },
+    {
+      "path": "qa/v323/sync-integration-report.json",
+      "status": "novo",
+      "reason": "Evidência sanitizada, manifesto ou resultado de testes sintéticos/classificação explícita."
+    },
+    {
+      "path": "qa/v323/sync-integration-test.mjs",
+      "status": "novo",
+      "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
+    },
+    {
+      "path": "session-diagnostics.js",
+      "status": "novo",
+      "reason": "Diagnóstico manual seguro e acessível, sem leitura de lançamentos."
+    },
+    {
+      "path": "supabase/enterprise-test.sql",
+      "status": "modificado",
+      "reason": "Arquivo de suporte à candidata; revisar no diff da branch."
+    },
+    {
+      "path": "supabase/enterprise.sql",
+      "status": "modificado",
+      "reason": "Somente seis SQLSTATEs de conflito em três RPCs; preserva autorização/locks/CAS."
+    },
+    {
+      "path": "supabase/migrations/20261127023748_rodagem_cas_http_conflict.sql",
+      "status": "novo",
+      "reason": "Quinta migração incremental mínima; aplicação remota pendente de autorização."
+    },
+    {
+      "path": "supabase/schema.sql",
+      "status": "modificado",
+      "reason": "Somente SQLSTATE de conflito CAS pessoal: PT409."
+    },
+    {
+      "path": "supabase/test-enterprise.sh",
+      "status": "modificado",
+      "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
+    },
+    {
+      "path": "supabase/test-postgres.sh",
+      "status": "modificado",
+      "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
+    },
+    {
+      "path": "supabase/test.sql",
+      "status": "modificado",
+      "reason": "Regressão automatizada, isolamento/concorrência ou runner de validação reproduzível."
+    },
+    {
+      "path": "sw.js",
+      "status": "modificado",
+      "reason": "Cache 3.2.3 com módulos completos e escopo existente preservado."
+    },
+    {
+      "path": "tracking.js",
+      "status": "modificado",
+      "reason": "Retorno de suspensão, callbacks antigos, revogação de permissão e falhas síncronas."
+    }
+  ],
+  "dependencyTreeUnchanged": true,
+  "noProductionPublication": true,
+  "note": "Runtime hashes exclude this inventory/document, avoiding recursive hashes. Full source is reviewed in the development branch."
+}

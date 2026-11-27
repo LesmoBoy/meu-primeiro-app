@@ -1,0 +1,136 @@
+NOTICE:  trigger "rodagem_sync_stamp" for relation "public.rodagem_sync" does not exist, skipping
+NOTICE:  policy "rodagem_sync_select" for relation "public.rodagem_sync" does not exist, skipping
+NOTICE:  policy "rodagem_sync_insert" for relation "public.rodagem_sync" does not exist, skipping
+NOTICE:  policy "rodagem_sync_update" for relation "public.rodagem_sync" does not exist, skipping
+NOTICE:  policy "rodagem_sync_delete" for relation "public.rodagem_sync" does not exist, skipping
+NOTICE:  function public.rodagem_load_snapshot() does not exist, skipping
+NOTICE:  function public.rodagem_save_snapshot(pg_catalog.int8,jsonb) does not exist, skipping
+NOTICE:  policy "business_company_read" for relation "public.business_companies" does not exist, skipping
+NOTICE:  policy "business_member_read" for relation "public.business_members" does not exist, skipping
+NOTICE:  policy "business_entity_read" for relation "public.business_entities" does not exist, skipping
+NOTICE:  trigger "business_archive_deleted_user" for relation "auth.users" does not exist, skipping
+NOTICE:  relation "business_companies" already exists, skipping
+NOTICE:  relation "business_members" already exists, skipping
+NOTICE:  relation "business_members_user" already exists, skipping
+NOTICE:  relation "business_entities" already exists, skipping
+NOTICE:  relation "business_entities_company" already exists, skipping
+NOTICE:  relation "business_invites" already exists, skipping
+NOTICE:  relation "business_invites_company" already exists, skipping
+NOTICE:  relation "business_companies_created_by" already exists, skipping
+NOTICE:  relation "business_invites_invited_by" already exists, skipping
+NOTICE:  PASS anonymous RPC access is denied
+NOTICE:  PASS anonymous table access is denied
+NOTICE:  PASS new company creates its authenticated owner
+NOTICE:  PASS expected UID mismatch is rejected before reading
+NOTICE:  PASS expected UID mismatch is rejected before mutation
+NOTICE:  PASS UID rejection does not create another company
+NOTICE:  PASS company lists and direct SELECT are isolated by membership
+NOTICE:  PASS another company cannot be loaded by RPC
+NOTICE:  PASS another company vehicles are not visible through direct SELECT
+NOTICE:  PASS clients cannot directly create or escalate membership
+NOTICE:  PASS invitation returns a one-time random token
+NOTICE:  PASS invitation hashes are not readable by clients
+NOTICE:  PASS an invitation cannot be accepted by the wrong email
+NOTICE:  PASS unverified email cannot accept an invitation
+NOTICE:  PASS expired invitations are refused
+NOTICE:  PASS revoked invitations are refused
+NOTICE:  PASS verified manager invitation grants only its prescribed role
+NOTICE:  PASS used invitations cannot be replayed
+NOTICE:  PASS a manager cannot invite another manager
+NOTICE:  PASS an owner role cannot be obtained through an invitation
+NOTICE:  PASS a manager cannot revoke an owner-authorized manager invitation
+NOTICE:  PASS a trip cannot reference a vehicle from another company
+NOTICE:  PASS a trip cannot reference a person from another company
+NOTICE:  PASS an unaccepted invitation cannot be assigned a trip
+NOTICE:  PASS malformed vehicle is refused
+NOTICE:  PASS malformed vehicle is refused
+NOTICE:  PASS malformed vehicle is refused
+NOTICE:  PASS malformed vehicle is refused
+NOTICE:  PASS malformed vehicle is refused
+NOTICE:  PASS malformed vehicle is refused
+NOTICE:  PASS malformed vehicle is refused
+NOTICE:  PASS malformed vehicle is refused
+NOTICE:  PASS malformed vehicle is refused
+NOTICE:  PASS malformed financial trip is refused
+NOTICE:  PASS malformed financial trip is refused
+NOTICE:  PASS malformed financial trip is refused
+NOTICE:  PASS malformed financial trip is refused
+NOTICE:  PASS malformed financial trip is refused
+NOTICE:  PASS malformed financial trip is refused
+NOTICE:  PASS malformed financial trip is refused
+NOTICE:  PASS malformed financial trip is refused
+NOTICE:  PASS malformed financial trip is refused
+NOTICE:  PASS all malformed vehicle and financial snapshots preserve existing rows
+NOTICE:  PASS finance may update existing trip costs with exact cents
+NOTICE:  PASS finance cannot change trip revenue
+NOTICE:  PASS finance cannot change fleet
+NOTICE:  PASS finance cannot grant membership
+NOTICE:  PASS driver direct SELECT sees only its assigned trips
+NOTICE:  PASS driver workspace contains only its trips and personal membership
+NOTICE:  PASS driver cannot take over another driver trip
+NOTICE:  PASS a stale entity revision cannot overwrite the latest trip
+NOTICE:  PASS direct entity mutation is denied even for assigned drivers
+NOTICE:  PASS driver sees only reminders assigned to its membership
+NOTICE:  PASS the last owner cannot be demoted
+NOTICE:  PASS the last owner cannot be deactivated
+NOTICE:  PASS a manager cannot promote itself to owner
+NOTICE:  PASS a manager cannot alter the owner
+NOTICE:  PASS archiving a vehicle preserves the vehicle and its financial history
+NOTICE:  PASS new trips cannot choose an archived vehicle
+NOTICE:  PASS archived references remain in workspaces for historical reports
+NOTICE:  PASS deactivated membership preserves historical identity
+NOTICE:  PASS inactive membership immediately loses company access
+NOTICE:  PASS inactive member cannot keep loading the company
+NOTICE:  PASS member deactivation never removes its recorded trips
+NOTICE:  PASS expected UID mismatch is rejected before an entity write
+NOTICE:  PASS rejected identity change leaves the entity untouched
+NOTICE:  PASS finance may correct historical costs without reactivating an archived trip or changing its inactive driver
+NOTICE:  PASS finance may correct a historical trip linked to an archived vehicle
+NOTICE:  PASS account deletion archives membership and preserves historical trip references
+NOTICE:  PASS account deletion cannot leave a company without an active owner
+NOTICE:  PASS rejected owner account deletion is rolled back
+NOTICE:  policy "business_billing_settings_read" for relation "public.business_billing_settings" does not exist, skipping
+NOTICE:  policy "business_entitlement_read" for relation "public.business_entitlements" does not exist, skipping
+NOTICE:  function public.business_billing_apply(uuid,uuid,text,text,text,text,text,pg_catalog.int4,timestamptz) does not exist, skipping
+NOTICE:  relation "business_billing_settings" already exists, skipping
+NOTICE:  relation "business_entitlements" already exists, skipping
+NOTICE:  relation "business_billing_accounts" already exists, skipping
+NOTICE:  relation "business_billing_events" already exists, skipping
+NOTICE:  relation "business_billing_leases" already exists, skipping
+NOTICE:  function public.business_billing_apply(uuid,uuid,text,text,text,text,text,pg_catalog.int4,timestamptz) does not exist, skipping
+NOTICE:  PASS billing starts disabled without inventing an active subscription
+NOTICE:  PASS anonymous clients cannot read server billing settings
+NOTICE:  PASS a client cannot enable billing or remove enforcement
+NOTICE:  PASS an owner cannot forge its paid entitlement
+NOTICE:  PASS private payment customer mapping is not readable by clients
+NOTICE:  PASS clients cannot claim or acknowledge provider events
+NOTICE:  PASS enforcement refuses activation without a confirmed subscription
+NOTICE:  PASS the payment service may verify the company in the database
+NOTICE:  PASS the payment service may verify the real owner membership
+NOTICE:  PASS a provider event cannot grant another customer an entitlement
+NOTICE:  PASS only the service confirmation records the purchased vehicle quantity
+NOTICE:  PASS a provider event is acknowledged once
+NOTICE:  PASS a delayed old subscription event preserves a newer pending checkout
+NOTICE:  PASS a stale checkout ID cannot clear a newer mapping
+NOTICE:  PASS a matching confirmed checkout clears its mapping atomically with the entitlement
+NOTICE:  PASS a confirmed per-vehicle plan enforces its purchased quota
+NOTICE:  PASS a per-company plan accepts multiple active vehicles
+NOTICE:  PASS simultaneous provider events serialize per company
+NOTICE:  PASS a released confirmation lease cannot mutate entitlements
+NOTICE:  PASS billable quantity counts active unarchived vehicles on the server
+NOTICE:  PASS members cannot read another company paid state
+NOTICE:  PASS members may read their own company paid state
+NOTICE:  PASS an expired subscription cannot keep activating vehicles
+NOTICE:  PASS turning enforcement off does not mark any subscription as paid
+NOTICE:  relation "business_companies" already exists, skipping
+NOTICE:  relation "business_members" already exists, skipping
+NOTICE:  relation "business_members_user" already exists, skipping
+NOTICE:  relation "business_entities" already exists, skipping
+NOTICE:  relation "business_entities_company" already exists, skipping
+NOTICE:  relation "business_invites" already exists, skipping
+NOTICE:  relation "business_invites_company" already exists, skipping
+NOTICE:  relation "business_companies_created_by" already exists, skipping
+NOTICE:  relation "business_invites_invited_by" already exists, skipping
+PASS independent PostgreSQL sessions cannot both save the same entity revision
+PASS a revoked role cannot write after waiting on an owner transaction
+PASS PostgreSQL 17 enterprise schema, company isolation, roles, invitations and CAS

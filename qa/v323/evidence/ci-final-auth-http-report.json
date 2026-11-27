@@ -1,0 +1,608 @@
+{
+  "suite": "v323-local-auth-http",
+  "timestamp": "2026-11-27T02:52:41.532Z",
+  "classification": "automated-local-real-auth-rest-http-with-synthetic-identities",
+  "passed": 16,
+  "failed": 0,
+  "results": [
+    {
+      "test": "local-only-stack-and-providers-disabled",
+      "passed": true
+    },
+    {
+      "test": "auth-user-rejects-missing-forged-and-expired-bearers",
+      "passed": true
+    },
+    {
+      "test": "real-client-verifySession-uses-real-sdk-and-authoritative-http-user",
+      "passed": true
+    },
+    {
+      "test": "cached-account-forgery-fails-closed",
+      "passed": true
+    },
+    {
+      "test": "backup-rpc-cas-and-two-account-rls-over-http",
+      "passed": true
+    },
+    {
+      "test": "rls-denies-cross-account-insert-update-delete-and-rpc-uid",
+      "passed": true
+    },
+    {
+      "test": "anonymous-expired-and-forged-rest-requests-cannot-read-backup",
+      "passed": true
+    },
+    {
+      "test": "two-concurrent-http-saves-have-exactly-one-cas-winner",
+      "passed": true
+    },
+    {
+      "test": "business-http-company-isolation-and-four-cas-functions",
+      "passed": true
+    },
+    {
+      "test": "expired-access-token-is-renewed-by-real-sdk-refresh-http",
+      "passed": true
+    },
+    {
+      "test": "explicit-client-refresh-preserves-uid-and-hides-tokens",
+      "passed": true
+    },
+    {
+      "test": "revoked-session-and-expired-refresh-cannot-authorize-backup",
+      "passed": true
+    },
+    {
+      "test": "logout-revokes-local-session-and-preserves-second-device",
+      "passed": true
+    },
+    {
+      "test": "account-switch-rejects-stale-uid-and-reads-only-new-account",
+      "passed": true
+    },
+    {
+      "test": "profile-switch-while-http-user-waits-invalidates-verification",
+      "passed": true
+    },
+    {
+      "test": "real-sync-profile-binding-upload-and-restore-over-authenticated-http",
+      "passed": true
+    }
+  ],
+  "syntheticGoogleFixtures": true,
+  "googleOidcTested": false,
+  "physicalDevice": false,
+  "productionMutation": false,
+  "realFinancialData": false,
+  "temporaryCredentialsOnly": true,
+  "externalProvidersDisabled": true,
+  "cloudStagingUsed": false,
+  "images": {
+    "postgres": "postgres:17-alpine@sha256:a77aa70e641402a21411b92b721c58d10f23b50ae5fdd2333efd22d166e1e5f7",
+    "auth": "supabase/gotrue:v2.199.0@sha256:85c8323c05854ba911a8b2968c513e7e1b4cf7ebf75a30124ae923e7127cf01f",
+    "rest": "postgrest/postgrest:v14.18@sha256:c7cd7e265a85b05248abf53f4473fcec7e327c282d0bd0cf60f1551996d09fcf",
+    "transport": "python:3.13-alpine@sha256:9ef1a599f863231c3d91e941389bfdc4a2d6070557243d54df1a4e57015b960e"
+  },
+  "sourceSha256": {
+    "cloud-client.js": "c4eeafd9cfb28d81f2e753318a579a05e937d5436e2e4eb64a3432af7a2e7d30",
+    "vendor/supabase/supabase.js": "a867edbcfb029370aeec7223dd6180b560b621fbe3bc64c6584fb0369d1b7bce",
+    "supabase/schema.sql": "79d2beeab8e4d572182ece1a717127e9fe19de00d1ae0fc348ebc0b690303965",
+    "supabase/enterprise.sql": "7f6b5bf251386fe20eb57002e270f186c4b770797fb7dd0f035d43b19532f2e2",
+    "cloud-sync.js": "254864867ad9fb07ff763bc7b33f3822dab086d16925bf135896647085be15f3",
+    "app.js": "922b4511fc7835c1ce1f5acc37bffba44f84b99cdc07072a7871ede35d1f684b",
+    "profiles-core.js": "886514169889df2bf090aa0f07cb747ea02768d68d3bd364168701d07bbc5e66",
+    "backup-budget.js": "010f7617030478dc9946e750803761753ff6db147171af24b7032d1599bfae54",
+    "gps-core.js": "e2651907be91a409f438e46a893345ad228bf68bf523b5d5d8b847c8a13015a6"
+  },
+  "http": [
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/rodagem_load_snapshot",
+      "method": "POST",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/rodagem_load_snapshot",
+      "method": "POST",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/rodagem_save_snapshot",
+      "method": "POST",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/rodagem_save_snapshot",
+      "method": "POST",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rodagem_sync",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rodagem_sync",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/rodagem_save_snapshot",
+      "method": "POST",
+      "status": 409,
+      "code": "PT409"
+    },
+    {
+      "route": "/rodagem_sync",
+      "method": "POST",
+      "status": 403,
+      "code": "42501"
+    },
+    {
+      "route": "/rodagem_sync",
+      "method": "PATCH",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rodagem_sync",
+      "method": "DELETE",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/rodagem_save_snapshot",
+      "method": "POST",
+      "status": 403,
+      "code": "28000"
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/rodagem_load_snapshot",
+      "method": "POST",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/rodagem_load_snapshot",
+      "method": "POST",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/rodagem_save_snapshot",
+      "method": "POST",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/rodagem_save_snapshot",
+      "method": "POST",
+      "status": 409,
+      "code": "PT409"
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/rodagem_load_snapshot",
+      "method": "POST",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/business_create_company",
+      "method": "POST",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/business_create_company",
+      "method": "POST",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/business_save_entity",
+      "method": "POST",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/business_save_entity",
+      "method": "POST",
+      "status": 409,
+      "code": "PT409"
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/business_archive_entity",
+      "method": "POST",
+      "status": 409,
+      "code": "PT409"
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/business_save_member",
+      "method": "POST",
+      "status": 409,
+      "code": "PT409"
+    },
+    {
+      "route": "/business_entities",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/business_load_workspace",
+      "method": "POST",
+      "status": 403,
+      "code": "42501"
+    },
+    {
+      "route": "/rpc/business_save_entity",
+      "method": "POST",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/business_save_entity",
+      "method": "POST",
+      "status": 409,
+      "code": "PT409"
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/business_load_workspace",
+      "method": "POST",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/token",
+      "method": "POST",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/token",
+      "method": "POST",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/rodagem_load_snapshot",
+      "method": "POST",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 403,
+      "code": "session_not_found"
+    },
+    {
+      "route": "/token",
+      "method": "POST",
+      "status": 400,
+      "code": "refresh_token_not_found"
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/logout",
+      "method": "POST",
+      "status": 204,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/rodagem_load_snapshot",
+      "method": "POST",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/rodagem_load_snapshot",
+      "method": "POST",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/rodagem_load_snapshot",
+      "method": "POST",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/rodagem_save_snapshot",
+      "method": "POST",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/rodagem_load_snapshot",
+      "method": "POST",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/rpc/rodagem_load_snapshot",
+      "method": "POST",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    },
+    {
+      "route": "/user",
+      "method": "GET",
+      "status": 200,
+      "code": null
+    }
+  ],
+  "residuals": [
+    {
+      "code": "STATELESS_ACCESS_JWT_AFTER_LOGOUT",
+      "authUserStatus": 403,
+      "restStatus": 200,
+      "accessJwtMayRemainUsableUntilExpiry": true,
+      "sessionRefreshRevoked": true,
+      "note": "GoTrue validates session_id; PostgREST validates signature/expiry and RLS, without consulting auth.sessions on each call."
+    }
+  ],
+  "limits": [
+    "Synthetic Google identities do not prove Google OIDC login, nonce or real provider consent.",
+    "UI integration uses a simulated DOM/confirmation/reload with real modules and real SDK/Auth/PostgREST HTTP.",
+    "No hosted staging or production mutation.",
+    "PostgREST gateway/API-key enforcement, TLS, mail, OAuth providers and physical Android are not part of this isolated stack."
+  ]
+}

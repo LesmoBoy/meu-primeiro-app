@@ -1,0 +1,183 @@
+{
+  "classification": "independent-static-review-with-cross-checked-local-runtime-evidence",
+  "reviewedAt": "2026-11-27T02:43:51.768279+00:00",
+  "baselineCommit": "8f4cae36367f667ca871bd2539891ad6d1a74599",
+  "productionWrites": false,
+  "productionFinancialRowsRead": false,
+  "codeEditedByReviewer": false,
+  "runtimeTestsExecutedByReviewer": false,
+  "staticReviewPassed": true,
+  "functionsReviewed": [
+    {
+      "name": "rodagem_save_snapshot",
+      "signature": "public.rodagem_save_snapshot(uuid,bigint,jsonb)",
+      "logicalRaisesChanged": 1,
+      "baselineBodyMd5": "a9597c8220b201d8228c0c8cb6e65ba7",
+      "candidateBodyMd5": "0bfd97a3c85f7d4e43518fbeead712bc",
+      "onlySqlstateLiteralChanged": true,
+      "uidAuthorizationLocksValidatorsAndFinancialRulesByteExact": true
+    },
+    {
+      "name": "business_save_entity",
+      "signature": "public.business_save_entity(uuid,uuid,text,uuid,bigint,jsonb)",
+      "logicalRaisesChanged": 3,
+      "baselineBodyMd5": "ccbc7568a265637f4347fb30ef69068e",
+      "candidateBodyMd5": "5bbbc0e096cdd8172aca1bfdbaef6871",
+      "onlySqlstateLiteralChanged": true,
+      "uidAuthorizationLocksValidatorsAndFinancialRulesByteExact": true
+    },
+    {
+      "name": "business_archive_entity",
+      "signature": "public.business_archive_entity(uuid,uuid,text,uuid,bigint)",
+      "logicalRaisesChanged": 1,
+      "baselineBodyMd5": "9e9de1d6a4b948bf98157b37cf936bad",
+      "candidateBodyMd5": "037e52b0f9a96bbf02b82cb789c41b58",
+      "onlySqlstateLiteralChanged": true,
+      "uidAuthorizationLocksValidatorsAndFinancialRulesByteExact": true
+    },
+    {
+      "name": "business_save_member",
+      "signature": "public.business_save_member(uuid,uuid,uuid,bigint,jsonb)",
+      "logicalRaisesChanged": 2,
+      "baselineBodyMd5": "24930095c4370733a78c8ad17bf7988d",
+      "candidateBodyMd5": "ac84103ef0ed0e2fc043940a01e01e0e",
+      "onlySqlstateLiteralChanged": true,
+      "uidAuthorizationLocksValidatorsAndFinancialRulesByteExact": true
+    }
+  ],
+  "functionCountPreserved": 25,
+  "securityDefinerCountPreserved": 13,
+  "exposedSecurityDefinerCountUnchanged": 11,
+  "unchangedFunctions": 21,
+  "logicalRaisesChanged": 7,
+  "baselineMigrationsUnchanged": [
+    {
+      "file": "supabase/migrations/20261124105205_rodagem_personal_sync.sql",
+      "sha256": "93855bd66083732bfe391fd6db8462edead8d4a530a2e3509d5180ee879a1af3",
+      "byteExactToAuditBaseline": true
+    },
+    {
+      "file": "supabase/migrations/20261124105206_rodagem_enterprise.sql",
+      "sha256": "cd180e5ef18f9c64a7eba3a3b0acf1d7128d34302ce890872a0d5dcbd3865526",
+      "byteExactToAuditBaseline": true
+    },
+    {
+      "file": "supabase/migrations/20261124105447_rodagem_foreign_key_indexes.sql",
+      "sha256": "60d2453e517bbb1ae7b5c9d337c431c39d0f2294b1923b9d91bbfb0a7a913e5b",
+      "byteExactToAuditBaseline": true
+    },
+    {
+      "file": "supabase/migrations/20261126211001_rodagem_track_snapshot_validation.sql",
+      "sha256": "7bb86e286be4788c49574f89aeda562554755b1e97bb1c7cc98fde007bdf3adb",
+      "byteExactToAuditBaseline": true
+    }
+  ],
+  "sqlScripts": [
+    {
+      "file": "supabase/migrations/20261127023748_rodagem_cas_http_conflict.sql",
+      "fourDefinitionsMatchReferenceExactly": true,
+      "transactionBoundariesAndTimeouts": true,
+      "topLevelDataDml": false,
+      "topLevelGrantRevokeAlterDropOrRlsChanges": false,
+      "guardChecks": [
+        "existing function resolution",
+        "known baseline or candidate body MD5",
+        "definer/invoker mode",
+        "volatile mode",
+        "empty search_path"
+      ]
+    },
+    {
+      "file": "docs/v3.2.3/sql/rollback-cas-http-conflict.sql",
+      "fourDefinitionsMatchReferenceExactly": true,
+      "transactionBoundariesAndTimeouts": true,
+      "topLevelDataDml": false,
+      "topLevelGrantRevokeAlterDropOrRlsChanges": false,
+      "guardChecks": [
+        "existing function resolution",
+        "known baseline or candidate body MD5",
+        "definer/invoker mode",
+        "volatile mode",
+        "empty search_path"
+      ]
+    }
+  ],
+  "clientReview": {
+    "supabaseDbAutomaticRetryDisabled": true,
+    "legacyAndNewConflictCodesSupported": true,
+    "authorizationAndFinancialRulesChangedBySqlstatePatch": false
+  },
+  "referencedRuntimeEvidence": {
+    "classification": "executed by owning test agents in disposable local stack; reviewer verified artifacts and current source hashes",
+    "migrationUpgradeRollbackReupgradeAndDriftGuard": {
+      "seededTableCounts": {
+        "rodagem_sync": 1,
+        "business_companies": 1,
+        "business_members": 2,
+        "business_entities": 1,
+        "business_invites": 1
+      },
+      "completeRowsSha256": "fa133889b3b9a859b7902b4fb716a8b761e04d996aa8dbefcd2085cbb0b300df",
+      "payloadRevisionsTimestampsUnchanged": true,
+      "fourFunctionBodiesChangedOnlySqlstate": true,
+      "logicalRaisesChanged": 7,
+      "ownersAndAclPreserved": true,
+      "allPgProcMetadataExceptBodyPreserved": true,
+      "rollbackRestoredBaselineDefinitionsAndRows": true,
+      "reupgradeSucceeded": true,
+      "unexpectedBodyRejected55000": true
+    },
+    "migrationReapplied": true,
+    "rlsAndForceTables": 5,
+    "authHttpPassed": 16,
+    "authHttpFailed": 0,
+    "googleOidcTested": false,
+    "realHttpConflictCode": {
+      "sqlstate": "PT409",
+      "httpStatus": 409,
+      "responseCode": "PT409",
+      "durationMs": 157
+    },
+    "payloadAndRevisionPreserved": true,
+    "coordinatedPostgresRacesPassed": 15,
+    "allCoordinatedLocksObserved": true,
+    "files": [
+      {
+        "path": "qa/migrations-chain-report.json",
+        "sha256": "0ce90af622a294b410ec508e9ffd18db718b74d0312791eac8cd1e17860d7844"
+      },
+      {
+        "path": "qa/v323/auth-http-report.json",
+        "sha256": "f8de497305b034aafb6d0f4fd52f139beeae7818030a68a76cc1261cad6cf511"
+      },
+      {
+        "path": "qa/v323/auth-http-cas-proof.json",
+        "sha256": "a244ba12e3c010505e29f9ca9362bd6388d635ce791f78d1c3e32289e08239be"
+      },
+      {
+        "path": "qa/v323/evidence/enterprise-races.json",
+        "sha256": "b59b321b170d93921e68c21690e1825d8e0f58d8b77ff898db94472851742898"
+      }
+    ],
+    "allPgProcMetadataExceptBodyPreserved": true,
+    "anonymousSecurityDefinerExecuteCount": 0
+  },
+  "reviewedFileSha256": {
+    "supabase/schema.sql": "79d2beeab8e4d572182ece1a717127e9fe19de00d1ae0fc348ebc0b690303965",
+    "supabase/enterprise.sql": "7f6b5bf251386fe20eb57002e270f186c4b770797fb7dd0f035d43b19532f2e2",
+    "supabase/migrations/20261127023748_rodagem_cas_http_conflict.sql": "4108674410f07a6e713fe32efa88f3f7a37141cc3b3c162ca420dfc87e9b0fa7",
+    "docs/v3.2.3/sql/rollback-cas-http-conflict.sql": "bfc6d35cd00df764299560c0329f94bb92c044b581350cc6b69f3b7aae335432",
+    "cloud-client.js": "c4eeafd9cfb28d81f2e753318a579a05e937d5436e2e4eb64a3432af7a2e7d30",
+    "qa/migrations-chain-test.py": "93a44a6ed69d5a17325f5e29a431a97d20630683c1ceddf7ffb80312e7fb947f",
+    "qa/v323/auth-http-hml.cjs": "2cd75c4d7c8994223340288c0a9b31d222cfcc44db1bcd954cec4e923f8ac88c"
+  },
+  "residualLimitations": [
+    "Production migration and production rollback are not executed or approved by this review.",
+    "SQL guard covers known body hashes and listed security attributes; it is not a universal check of every PostgreSQL function metadata field. CREATE OR REPLACE preserves existing owners and ACLs; local tests separately verify these.",
+    "Deployment requires a controlled window without concurrent privileged DDL and fresh production catalog review.",
+    "Rollback restores legacy logical 40001 exceptions and reintroduces the confirmed server retry/timeout behavior; prefer retaining the forward SQL fix when reverting frontend.",
+    "Existing cached v3.2.2 clients may still retry HTTP409 until refreshed; server CAS prevents stale overwrites.",
+    "Genuine database serialization failures are not rewritten; only the seven manually raised logical conflict literals change.",
+    "This evidence is not real Google OIDC, physical Android GPS or commercial production certification."
+  ]
+}

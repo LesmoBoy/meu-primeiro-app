@@ -1,0 +1,286 @@
+{
+  "classification": "automated-local-node-and-simulated-DOM",
+  "timestamp": "2026-11-27T02:52:34.406Z",
+  "productionMutated": false,
+  "realFinancialData": false,
+  "physicalGPS": false,
+  "suiteCount": 30,
+  "passed": 30,
+  "failed": 0,
+  "note": "passLines are log markers, not a count of unique scenarios; math fuzz and grouped assertions have different granularity.",
+  "results": [
+    {
+      "suite": "qa/gps-core-test.cjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 219,
+      "passLines": 14,
+      "evidence": "qa/v323/evidence/local-01.log"
+    },
+    {
+      "suite": "qa/profiles-core-test.cjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 40,
+      "passLines": 13,
+      "evidence": "qa/v323/evidence/local-02.log"
+    },
+    {
+      "suite": "qa/vehicle-catalog-test.cjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 25,
+      "passLines": 9,
+      "evidence": "qa/v323/evidence/local-03.log"
+    },
+    {
+      "suite": "qa/vehicle-integration.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 255,
+      "passLines": 7,
+      "evidence": "qa/v323/evidence/local-04.log"
+    },
+    {
+      "suite": "qa/cloud-client-test.cjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 99,
+      "passLines": 23,
+      "evidence": "qa/v323/evidence/local-05.log"
+    },
+    {
+      "suite": "qa/cloud-sync-test.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 391,
+      "passLines": 19,
+      "evidence": "qa/v323/evidence/local-06.log"
+    },
+    {
+      "suite": "qa/google-identity-dom.cjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 119,
+      "passLines": 10,
+      "evidence": "qa/v323/evidence/local-07.log"
+    },
+    {
+      "suite": "qa/dom-smoke.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 372,
+      "passLines": 15,
+      "evidence": "qa/v323/evidence/local-08.log"
+    },
+    {
+      "suite": "qa/connection-test.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 137,
+      "passLines": 7,
+      "evidence": "qa/v323/evidence/local-09.log"
+    },
+    {
+      "suite": "qa/sw-test.cjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 60,
+      "passLines": 11,
+      "evidence": "qa/v323/evidence/local-10.log"
+    },
+    {
+      "suite": "qa/business-core-test.cjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 66,
+      "passLines": 16,
+      "evidence": "qa/v323/evidence/local-11.log"
+    },
+    {
+      "suite": "qa/business-client-test.cjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 55,
+      "passLines": 16,
+      "evidence": "qa/v323/evidence/local-12.log"
+    },
+    {
+      "suite": "qa/billing-test.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 101,
+      "passLines": 24,
+      "evidence": "qa/v323/evidence/local-13.log"
+    },
+    {
+      "suite": "qa/tracking-test.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 191,
+      "passLines": 9,
+      "evidence": "qa/v323/evidence/local-14.log"
+    },
+    {
+      "suite": "qa/math-audit.cjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 197,
+      "passLines": 7,
+      "evidence": "qa/v323/evidence/local-15.log"
+    },
+    {
+      "suite": "qa/deep-audit-data-gps-consent-test.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 146,
+      "passLines": 4,
+      "evidence": "qa/v323/evidence/local-16.log"
+    },
+    {
+      "suite": "qa/deep-audit-ui-probes.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 266,
+      "passLines": 13,
+      "evidence": "qa/v323/evidence/local-17.log"
+    },
+    {
+      "suite": "qa/deep-audit-integrations-auth.cjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 32,
+      "passLines": 6,
+      "evidence": "qa/v323/evidence/local-18.log"
+    },
+    {
+      "suite": "qa/deep-audit-integrations-ui.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 232,
+      "passLines": 7,
+      "evidence": "qa/v323/evidence/local-19.log"
+    },
+    {
+      "suite": "qa/deep-audit-integrations-invite-context.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 153,
+      "passLines": 3,
+      "evidence": "qa/v323/evidence/local-20.log"
+    },
+    {
+      "suite": "qa/deep-audit-payments-boundaries.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 49,
+      "passLines": 5,
+      "evidence": "qa/v323/evidence/local-21.log"
+    },
+    {
+      "suite": "qa/deep-audit-payments-checkout-race.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 47,
+      "passLines": 0,
+      "evidence": "qa/v323/evidence/local-22.log"
+    },
+    {
+      "suite": "qa/v323/legacy-hours-test.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 350,
+      "passLines": 12,
+      "evidence": "qa/v323/evidence/local-23.log"
+    },
+    {
+      "suite": "qa/v323/backup-budget-test.cjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 815,
+      "passLines": 10,
+      "evidence": "qa/v323/evidence/local-24.log"
+    },
+    {
+      "suite": "qa/v323/session-client-test.cjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 79,
+      "passLines": 26,
+      "evidence": "qa/v323/evidence/local-25.log"
+    },
+    {
+      "suite": "qa/v323/session-diagnostics-test.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 116,
+      "passLines": 12,
+      "evidence": "qa/v323/evidence/local-26.log"
+    },
+    {
+      "suite": "qa/v323/gps-lifecycle-test.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 165,
+      "passLines": 7,
+      "evidence": "qa/v323/evidence/local-27.log"
+    },
+    {
+      "suite": "qa/v323/gps-review-test.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 148,
+      "passLines": 4,
+      "evidence": "qa/v323/evidence/local-28.log"
+    },
+    {
+      "suite": "qa/v323/sync-integration-test.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 1734,
+      "passLines": 23,
+      "evidence": "qa/v323/evidence/local-29.log"
+    },
+    {
+      "suite": "qa/v323/device-data-test.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 644,
+      "passLines": 28,
+      "evidence": "qa/v323/evidence/local-30.log"
+    }
+  ],
+  "sourceSha256": {
+    "app.js": "922b4511fc7835c1ce1f5acc37bffba44f84b99cdc07072a7871ede35d1f684b",
+    "backup-budget.js": "010f7617030478dc9946e750803761753ff6db147171af24b7032d1599bfae54",
+    "billing-config.js": "ca7746910103a4f43a7b044faab212e60a23feaca6871bb9812d2ec59aeade8c",
+    "billing.js": "84ad7b98e1534dcf233bf78cf9adbb6726b3b93d85d6665e68751d7167605492",
+    "business-client.js": "b213c965d4f55cbee2147de76a2350b901641ef0216840d939715e18eac785f7",
+    "business-core.js": "459c295e72090dc157a3bcd3566875a6bc2a89eb01828cc1986653158c8c8b70",
+    "business-ui.js": "96522bde47de2f6ab2b0ad08cdacb4fa37b585aa372b4f42a31c8225282ffaf9",
+    "business.css": "3551149f0a700f0c31c943b557109468899b25bd1b688e28f4df1d3e4caa49f8",
+    "cloud-client.js": "c4eeafd9cfb28d81f2e753318a579a05e937d5436e2e4eb64a3432af7a2e7d30",
+    "cloud-config.js": "7878a784cd5ff0122f706713ddc7c79e71d30e7dcdba6ba2179940efb6ef1314",
+    "cloud-sync.js": "254864867ad9fb07ff763bc7b33f3822dab086d16925bf135896647085be15f3",
+    "cloud.css": "53e6cbc84f867615ec73cc86866fd340be0ef88d3f246033b3796676f45af479",
+    "device-data.js": "68dded06363b64c7a4b30be6efae80eebe5f7a59cb44554d903a53599022914c",
+    "enhancements.css": "2bc64d8cd92f42db46b28e80a45644f5094851276d546bd1e01546edb60b1f53",
+    "exclusao-dados.html": "a7942911de93ce6b8e2e2943d915cba83b62fa2c85b0f1777cc51e95293a9e41",
+    "experience.js": "f3b23ec1c1032cb9b24fd46a0203fed1d08d87de322ab1aaf6d4a0f4a4a52223",
+    "fleet.css": "b9dca2183b0bd45f71be67c17ea2adee91e547a2b4ce8c47fc538d651c23e743",
+    "google-identity.js": "3509c36284b184bc06fd792685ee5877b52c19030816fbf04c2f88f85b6979e7",
+    "gps-core.js": "e2651907be91a409f438e46a893345ad228bf68bf523b5d5d8b847c8a13015a6",
+    "index.html": "6a9551da88f0ee5e31b000da8dcc1471fef44ec8b85b5c3352fdb3473b35fc50",
+    "interactions.js": "fedb140f66615f2f13ac8a45170ac1317443477acc4f270ccaa2be79fed02710",
+    "privacidade.html": "397c1fa69528f72bf5b15c18f06a86bc61338750eeb57afae67bdf0debcddc72",
+    "profiles-core.js": "886514169889df2bf090aa0f07cb747ea02768d68d3bd364168701d07bbc5e66",
+    "profiles-ui.js": "5b0285d77cbc891e0423889b832cbfc560fb92bac1b0699ec47c79119efc5e86",
+    "profiles.css": "3a94861ff1fae80271db3885c7908dabf1e2b8a61577fd0eccc4af32eb1e1bfb",
+    "session-diagnostics.js": "46bcf56880ffcab0d62844c45de91e002b75a66f89ed85321287db1bcd7d2f80",
+    "styles.css": "a1cf98f3464ba3e3cea1f6c669ef3a78243cfa40c1a5ae1c0559130777df02de",
+    "sw.js": "1ef4528526de0ce720156b654a4244971bdb20d8e730addeef1ca0665ecec4c1",
+    "tracking.js": "a1ba75091376f52f5015f1c8cacc361dc25238a1defc249c58bd9de60af3a9fa",
+    "transport-art.css": "728b136a7fef8ee0fcf997e96f6ac560ba744cb13c093467f97a4b4e3e69c5db",
+    "vehicle-catalog.js": "0a06b04524c9c60226fcefd83b54608cdb38ed7bf8e080d895bde2f255803ce6"
+  }
+}
